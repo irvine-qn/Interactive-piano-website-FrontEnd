@@ -29,8 +29,10 @@ Sign in (lưu nhạc, bản sheet upload): phải đăng nhập mới chơi đư
 
 # Hướng phát triển: 
 - Cho phép hướng dẫn người dùng chơi music sheet theo bàn phím
----
+
+
 # Ý tưởng cho các feature
 
----
+
+
 "How to use git reposity in practice"
