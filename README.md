@@ -7,15 +7,19 @@ The website includes FE, BE and database and deployment.
 
 
 # Technologies
-Language: 
+Runtime Environment: NodeJS
 
-Deployment: 
+Language: Javascript
 
-Database: 
+Deployment: mua tên miền
+
+Database: PostgreSQL
 
 Rest API: 
 
-Libraries:
+Libraries: ReactJS
+
+Framework: Express.js
 
 Method tạo âm nhạc:
 
