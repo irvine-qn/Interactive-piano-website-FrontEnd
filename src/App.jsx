@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import React, { Suspense } from "react";
+import "./App.css";
 
 const Home = React.lazy(() => import("./virtual-piano/home"));
 
