@@ -1,12 +1,18 @@
-import React, { Suspense } from "react";
-import "./App.css";
-
-const Home = React.lazy(() => import("./virtual-piano/home"));
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import { AudioProvider } from "./contexts/AudioContext";
+import HomePage from "./pages/index";
 
 const App = () => (
-  <Suspense fallback={<div>Loading...</div>}>
-    <Home />
-  </Suspense>
+  <BrowserRouter>
+    <AuthProvider>
+      <AudioProvider>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+        </Routes>
+      </AudioProvider>
+    </AuthProvider>
+  </BrowserRouter>
 );
 
 export default App;
