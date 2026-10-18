@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import Key from './Key';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
-import { KEYBOARD_TO_NOTE_MAP } from '../config/keyMapping';
+import { KEYBOARD_TO_NOTE_MAP, NOTE_TO_KEYBOARD_MAP } from '../config/keyMapping';
 
 const NOTES_IN_OCTAVE = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
@@ -72,6 +72,7 @@ const PianoKeyboard = () => {
           <Key
             key={keyObj.note}
             note={keyObj.note}
+            hint={NOTE_TO_KEYBOARD_MAP[keyObj.note]}
             isBlack={keyObj.isBlack}
             isActive={activeKeys.includes(keyObj.note)}
             onMouseDown={pressKey}

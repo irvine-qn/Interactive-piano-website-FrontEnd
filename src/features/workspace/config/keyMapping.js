@@ -21,3 +21,9 @@ export const KEYBOARD_TO_NOTE_MAP = {
   'c': 'F6', 'C': 'F#6', 'v': 'G6', 'V': 'G#6', 'b': 'A6', 'B': 'A#6', 'n': 'B6',
   'm': 'C7'
 };
+
+// Trích xuất map ngược từ NOTE sang KEYBOARD
+export const NOTE_TO_KEYBOARD_MAP = Object.entries(KEYBOARD_TO_NOTE_MAP).reduce((acc, [key, note]) => {
+  acc[note] = key;
+  return acc;
+}, {});
