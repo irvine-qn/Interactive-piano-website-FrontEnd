@@ -1,111 +1,188 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
 :root {
-  --text: #7e3325;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  /* Mau muc va chu chinh */
+  --color-ink: #2b2d42;               /* Vien bong va tieu de */
+  --color-ink-soft: #1f3b57;          /* Chu phu tren nen troi */
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  /* Mau thuong hieu */
+  --color-brand: #ff7a1a;             /* Nut chinh va muc dang chon */
+  --color-brand-strong: #e8630a;      /* Bieu tuong va lien ket */
+  --color-brand-deep: #c2410c;        /* Chu tren nen cam nhat */
+  --color-brand-light: #ffb27a;       /* Nut dang tai va phim dang nhan */
+  --color-brand-tint: #ffe8d1;        /* Nen the va bieu tuong */
+  --color-brand-wash: #ffd9b8;        /* Phim trang dang nhan */
+  --color-brand-glow: #ffe2c7;        /* Vet sang waterfall */
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Mau nen */
+  --color-surface-page: #fff8ea;      /* Nen trang */
+  --color-surface-card: #ffffff;      /* The va bang dieu khien */
+  --color-surface-soft: #fff4dc;      /* Nen khu vuc phu */
+  --color-surface-warm: #fffbf2;      /* Nen ban nhap */
+  --color-surface-paper: #fffdf6;     /* Nen phim roi */
+  --color-surface-muted: #f6f1e7;     /* Nen noi dung vo hieu */
+  --color-surface-disabled: #efe8da;  /* Nen nut bi khoa */
+  --color-skeleton: #f1e6cf;          /* Nen dang tai */
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+  /* Mau duong vien */
+  --color-line-dashed: #e7dcc6;       /* Duong chia va thanh do manh */
+  --color-line-soft: #f1e8d6;         /* Duong truot va ngan cach */
+  --color-line-keybed: #ede3d0;       /* De phim va day phim trang */
+  --color-line-disabled: #c9c0ae;     /* Vien noi dung bi khoa */
+  --color-line-handle: #d9cfbd;       /* Tay cam va phim thu nho */
+  --color-line-lane: #f6eedd;         /* Lan phim waterfall */
+  --color-line-lane-octave: #eadfc8;  /* Ranh gioi quang phim */
+  --color-line-grid: #fbf4e4;         /* Luoi waterfall */
+  --color-line-staff: #2b2d42;        /* Khuong nhac */
+
+  /* Mau chu phu */
+  --color-neutral-700: #4b5563;       /* Noi dung phu dam */
+  --color-neutral-600: #5b6476;       /* Chu phu chinh */
+  --color-neutral-500: #6b7280;       /* Bieu tuong va nghe si */
+  --color-neutral-450: #7a8299;       /* Ten tac gia */
+  --color-neutral-400: #8a94a6;       /* Goi y va thong tin phu */
+  --color-neutral-350: #9aa3b2;       /* Chu cho tim kiem */
+  --color-neutral-300: #a9b0be;       /* Chu cho nhap lieu */
+  --color-neutral-250: #b8bfcc;       /* Dau ngan cach */
+  --color-neutral-200: #b9b0a0;       /* Bieu tuong trang trong */
+  --color-neutral-white: #ffffff;
+
+  /* Mau troi */
+  --color-sky-1: #4fc3f7;
+  --color-sky-2: #62cbf8;
+  --color-sky-3: #78d3f9;
+  --color-sky-4: #8edbfa;
+  --color-sky-5: #a5e3fb;
+  --color-sky-6: #bcebfc;
+  --color-sky-mobile-2: #6acff8;      /* Troi tren dien thoai */
+  --color-sky-mobile-4: #b0e7fc;
+  --color-cloud: #ffffff;
+  --color-cloud-shade: #d7eefb;
+  --color-sun: #ffd84d;
+  --color-sun-ray: #ffb627;
+
+  /* Mau co */
+  --color-grass-light: #86dd5b;       /* Ngon co */
+  --color-grass: #5cc64a;             /* Than co */
+  --color-grass-dark: #3fa43a;        /* Chan co */
+  --color-grass-deep: #3e9e3a;        /* Nen chan trang */
+  --color-grass-stem: #2f8f37;        /* Than hoa */
+  --color-grass-text: #d9f5d0;        /* Chu chan trang */
+  --color-grass-text-soft: #e4f7dd;   /* Chu ban quyen */
+  --color-status-online: #7cffb2;
+
+  /* Mau trang tri */
+  --color-decor-pink: #ff8fb1;
+  --color-decor-lilac: #b99cff;
+  --color-decor-sky: #7cc8ff;
+  --color-decor-peach: #ffb27a;
+  --color-banner-peach: #ffe7c9;
+  --color-banner-check: #ffddb5;
+  --color-brick: #e9843a;
+  --color-brick-mortar: #b85c1e;
+  --color-brick-cap: #f4a261;
+
+  /* Mau the nhac */
+  --color-pastel-yellow: #ffe58f;
+  --color-pastel-pink: #ffc9d9;
+  --color-pastel-mint: #bdefd0;
+  --color-pastel-lavender: #d8d0ff;
+  --color-pastel-cream: #fff7e0;
+  --color-pastel-ice: #eaf6ff;
+  --color-pastel-slate: #e7eef8;
+  --color-draft-icon: #7a8ba8;
+  --color-file-icon: #5b6b8a;
+
+  /* Mau phim dan */
+  --color-key-white: #ffffff;
+  --color-key-black: #24263a;
+  --color-key-black-edge: #3b3e58;
+  --color-key-black-mini: #5b5e75;
+  --color-key-label: #64748b;
+  --color-key-label-black: #c9cedc;
+  --color-key-pressed: var(--color-brand-wash);
+  --color-key-hint: #d6f0ff;
+  --color-key-hint-text: #0284c7;
+  --color-piano-wood: #8a5230;
+  --color-piano-wood-grain: #9c6139;
+  --color-piano-felt: #c0392b;
+
+  /* Mau not roi */
+  --color-note-orange-top: #ffe29a;
+  --color-note-orange-mid: #ffa24d;
+  --color-note-orange-end: #ff6a00;
+  --color-note-blue-top: #9ee3ff;
+  --color-note-blue-mid: #2aa8e8;
+  --color-note-blue-end: #0b84c9;
+  --color-progress-start: #38bdf8;
+  --color-progress-mid: #ff7a1a;
+  --color-progress-end: #fbbf24;
+
+  /* Mau trang thai */
+  /* Mau bao loi */
+  --color-danger: #e11d48;
+  --color-danger-strong: #be123c;
+  --color-danger-deep: #9f1239;
+  --color-danger-bright: #f43f5e;
+  --color-danger-tint: #ffe4ea;
+  --color-danger-wash: #fff5f7;
+
+  /* Mau thanh cong */
+  --color-success: #059669;
+  --color-success-strong: #047857;
+  --color-success-deep: #166534;
+  --color-success-bright: #34d399;
+  --color-success-border: #16a34a;
+  --color-success-tint: #d7f7e4;
+  --color-success-wash: #effbf4;
+  --color-success-banner: #dcfce7;
+
+  /* Mau canh bao */
+  --color-warning: #b45309;
+  --color-warning-deep: #92400e;
+  --color-warning-bright: #fbbf24;
+  --color-warning-border: #f59e0b;
+  --color-warning-tint: #fff3c4;
+  --color-warning-wash: #fff4e8;
+  /* Mau thong tin */
+  --color-info: #0284c7;
+  --color-info-strong: #0369a1;
+  --color-info-deep: #075985;
+  --color-info-bright: #0ea5e9;
+  --color-info-tint: #e0f2fe;
+  --color-info-blue: #2563eb;
+  --color-info-blue-tint: #dcebff;
+
+  /* Nen phu hop thoai */
+  --color-overlay: rgba(43, 45, 66, 0.55);
+
+  --radius: 0;
+  --border-width: 2px;
+  --shadow-hard-sm: 2px 2px 0 var(--color-ink);
+  --shadow-hard: 4px 4px 0 var(--color-ink);
+  --shadow-hard-lg: 6px 6px 0 var(--color-ink);
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
+/* Nen tang trang */
+* {
+  box-sizing: border-box;
+  border-radius: var(--radius);
+}
 
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  background: var(--bg-page);
+  -webkit-font-smoothing: antialiased;
 }
 
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
-
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
-
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+/* Anh dai dien co goc tron */
+.avatar {
+  border-radius: 50%;
 }
