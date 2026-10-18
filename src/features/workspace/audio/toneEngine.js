@@ -40,7 +40,7 @@ export const pianoSampler = new Tone.Sampler({
   // Sử dụng bộ âm thanh Salamander Grand Piano mã nguồn mở được host sẵn trên server của Tone.js
   // (Sau này chúng ta có thể tải về host trên S3 của mình sau)
   baseUrl: "https://tonejs.github.io/audio/salamander/",
-  release: 1,
+  release: 10,
   onload: () => {
     console.log("Fiano Audio Engine: Piano samples loaded!");
   }

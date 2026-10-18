@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Key from './Key';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
+import { KEYBOARD_TO_NOTE_MAP } from '../config/keyMapping';
 
 const NOTES_IN_OCTAVE = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
@@ -34,6 +35,34 @@ const PianoKeyboard = () => {
 
   // Quyết định dùng mảng nào dựa trên Mode hiện tại
   const displayedKeys = currentMode === 'AUTO_PLAY' ? PIANO_KEYS_88 : PIANO_KEYS_61;
+
+  // --- LẮNG NGHE BÀN PHÍM ---
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Bỏ qua nếu người dùng đang nhấn các phím Ctrl/Cmd/Alt (để dùng phím tắt trình duyệt)
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      
+      const note = KEYBOARD_TO_NOTE_MAP[e.key];
+      if (note && !e.repeat) { // e.repeat = true khi giữ đè phím, ta bỏ qua để không phát tiếng liên tục
+        pressKey(note);
+      }
+    };
+
+    const handleKeyUp = (e) => {
+      const note = KEYBOARD_TO_NOTE_MAP[e.key];
+      if (note) {
+        releaseKey(note);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [pressKey, releaseKey]); // Chạy một lần khi component mount
 
   return (
     // Dùng justify-start để đảm bảo thanh cuộn không bị ăn mất phím bên trái khi thu nhỏ màn hình
