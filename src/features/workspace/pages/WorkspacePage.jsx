@@ -14,31 +14,37 @@ const WorkspacePage = () => {
         <h1 className="text-3xl font-black text-gray-800 tracking-wider">
           FIANO<span className="text-[#ff7a1a]">.</span>
         </h1>
-        {/* Sau này Info Sheet (Tên bài hát, tác giả...) sẽ nằm ở đây */}
       </div>
 
-      {/* TẦNG 2: CONTROL BAR (FULL WIDTH) */}
+      {/* TẦNG 2: CONTROL BAR */}
       <div className="w-full border-y border-gray-300 shadow-sm shrink-0">
-        {/* Bên trong ControlBar hiện tại đang có margin và max-width, ta sẽ xóa max-width ở file kia sau */}
         <ControlBar />
       </div>
 
-      {/* TẦNG 3: WATERFALL CANVAS (FLEX-1 ĐỂ ĐẨY PIANO XUỐNG ĐÁY) */}
-      <div className="flex-1 w-full flex items-center justify-center relative bg-white bg-opacity-40">
-         {currentMode !== 'FREE_PLAY' ? (
-           <div className="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none">
-             <p className="text-2xl font-bold text-gray-500">Khu vực hiển thị Sheet nhạc / Waterfall đang được xây dựng...</p>
-           </div>
-         ) : (
-            <div className="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none">
-             <p className="text-2xl font-bold text-gray-500">Free Play Mode</p>
-           </div>
-         )}
-      </div>
-      
-      {/* TẦNG 4: PIANO KEYBOARD */}
-      <div className="w-full max-w-[95vw] mx-auto shrink-0 pb-4 pt-2">
-        <PianoKeyboard />
+      {/* TẦNG 3 + 4: KHU VỰC CANAVAS & PIANO */}
+      {/* Không còn overflow-x-auto nữa, mọi thứ nằm vừa in 100% */}
+      <div className="flex-1 w-full flex flex-col items-center">
+        
+        {/* Đổi lại thành w-full thay vì w-max */}
+        <div className="flex flex-col w-full h-full mx-auto px-4">
+          
+          {/* TẦNG 3: WATERFALL CANVAS CONTAINER */}
+          <div className="flex-1 relative w-full bg-[#f8f9fa] bg-opacity-90 border-b-4 border-[#ff7a1a] rounded-t-lg overflow-hidden">
+             {/* Tạm thời hiển thị text giữ chỗ */}
+             <div className="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none">
+                <p className="text-xl font-bold text-gray-500">
+                  [{currentMode}] Waterfall Area
+                </p>
+             </div>
+          </div>
+          
+          {/* TẦNG 4: PIANO KEYBOARD */}
+          {/* Bàn phím giờ sẽ tự động co giãn theo width này */}
+          <div className="w-full shrink-0 pb-4 pt-0">
+            <PianoKeyboard />
+          </div>
+
+        </div>
       </div>
 
     </div>
