@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import defaultAvatar from "../../assets/virtual-piano-assets/default-avatar.jpeg";
 import fianoLogo from "../../assets/virtual-piano-assets/fiano-logo.png";
 import foxMascot from "../../assets/virtual-piano-assets/fox-mascot.png";
-import searchIcon from "../../assets/virtual-piano-assets/search-icon.png";
+import { Search } from "lucide-react";
 
 const NAV_ITEMS = [
   { to: "/", label: "Piano" },
@@ -35,7 +35,11 @@ const Navbar = () => (
           placeholder="Find some music?"
           className="min-w-0 flex-1 appearance-none border-0 bg-transparent p-0 font-[inherit] text-sm text-[var(--color-ink)] outline-none placeholder:text-[var(--color-neutral-350)]"
         />
-        <img src={searchIcon} alt="" className="h-[26px] w-7" />
+        <img
+          src={Search}
+          alt=""
+          className="h-[26px] w-7 color-(--color-brand)"
+        />
       </label>
       <nav
         aria-label="Main navigation"
