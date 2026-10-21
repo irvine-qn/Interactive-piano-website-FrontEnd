@@ -1,25 +1,24 @@
-import { Link } from "react-router-dom";
+import Metronome from "../metronome/metronome";
+import Piano from "../piano/piano";
 
 const Home = () => (
-  <main className="min-h-screen bg-[var(--color-surface-page)] px-6 py-12 text-[var(--color-ink)]">
-    <section className="mx-auto w-full max-w-4xl">
-      <h1 className="mb-8 text-3xl font-bold">Home</h1>
-      <nav aria-label="Home features" className="grid gap-6 sm:grid-cols-2">
-        <Link
-          to="/piano"
-          className="block border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] p-6 font-semibold text-[var(--color-ink)] no-underline shadow-[var(--shadow-hard)] transition-shadow hover:shadow-[var(--shadow-hard-lg)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand)]"
-        >
-          Piano
-        </Link>
-        <Link
-          to="/metronome"
-          className="block border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] p-6 font-semibold text-[var(--color-ink)] no-underline shadow-[var(--shadow-hard)] transition-shadow hover:shadow-[var(--shadow-hard-lg)] focus-visible:outline-2 focus-visible:outline-[var(--color-brand)]"
-        >
-          Metronome
-        </Link>
-      </nav>
-    </section>
-  </main>
+  <div className="flex flex-1 flex-col">
+    <main className="mx-auto w-full max-w-[1600px] flex-1 overflow-x-auto px-4 pb-14 pt-10">
+      <Piano>
+        <Metronome />
+      </Piano>
+    </main>
+    <footer className="flex flex-col">
+      <span
+        aria-hidden="true"
+        className="h-[18px] bg-[repeating-linear-gradient(90deg,var(--color-grass)_0_6px,transparent_6px_12px,var(--color-grass)_12px_24px,transparent_24px_30px,var(--color-grass-light)_30px_36px,transparent_36px_42px),linear-gradient(to_bottom,transparent_0_12px,var(--color-grass)_12px)]"
+      />
+      <div className="flex h-[78px] items-center justify-center bg-[var(--color-grass)] text-sm font-semibold text-[var(--color-grass-text)]">
+        @2026 - Team 5
+      </div>
+      <span aria-hidden="true" className="h-6 bg-[var(--color-grass-dark)]" />
+    </footer>
+  </div>
 );
 
 export default Home;

@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { ChevronDown, Keyboard } from "lucide-react";
+import Waterfall from "./waterfall";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const BLACK_KEY_RATIO = 0.62;
+const OCTAVE_SIZE = 12;
 
-const Piano = () => {
+const Piano = ({ children }) => {
   const [notes, setNotes] = useState([]);
   const [showKeyboardHints, setShowKeyboardHints] = useState(true);
+  const [octaveShift, setOctaveShift] = useState(0);
   const [activeNotes, setActiveNotes] = useState(new Set());
   const [error, setError] = useState("");
   const audioContextRef = useRef(null);
@@ -14,19 +18,50 @@ const Piano = () => {
   const noteByMidiRef = useRef(new Map());
   const keyboardSourcesRef = useRef(new Map());
 
-  const noteRows = useMemo(() => {
-    const rows = [];
+  const keyLayout = useMemo(() => {
+    const whiteWidth = 100 / notes.filter((note) => !note.name.includes("#")).length;
+    return notes.map((note, index) => {
+      const whiteIndex = notes.slice(0, index).filter((previous) => !previous.name.includes("#")).length;
+      if (note.name.includes("#")) {
+        const width = whiteWidth * BLACK_KEY_RATIO;
+        return { note, black: true, left: whiteIndex * whiteWidth - width / 2, width };
+      }
+      return { note, black: false, left: whiteIndex * whiteWidth, width: whiteWidth };
+    });
+  }, [notes]);
+
+  const octaveRange = useMemo(() => {
+    const mappedMidis = notes.filter((note) => note.keyboardKey).map((note) => note.midi);
+    if (!mappedMidis.length) {
+      return { min: 0, max: 0 };
+    }
+    return {
+      min: -Math.floor((Math.min(...mappedMidis) - notes[0].midi) / OCTAVE_SIZE),
+      max: Math.floor((notes[notes.length - 1].midi - Math.max(...mappedMidis)) / OCTAVE_SIZE),
+    };
+  }, [notes]);
+
+  const keyboardMapping = useMemo(() => {
+    const noteByMidi = new Map(notes.map((note) => [note.midi, note]));
+    const noteByKey = new Map();
     notes.forEach((note) => {
-      const octave = Math.floor(note.midi / 12) - 1;
-      const lastRow = rows[rows.length - 1];
-      if (!lastRow || lastRow.octave !== octave) {
-        rows.push({ octave, notes: [note] });
-      } else {
-        lastRow.notes.push(note);
+      const shiftedNote = noteByMidi.get(note.midi + octaveShift * OCTAVE_SIZE);
+      if (note.keyboardKey && shiftedNote) {
+        noteByKey.set(note.keyboardKey, shiftedNote);
       }
     });
-    return rows;
-  }, [notes]);
+    const mappedNotes = Array.from(noteByKey.values());
+    return {
+      noteByKey,
+      keyByNote: new Map(Array.from(noteByKey, ([key, note]) => [note.name, key])),
+      firstNote: mappedNotes[0]?.name ?? "",
+      lastNote: mappedNotes[mappedNotes.length - 1]?.name ?? "",
+    };
+  }, [notes, octaveShift]);
+
+  useEffect(() => {
+    noteByKeyboardKeyRef.current = keyboardMapping.noteByKey;
+  }, [keyboardMapping]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -57,11 +92,6 @@ const Piano = () => {
         }
 
         setNotes(validNotes);
-        noteByKeyboardKeyRef.current = new Map(
-          validNotes
-            .filter((note) => note.keyboardKey)
-            .map((note) => [note.keyboardKey, note]),
-        );
         noteByMidiRef.current = new Map(
           validNotes.map((note) => [note.midi, note]),
         );
@@ -310,50 +340,138 @@ const Piano = () => {
   };
 
   return (
-    <>
-      <Link to="/">Home</Link>
-      <header>Virtual Piano</header>
-      <main>
-        <section aria-label="Piano controls">
-          <label>
-            <input
-              type="checkbox"
-              checked={showKeyboardHints}
-              onChange={(event) => setShowKeyboardHints(event.target.checked)}
+    <section aria-label="Virtual piano" className="flex min-w-[1200px] flex-col gap-6">
+      <Waterfall keyLayout={keyLayout} activeNotes={activeNotes} />
+
+      <section
+        aria-label="Piano controls"
+        className="flex flex-wrap items-center gap-x-5 gap-y-3 border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-[14px] py-[12px] shadow-[var(--shadow-hard)]"
+      >
+        {children}
+        <label className="ml-10 flex items-center gap-2 text-sm font-bold text-[var(--color-ink)]">
+          <Keyboard aria-hidden="true" className="h-4 w-4 text-[var(--color-brand-strong)]" />
+          Hiển thị phím:
+          <span className="relative ml-4 flex">
+            <select
+              value={showKeyboardHints ? "hints" : "names"}
+              onChange={(event) => setShowKeyboardHints(event.target.value === "hints")}
+              className="h-9 w-[186px] cursor-pointer appearance-none font-[inherit] border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] pl-3 pr-8 text-sm font-bold text-[var(--color-brand-strong)] outline-none"
+            >
+              <option value="hints">Phím tắt + Tên nốt</option>
+              <option value="names">Tên nốt</option>
+            </select>
+            <ChevronDown
+              aria-hidden="true"
+              className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-ink)]"
             />
-            Show keys
-          </label>
-        </section>
-        {error && <p role="alert">{error}</p>}
-        <table aria-label="Virtual piano keyboard">
-          <tbody>
-            {noteRows.map((row) => (
-              <tr key={row.octave}>
-                {row.notes.map((note) => (
-                  <td key={note.midi}>
-                    <button
-                      type="button"
-                      aria-label={`${note.name}${note.keyboardKey ? `, key ${note.keyboardKey}` : ""}`}
-                      aria-pressed={activeNotes.has(note.name)}
-                      onPointerDown={(event) => handlePointerDown(note, event)}
-                      onPointerUp={handlePointerUp}
-                      onPointerCancel={handlePointerUp}
-                      onClick={(event) => handleAccessibleClick(note, event)}
+          </span>
+        </label>
+        <div className="ml-auto flex items-center gap-3">
+          <span className="text-sm font-bold text-[var(--color-neutral-600)]">Octave Shift:</span>
+          <div className="flex h-10 items-center border-2 border-[var(--color-ink)] bg-[var(--color-surface-soft)] px-1">
+            <button
+              type="button"
+              onClick={() => setOctaveShift((shift) => shift - 1)}
+              disabled={octaveShift <= octaveRange.min}
+              aria-label="Shift keyboard down one octave"
+              className="h-7 w-10 cursor-pointer border-0 bg-transparent font-[inherit] text-sm font-bold text-[var(--color-ink)] disabled:cursor-default disabled:text-[var(--color-line-disabled)]"
+            >
+              -1
+            </button>
+            <output
+              aria-live="polite"
+              className="flex h-7 w-24 items-center justify-center border-[1.5px] border-[var(--color-ink)] bg-[var(--color-surface-card)] text-sm font-bold text-[var(--color-brand-deep)]"
+            >
+              {keyboardMapping.firstNote}-{keyboardMapping.lastNote} ({octaveShift > 0 ? `+${octaveShift}` : octaveShift})
+            </output>
+            <button
+              type="button"
+              onClick={() => setOctaveShift((shift) => shift + 1)}
+              disabled={octaveShift >= octaveRange.max}
+              aria-label="Shift keyboard up one octave"
+              className="h-7 w-10 cursor-pointer border-0 bg-transparent font-[inherit] text-sm font-bold text-[var(--color-ink)] disabled:cursor-default disabled:text-[var(--color-line-disabled)]"
+            >
+              +1
+            </button>
+          </div>
+        </div>
+        {error && (
+          <p role="alert" className="w-full text-sm font-semibold text-[var(--color-danger)]">
+            {error}
+          </p>
+        )}
+      </section>
+
+      <div className="relative border-2 border-[var(--color-ink)] bg-[var(--color-piano-wood)] p-[14px] shadow-[var(--shadow-hard-lg)]">
+        <span
+          aria-hidden="true"
+          className="absolute inset-x-[6px] top-[3px] h-[2px] bg-[repeating-linear-gradient(90deg,var(--color-piano-wood-grain)_0_8px,transparent_8px_16px)]"
+        />
+        <div className="h-[10px] border-2 border-[var(--color-ink)] bg-[var(--color-piano-felt)]" />
+        <div
+          role="group"
+          aria-label="Virtual piano keyboard"
+          className="relative h-[296px] select-none border-l-[1.5px] border-[var(--color-ink)]"
+        >
+          {keyLayout.map(({ note, black, left, width }) => {
+            const isActive = activeNotes.has(note.name);
+            const keyboardKey = keyboardMapping.keyByNote.get(note.name);
+            return (
+              <button
+                key={note.midi}
+                type="button"
+                aria-label={`${note.name}${keyboardKey ? `, key ${keyboardKey}` : ""}`}
+                aria-pressed={isActive}
+                onPointerDown={(event) => handlePointerDown(note, event)}
+                onPointerUp={handlePointerUp}
+                onPointerCancel={handlePointerUp}
+                onClick={(event) => handleAccessibleClick(note, event)}
+                style={{ left: `${left}%`, width: `${width}%` }}
+                className={
+                  black
+                    ? `absolute top-0 z-10 flex px-0 font-[inherit] h-[60%] flex-col items-center justify-end border-[1.5px] border-t-0 border-[var(--color-ink)] pb-[8px] shadow-[var(--shadow-hard-sm)] ${
+                        isActive ? "bg-[var(--color-brand-light)]" : "bg-[var(--color-key-black)]"
+                      }`
+                    : `absolute top-0 flex h-full px-0 font-[inherit] flex-col items-center justify-end border-[1.5px] border-l-0 border-t-0 border-[var(--color-ink)] pb-[12px] ${
+                        isActive ? "bg-[var(--color-key-pressed)]" : "bg-[var(--color-key-white)]"
+                      }`
+                }
+              >
+                {black ? (
+                  <>
+                    {showKeyboardHints && keyboardKey && (
+                      <kbd className="font-[inherit] text-[9px] font-bold text-[var(--color-brand-light)]">{keyboardKey}</kbd>
+                    )}
+                    <span className="text-[9px] font-bold text-[var(--color-key-label-black)]">{note.name}</span>
+                    <span aria-hidden="true" className="mt-[3px] h-1 w-[80%] bg-[var(--color-key-black-edge)]" />
+                  </>
+                ) : (
+                  <>
+                    {isActive && <span aria-hidden="true" className="mb-[4px] h-[6px] w-[6px] bg-[var(--color-brand)]" />}
+                    {showKeyboardHints && keyboardKey && (
+                      <kbd className="font-[inherit] text-[11px] font-bold text-[var(--color-ink)]">{keyboardKey}</kbd>
+                    )}
+                    <span
+                      className={`text-[11px] font-bold ${
+                        isActive ? "text-[var(--color-brand)]" : "text-[var(--color-key-label)]"
+                      }`}
                     >
-                      {showKeyboardHints && note.keyboardKey && (
-                        <kbd>{note.keyboardKey}</kbd>
-                      )}
-                      <span>{note.name.replace("#", "♯")}</span>
-                    </button>
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </main>
-      <footer>@2026 - Team 5</footer>
-    </>
+                      {note.name}
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      className={`absolute inset-x-0 bottom-0 h-[6px] ${
+                        isActive ? "bg-[var(--color-brand-light)]" : "bg-[var(--color-line-keybed)]"
+                      }`}
+                    />
+                  </>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </section>
   );
 };
 
