@@ -12,31 +12,56 @@ const Piano = ({ children }) => {
   const [showKeyboardHints, setShowKeyboardHints] = useState(true);
   const [octaveShift, setOctaveShift] = useState(0);
   const [error, setError] = useState("");
-  const { activeNotes, startNote, releaseNote, releaseNotesFrom } = usePianoSound(setError);
+  const {
+    activeNotes,
+    isLoading: isSoundLoading,
+    startNote,
+    releaseNote,
+    releaseNotesFrom,
+  } = usePianoSound(setError);
   const noteByKeyboardKeyRef = useRef(new Map());
   const noteByMidiRef = useRef(new Map());
   const keyboardSourcesRef = useRef(new Map());
 
   const keyLayout = useMemo(() => {
-    const whiteWidth = 100 / notes.filter((note) => !note.name.includes("#")).length;
+    const whiteWidth =
+      100 / notes.filter((note) => !note.name.includes("#")).length;
     return notes.map((note, index) => {
-      const whiteIndex = notes.slice(0, index).filter((previous) => !previous.name.includes("#")).length;
+      const whiteIndex = notes
+        .slice(0, index)
+        .filter((previous) => !previous.name.includes("#")).length;
       if (note.name.includes("#")) {
         const width = whiteWidth * BLACK_KEY_RATIO;
-        return { note, black: true, left: whiteIndex * whiteWidth - width / 2, width };
+        return {
+          note,
+          black: true,
+          left: whiteIndex * whiteWidth - width / 2,
+          width,
+        };
       }
-      return { note, black: false, left: whiteIndex * whiteWidth, width: whiteWidth };
+      return {
+        note,
+        black: false,
+        left: whiteIndex * whiteWidth,
+        width: whiteWidth,
+      };
     });
   }, [notes]);
 
   const octaveRange = useMemo(() => {
-    const mappedMidis = notes.filter((note) => note.keyboardKey).map((note) => note.midi);
+    const mappedMidis = notes
+      .filter((note) => note.keyboardKey)
+      .map((note) => note.midi);
     if (!mappedMidis.length) {
       return { min: 0, max: 0 };
     }
     return {
-      min: -Math.floor((Math.min(...mappedMidis) - notes[0].midi) / OCTAVE_SIZE),
-      max: Math.floor((notes[notes.length - 1].midi - Math.max(...mappedMidis)) / OCTAVE_SIZE),
+      min: -Math.floor(
+        (Math.min(...mappedMidis) - notes[0].midi) / OCTAVE_SIZE,
+      ),
+      max: Math.floor(
+        (notes[notes.length - 1].midi - Math.max(...mappedMidis)) / OCTAVE_SIZE,
+      ),
     };
   }, [notes]);
 
@@ -52,7 +77,9 @@ const Piano = ({ children }) => {
     const mappedNotes = Array.from(noteByKey.values());
     return {
       noteByKey,
-      keyByNote: new Map(Array.from(noteByKey, ([key, note]) => [note.name, key])),
+      keyByNote: new Map(
+        Array.from(noteByKey, ([key, note]) => [note.name, key]),
+      ),
       firstNote: mappedNotes[0]?.name ?? "",
       lastNote: mappedNotes[mappedNotes.length - 1]?.name ?? "",
     };
@@ -86,7 +113,10 @@ const Piano = ({ children }) => {
             Number.isFinite(note.frequency) &&
             (typeof note.keyboardKey === "string" || note.keyboardKey === null),
         );
-        if (validNotes.length !== data.notes.length || validNotes.length === 0) {
+        if (
+          validNotes.length !== data.notes.length ||
+          validNotes.length === 0
+        ) {
           throw new Error("Piano API returned invalid note data");
         }
 
@@ -109,8 +139,10 @@ const Piano = ({ children }) => {
     const handleKeyDown = (event) => {
       if (
         event.repeat ||
-        event.target instanceof HTMLElement &&
-          event.target.closest("input, textarea, select, [contenteditable=true]")
+        (event.target instanceof HTMLElement &&
+          event.target.closest(
+            "input, textarea, select, [contenteditable=true]",
+          ))
       ) {
         return;
       }
@@ -170,7 +202,7 @@ const Piano = ({ children }) => {
       const source = `midi:${input.id}:${status & 0x0f}:${midi}`;
       if (command === 0x90 && velocity > 0) {
         startNote(note, source);
-      } else if (command === 0x80 || command === 0x90 && velocity === 0) {
+      } else if (command === 0x80 || (command === 0x90 && velocity === 0)) {
         releaseNote(source);
       }
     };
@@ -192,7 +224,8 @@ const Piano = ({ children }) => {
       connectedInputs = inputs;
     };
 
-    navigator.requestMIDIAccess()
+    navigator
+      .requestMIDIAccess()
       .then((midiAccess) => {
         access = midiAccess;
         syncInputs();
@@ -232,7 +265,10 @@ const Piano = ({ children }) => {
   };
 
   return (
-    <section aria-label="Virtual piano" className="flex min-w-[1200px] flex-col gap-6">
+    <section
+      aria-label="Virtual piano"
+      className="flex min-w-[1200px] flex-col gap-6"
+    >
       <Waterfall keyLayout={keyLayout} activeNotes={activeNotes} />
 
       <section
@@ -241,12 +277,17 @@ const Piano = ({ children }) => {
       >
         {children}
         <label className="ml-10 flex items-center gap-2 text-sm font-bold text-[var(--color-ink)]">
-          <Keyboard aria-hidden="true" className="h-4 w-4 text-[var(--color-brand-strong)]" />
+          <Keyboard
+            aria-hidden="true"
+            className="h-4 w-4 text-[var(--color-brand-strong)]"
+          />
           Hiển thị phím:
           <span className="relative ml-4 flex">
             <select
               value={showKeyboardHints ? "hints" : "names"}
-              onChange={(event) => setShowKeyboardHints(event.target.value === "hints")}
+              onChange={(event) =>
+                setShowKeyboardHints(event.target.value === "hints")
+              }
               className="h-9 w-[186px] cursor-pointer appearance-none font-[inherit] border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] pl-3 pr-8 text-sm font-bold text-[var(--color-brand-strong)] outline-none"
             >
               <option value="hints">Phím tắt + Tên nốt</option>
@@ -259,7 +300,9 @@ const Piano = ({ children }) => {
           </span>
         </label>
         <div className="ml-auto flex items-center gap-3">
-          <span className="text-sm font-bold text-[var(--color-neutral-600)]">Octave Shift:</span>
+          <span className="text-sm font-bold text-[var(--color-neutral-600)]">
+            Octave Shift:
+          </span>
           <div className="flex h-10 items-center border-2 border-[var(--color-ink)] bg-[var(--color-surface-soft)] px-1">
             <button
               type="button"
@@ -274,7 +317,8 @@ const Piano = ({ children }) => {
               aria-live="polite"
               className="flex h-7 w-24 items-center justify-center border-[1.5px] border-[var(--color-ink)] bg-[var(--color-surface-card)] text-sm font-bold text-[var(--color-brand-deep)]"
             >
-              {keyboardMapping.firstNote}-{keyboardMapping.lastNote} ({octaveShift > 0 ? `+${octaveShift}` : octaveShift})
+              {keyboardMapping.firstNote}-{keyboardMapping.lastNote} (
+              {octaveShift > 0 ? `+${octaveShift}` : octaveShift})
             </output>
             <button
               type="button"
@@ -287,8 +331,19 @@ const Piano = ({ children }) => {
             </button>
           </div>
         </div>
+        {isSoundLoading && (
+          <p
+            role="status"
+            className="w-full text-sm font-semibold text-[var(--color-neutral-500)]"
+          >
+            Đang tải âm thanh piano...
+          </p>
+        )}
         {error && (
-          <p role="alert" className="w-full text-sm font-semibold text-[var(--color-danger)]">
+          <p
+            role="alert"
+            className="w-full text-sm font-semibold text-[var(--color-danger)]"
+          >
             {error}
           </p>
         )}
@@ -303,7 +358,7 @@ const Piano = ({ children }) => {
         <div
           role="group"
           aria-label="Virtual piano keyboard"
-          className="relative h-[296px] select-none border-l-[1.5px] border-[var(--color-ink)]"
+          className="relative h-[200px] select-none border-l-[1.5px] border-[var(--color-ink)]"
         >
           {keyLayout.map(({ note, black, left, width }) => {
             const isActive = activeNotes.has(note.name);
@@ -322,30 +377,50 @@ const Piano = ({ children }) => {
                 className={
                   black
                     ? `absolute top-0 z-10 flex px-0 font-[inherit] h-[60%] flex-col items-center justify-end border-[1.5px] border-t-0 border-[var(--color-ink)] pb-[8px] shadow-[var(--shadow-hard-sm)] ${
-                        isActive ? "bg-[var(--color-brand-light)]" : "bg-[var(--color-key-black)]"
+                        isActive
+                          ? "bg-[var(--color-brand-light)]"
+                          : "bg-[var(--color-key-black)]"
                       }`
                     : `absolute top-0 flex h-full px-0 font-[inherit] flex-col items-center justify-end border-[1.5px] border-l-0 border-t-0 border-[var(--color-ink)] pb-[12px] ${
-                        isActive ? "bg-[var(--color-key-pressed)]" : "bg-[var(--color-key-white)]"
+                        isActive
+                          ? "bg-[var(--color-key-pressed)]"
+                          : "bg-[var(--color-key-white)]"
                       }`
                 }
               >
                 {black ? (
                   <>
                     {showKeyboardHints && keyboardKey && (
-                      <kbd className="font-[inherit] text-[9px] font-bold text-[var(--color-brand-light)]">{keyboardKey}</kbd>
+                      <kbd className="font-[inherit] text-[9px] font-bold text-[var(--color-brand-light)]">
+                        {keyboardKey}
+                      </kbd>
                     )}
-                    <span className="text-[9px] font-bold text-[var(--color-key-label-black)]">{note.name}</span>
-                    <span aria-hidden="true" className="mt-[3px] h-1 w-[80%] bg-[var(--color-key-black-edge)]" />
+                    <span className="text-[9px] font-bold text-[var(--color-key-label-black)]">
+                      {note.name}
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      className="mt-[3px] h-1 w-[80%] bg-[var(--color-key-black-edge)]"
+                    />
                   </>
                 ) : (
                   <>
-                    {isActive && <span aria-hidden="true" className="mb-[4px] h-[6px] w-[6px] bg-[var(--color-brand)]" />}
+                    {isActive && (
+                      <span
+                        aria-hidden="true"
+                        className="mb-[4px] h-[6px] w-[6px] bg-[var(--color-brand)]"
+                      />
+                    )}
                     {showKeyboardHints && keyboardKey && (
-                      <kbd className="font-[inherit] text-[11px] font-bold text-[var(--color-ink)]">{keyboardKey}</kbd>
+                      <kbd className="font-[inherit] text-[11px] font-bold text-[var(--color-ink)]">
+                        {keyboardKey}
+                      </kbd>
                     )}
                     <span
                       className={`text-[11px] font-bold ${
-                        isActive ? "text-[var(--color-brand)]" : "text-[var(--color-key-label)]"
+                        isActive
+                          ? "text-[var(--color-brand)]"
+                          : "text-[var(--color-key-label)]"
                       }`}
                     >
                       {note.name}
@@ -353,7 +428,9 @@ const Piano = ({ children }) => {
                     <span
                       aria-hidden="true"
                       className={`absolute inset-x-0 bottom-0 h-[6px] ${
-                        isActive ? "bg-[var(--color-brand-light)]" : "bg-[var(--color-line-keybed)]"
+                        isActive
+                          ? "bg-[var(--color-brand-light)]"
+                          : "bg-[var(--color-line-keybed)]"
                       }`}
                     />
                   </>

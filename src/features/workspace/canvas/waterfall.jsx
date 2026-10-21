@@ -91,8 +91,9 @@ const Waterfall = ({ keyLayout, activeNotes }) => {
         if (!key) {
           return;
         }
-        const top = bar.end === null ? 0 : ((time - bar.end) * FALL_SPEED) / 1000;
-        const bottom = Math.min(((time - bar.start) * FALL_SPEED) / 1000, hitY);
+        const bottom =
+          bar.end === null ? hitY : hitY - ((time - bar.end) * FALL_SPEED) / 1000;
+        const top = Math.max(hitY - ((time - bar.start) * FALL_SPEED) / 1000, 0);
         if (bottom <= top) {
           return;
         }
@@ -131,7 +132,7 @@ const Waterfall = ({ keyLayout, activeNotes }) => {
 
   return (
     <div className="border-2 border-[var(--color-ink)] bg-[var(--color-surface-paper)] px-[14px] shadow-[var(--shadow-hard)]">
-      <canvas ref={canvasRef} aria-hidden="true" className="block h-[336px] w-full" />
+      <canvas ref={canvasRef} aria-hidden="true" className="block h-[300px] w-full" />
     </div>
   );
 };

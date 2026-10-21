@@ -35,10 +35,9 @@ const Navbar = () => (
           placeholder="Find some music?"
           className="min-w-0 flex-1 appearance-none border-0 bg-transparent p-0 font-[inherit] text-sm text-[var(--color-ink)] outline-none placeholder:text-[var(--color-neutral-350)]"
         />
-        <img
-          src={Search}
-          alt=""
-          className="h-[26px] w-7 color-(--color-brand)"
+        <Search
+          aria-hidden="true"
+          className="h-[26px] w-7 text-[var(--color-brand)]"
         />
       </label>
       <nav
