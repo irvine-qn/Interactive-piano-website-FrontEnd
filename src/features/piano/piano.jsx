@@ -1,12 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
-const Home = () => {
+const Piano = () => {
   const [notes, setNotes] = useState([]);
-  const [config, setConfig] = useState(null);
-  const [bpm, setBpm] = useState(null);
-  const [metronomeEnabled, setMetronomeEnabled] = useState(false);
   const [showKeyboardHints, setShowKeyboardHints] = useState(true);
   const [activeNotes, setActiveNotes] = useState(new Set());
   const [error, setError] = useState("");
@@ -43,15 +41,8 @@ const Home = () => {
         }
 
         const data = await response.json();
-        if (
-          !Array.isArray(data.notes) ||
-          !Number.isFinite(data.minBpm) ||
-          !Number.isFinite(data.maxBpm) ||
-          !Number.isFinite(data.defaultBpm) ||
-          data.defaultBpm < data.minBpm ||
-          data.defaultBpm > data.maxBpm
-        ) {
-          throw new Error("Piano API returned invalid configuration");
+        if (!Array.isArray(data.notes)) {
+          throw new Error("Piano API returned invalid note data");
         }
 
         const validNotes = data.notes.filter(
@@ -65,8 +56,6 @@ const Home = () => {
           throw new Error("Piano API returned invalid note data");
         }
 
-        setConfig(data);
-        setBpm(data.defaultBpm);
         setNotes(validNotes);
         noteByKeyboardKeyRef.current = new Map(
           validNotes
@@ -174,41 +163,6 @@ const Home = () => {
     },
     [updateActiveNotes],
   );
-
-  const playMetronomeClick = useCallback(() => {
-    const context = getAudioContext();
-    const oscillator = context.createOscillator();
-    const gain = context.createGain();
-    const now = context.currentTime;
-    oscillator.type = "sine";
-    oscillator.frequency.setValueAtTime(880, now);
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(0.12, now + 0.004);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
-    oscillator.connect(gain);
-    gain.connect(context.destination);
-    oscillator.start(now);
-    oscillator.stop(now + 0.05);
-  }, [getAudioContext]);
-
-  useEffect(() => {
-    if (!metronomeEnabled || !bpm) {
-      return undefined;
-    }
-
-    let timer;
-    const tick = () => {
-      try {
-        playMetronomeClick();
-        timer = window.setTimeout(tick, 60000 / bpm);
-      } catch (audioError) {
-        setError(`Unable to play metronome: ${audioError.message}`);
-        setMetronomeEnabled(false);
-      }
-    };
-    tick();
-    return () => window.clearTimeout(timer);
-  }, [bpm, metronomeEnabled, playMetronomeClick]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -355,64 +309,12 @@ const Home = () => {
     window.setTimeout(() => releaseNote(source), 250);
   };
 
-  const handleMetronomeToggle = () => {
-    if (!metronomeEnabled) {
-      try {
-        getAudioContext();
-        setError("");
-        setMetronomeEnabled(true);
-      } catch (audioError) {
-        setError(`Unable to start metronome: ${audioError.message}`);
-      }
-    } else {
-      setMetronomeEnabled(false);
-    }
-  };
-
-  const changeBpm = (amount) => {
-    setBpm((currentBpm) =>
-      Math.max(config.minBpm, Math.min(config.maxBpm, currentBpm + amount)),
-    );
-  };
-
   return (
     <>
+      <Link to="/">Home</Link>
       <header>Virtual Piano</header>
       <main>
         <section aria-label="Piano controls">
-          <button
-            type="button"
-            onClick={handleMetronomeToggle}
-            aria-pressed={metronomeEnabled}
-          >
-            Metronome {metronomeEnabled ? "On" : "Off"}
-          </button>
-          <button
-            type="button"
-            onClick={() => changeBpm(-1)}
-            disabled={!config || bpm <= config.minBpm}
-            aria-label="Decrease BPM"
-          >
-            -
-          </button>
-          <output aria-live="polite">{bpm ?? ""} BPM</output>
-          <button
-            type="button"
-            onClick={() => changeBpm(1)}
-            disabled={!config || bpm >= config.maxBpm}
-            aria-label="Increase BPM"
-          >
-            +
-          </button>
-          <input
-            type="range"
-            min={config?.minBpm ?? 30}
-            max={config?.maxBpm ?? 240}
-            value={bpm ?? 120}
-            disabled={!config}
-            onChange={(event) => setBpm(Number(event.target.value))}
-            aria-label="Metronome BPM"
-          />
           <label>
             <input
               type="checkbox"
@@ -455,4 +357,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Piano;
