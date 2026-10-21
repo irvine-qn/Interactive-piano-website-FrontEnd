@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, Keyboard } from "lucide-react";
-import Waterfall from "./waterfall";
+import { API_BASE_URL } from "../../../config/api";
+import usePianoSound from "../audio/usePianoSound";
+import Waterfall from "../canvas/waterfall";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const BLACK_KEY_RATIO = 0.62;
 const OCTAVE_SIZE = 12;
 
@@ -10,10 +11,8 @@ const Piano = ({ children }) => {
   const [notes, setNotes] = useState([]);
   const [showKeyboardHints, setShowKeyboardHints] = useState(true);
   const [octaveShift, setOctaveShift] = useState(0);
-  const [activeNotes, setActiveNotes] = useState(new Set());
   const [error, setError] = useState("");
-  const audioContextRef = useRef(null);
-  const voicesRef = useRef(new Map());
+  const { activeNotes, startNote, releaseNote, releaseNotesFrom } = usePianoSound(setError);
   const noteByKeyboardKeyRef = useRef(new Map());
   const noteByMidiRef = useRef(new Map());
   const keyboardSourcesRef = useRef(new Map());
@@ -106,94 +105,6 @@ const Piano = ({ children }) => {
     return () => controller.abort();
   }, []);
 
-  const getAudioContext = useCallback(() => {
-    const AudioContextConstructor =
-      window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextConstructor) {
-      throw new Error("Web Audio is not supported by this browser");
-    }
-    if (!audioContextRef.current) {
-      audioContextRef.current = new AudioContextConstructor();
-    }
-
-    const context = audioContextRef.current;
-    if (context.state === "suspended") {
-      context.resume().catch((audioError) => {
-        setError(`Unable to start audio: ${audioError.message}`);
-      });
-    }
-    return context;
-  }, []);
-
-  const updateActiveNotes = useCallback(() => {
-    setActiveNotes(
-      new Set(Array.from(voicesRef.current.values(), (voice) => voice.note)),
-    );
-  }, []);
-
-  const startNote = useCallback(
-    (note, source) => {
-      if (voicesRef.current.has(source)) {
-        return;
-      }
-      try {
-        const context = getAudioContext();
-        const now = context.currentTime;
-        const envelope = context.createGain();
-        const oscillators = [];
-        envelope.gain.setValueAtTime(0.0001, now);
-        envelope.gain.exponentialRampToValueAtTime(0.18, now + 0.015);
-        envelope.connect(context.destination);
-
-        [[1, 1], [2, 0.24], [3, 0.08]].forEach(([partial, level]) => {
-          const oscillator = context.createOscillator();
-          const partialGain = context.createGain();
-          oscillator.type = "sine";
-          oscillator.frequency.setValueAtTime(note.frequency * partial, now);
-          partialGain.gain.setValueAtTime(level, now);
-          oscillator.connect(partialGain);
-          partialGain.connect(envelope);
-          oscillator.start(now);
-          oscillators.push(oscillator);
-        });
-
-        voicesRef.current.set(source, {
-          note: note.name,
-          envelope,
-          oscillators,
-        });
-        updateActiveNotes();
-      } catch (audioError) {
-        setError(`Unable to play ${note.name}: ${audioError.message}`);
-      }
-    },
-    [getAudioContext, updateActiveNotes],
-  );
-
-  const releaseNote = useCallback(
-    (source) => {
-      const voice = voicesRef.current.get(source);
-      if (!voice) {
-        return;
-      }
-
-      const context = audioContextRef.current;
-      if (context && context.state !== "closed") {
-        const now = context.currentTime;
-        voice.envelope.gain.cancelScheduledValues(now);
-        voice.envelope.gain.setValueAtTime(
-          Math.max(voice.envelope.gain.value, 0.0001),
-          now,
-        );
-        voice.envelope.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
-        voice.oscillators.forEach((oscillator) => oscillator.stop(now + 0.21));
-      }
-      voicesRef.current.delete(source);
-      updateActiveNotes();
-    },
-    [updateActiveNotes],
-  );
-
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (
@@ -272,11 +183,7 @@ const Piano = ({ children }) => {
       connectedInputs.forEach((input, id) => {
         if (!inputs.has(id)) {
           input.onmidimessage = null;
-          voicesRef.current.forEach((voice, source) => {
-            if (source.startsWith(`midi:${id}:`)) {
-              releaseNote(source);
-            }
-          });
+          releaseNotesFrom(`midi:${id}:`);
         }
       });
       inputs.forEach((input) => {
@@ -303,22 +210,7 @@ const Piano = ({ children }) => {
         input.onmidimessage = null;
       });
     };
-  }, [notes.length, releaseNote, startNote]);
-
-  useEffect(
-    () => () => {
-      voicesRef.current.forEach((voice) => {
-        voice.oscillators.forEach((oscillator) => {
-          oscillator.stop();
-        });
-      });
-      voicesRef.current.clear();
-      if (audioContextRef.current && audioContextRef.current.state !== "closed") {
-        audioContextRef.current.close();
-      }
-    },
-    [],
-  );
+  }, [notes.length, releaseNote, releaseNotesFrom, startNote]);
 
   const handlePointerDown = (note, event) => {
     event.preventDefault();

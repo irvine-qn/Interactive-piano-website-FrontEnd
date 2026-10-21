@@ -1,7 +1,7 @@
-import Metronome from "../metronome/metronome";
-import Piano from "../piano/piano";
+import Metronome from "../features/workspace/components/metronome";
+import Piano from "../features/workspace/components/piano";
 
-const Home = () => (
+const HomePage = () => (
   <div className="flex flex-1 flex-col">
     <main className="mx-auto w-full max-w-[1600px] flex-1 overflow-x-auto px-4 pb-14 pt-10">
       <Piano>
@@ -21,4 +21,4 @@ const Home = () => (
   </div>
 );
 
-export default Home;
+export default HomePage;
