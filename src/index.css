@@ -179,8 +179,8 @@ html {
 body {
   margin: 0;
   font-family: var(--font-sans);
-  color: var(--text-primary);
-  background: var(--bg-page);
+  color: var(--color-ink);
+  background: var(--color-surface-page);
   -webkit-font-smoothing: antialiased;
 }
 

@@ -7,7 +7,6 @@ import { Search } from "lucide-react";
 const NAV_ITEMS = [
   { to: "/", label: "Piano" },
   { to: "/library", label: "Sheet library" },
-  { to: "/metronome", label: "Metronome" },
 ];
 
 const Navbar = () => (
