@@ -48,18 +48,14 @@ export const pianoSampler = new Tone.Sampler({
 
 // Hàm phát nốt
 export const playNote = async (note) => {
+  if (Tone.context.state !== 'running') {
+    await Tone.start();
+  }
   if (pianoSampler.loaded) {
-    // Lưu ý: Trình duyệt luôn chặn âm thanh cho đến khi user click vào web lần đầu tiên.
-    // Lệnh này đảm bảo AudioContext được bật ngay khi user bấm phím đàn.
-    if (Tone.context.state !== 'running') {
-      await Tone.start();
-    }
-    // Phát âm thanh của nốt
     pianoSampler.triggerAttack(note);
   }
 };
 
-// Hàm ngắt nốt (khi nhả chuột/phím)
 export const stopNote = (note) => {
   if (pianoSampler.loaded) {
     pianoSampler.triggerRelease(note);
