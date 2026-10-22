@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, Keyboard } from "lucide-react";
-import { API_BASE_URL } from "../../../config/api";
+import { getPianoConfig } from "../api/pianoApi";
 import usePianoSound from "../audio/usePianoSound";
 import Waterfall from "../canvas/waterfall";
 
@@ -90,18 +90,14 @@ const Piano = ({ children }) => {
   }, [keyboardMapping]);
 
   useEffect(() => {
-    const controller = new AbortController();
+    let cancelled = false;
 
     const loadPiano = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/piano`, {
-          signal: controller.signal,
-        });
-        if (!response.ok) {
-          throw new Error(`Piano API returned ${response.status}`);
+        const data = await getPianoConfig();
+        if (cancelled) {
+          return;
         }
-
-        const data = await response.json();
         if (!Array.isArray(data.notes)) {
           throw new Error("Piano API returned invalid note data");
         }
@@ -125,14 +121,16 @@ const Piano = ({ children }) => {
           validNotes.map((note) => [note.midi, note]),
         );
       } catch (loadError) {
-        if (loadError.name !== "AbortError") {
+        if (!cancelled) {
           setError(`Unable to load piano settings: ${loadError.message}`);
         }
       }
     };
 
     loadPiano();
-    return () => controller.abort();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -273,10 +271,10 @@ const Piano = ({ children }) => {
 
       <section
         aria-label="Piano controls"
-        className="flex flex-wrap items-center gap-x-5 gap-y-3 border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-[14px] py-[12px] shadow-[var(--shadow-hard)]"
+        className="sticky left-0 flex w-[min(100%,calc(100vw-2rem))] flex-wrap items-center gap-x-5 gap-y-3 border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-[14px] py-[12px] shadow-[var(--shadow-hard)]"
       >
         {children}
-        <label className="ml-10 flex items-center gap-2 text-sm font-bold text-[var(--color-ink)]">
+        <label className="flex md:ml-10 items-center gap-2 text-sm font-bold text-[var(--color-ink)]">
           <Keyboard
             aria-hidden="true"
             className="h-4 w-4 text-[var(--color-brand-strong)]"

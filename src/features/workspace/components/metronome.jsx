@@ -15,7 +15,7 @@ const Metronome = () => {
   return (
     <section
       aria-label="Metronome controls"
-      className="flex items-center gap-5"
+      className="flex flex-wrap items-center gap-5"
     >
       <button
         type="button"
