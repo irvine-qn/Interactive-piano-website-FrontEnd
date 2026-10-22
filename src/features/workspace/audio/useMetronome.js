@@ -1,26 +1,22 @@
 import { useCallback, useEffect, useState } from "react";
-import { API_BASE_URL } from "../../../config/api";
+import { getPianoConfig } from "../api/pianoApi";
+import { resumeAudioContext } from "./audioContext";
 
 const useMetronome = () => {
   const [config, setConfig] = useState(null);
   const [bpm, setBpm] = useState(null);
   const [enabled, setEnabled] = useState(false);
   const [error, setError] = useState("");
-  const [audioContext, setAudioContext] = useState(null);
 
   useEffect(() => {
-    const controller = new AbortController();
+    let cancelled = false;
 
     const loadConfig = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/piano`, {
-          signal: controller.signal,
-        });
-        if (!response.ok) {
-          throw new Error(`Piano API returned ${response.status}`);
+        const data = await getPianoConfig();
+        if (cancelled) {
+          return;
         }
-
-        const data = await response.json();
         if (
           !Number.isFinite(data.minBpm) ||
           !Number.isFinite(data.maxBpm) ||
@@ -35,37 +31,20 @@ const useMetronome = () => {
         setConfig(data);
         setBpm(data.defaultBpm);
       } catch (loadError) {
-        if (loadError.name !== "AbortError") {
+        if (!cancelled) {
           setError(`Unable to load metronome settings: ${loadError.message}`);
         }
       }
     };
 
     loadConfig();
-    return () => controller.abort();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  const getAudioContext = useCallback(() => {
-    const AudioContextConstructor =
-      window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextConstructor) {
-      throw new Error("Web Audio is not supported by this browser");
-    }
-
-    const context = audioContext || new AudioContextConstructor();
-    if (!audioContext) {
-      setAudioContext(context);
-    }
-    if (context.state === "suspended") {
-      context.resume().catch((audioError) => {
-        setError(`Unable to start audio: ${audioError.message}`);
-      });
-    }
-    return context;
-  }, [audioContext]);
-
   const playClick = useCallback(() => {
-    const context = getAudioContext();
+    const context = resumeAudioContext(setError);
     const oscillator = context.createOscillator();
     const gain = context.createGain();
     const now = context.currentTime;
@@ -78,7 +57,7 @@ const useMetronome = () => {
     gain.connect(context.destination);
     oscillator.start(now);
     oscillator.stop(now + 0.05);
-  }, [getAudioContext]);
+  }, []);
 
   useEffect(() => {
     if (!enabled || !bpm) {
@@ -100,19 +79,10 @@ const useMetronome = () => {
     return () => window.clearTimeout(timer);
   }, [bpm, enabled, playClick]);
 
-  useEffect(
-    () => () => {
-      if (audioContext && audioContext.state !== "closed") {
-        audioContext.close();
-      }
-    },
-    [audioContext],
-  );
-
   const toggleMetronome = () => {
     if (!enabled) {
       try {
-        getAudioContext();
+        resumeAudioContext(setError);
         setError("");
         setEnabled(true);
       } catch (audioError) {

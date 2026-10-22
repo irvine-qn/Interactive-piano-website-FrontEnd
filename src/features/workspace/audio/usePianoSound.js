@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Soundfont from 'soundfont-player';
+import { getAudioContext as getSharedAudioContext, resumeAudioContext } from "./audioContext";
 
 const PIANO_INSTRUMENT = "acoustic_grand_piano";
 // soundfont-player mặc định gain = 1
@@ -8,28 +9,13 @@ const NOTE_GAIN = 2;
 const usePianoSound = (onError) => {
   const [activeNotes, setActiveNotes] = useState(new Set());
   const [isLoading, setIsLoading] = useState(true);
-  const audioContextRef = useRef(null);
   const instrumentRef = useRef(null);
   const voicesRef = useRef(new Map());
 
-  const getAudioContext = useCallback(() => {
-    const AudioContextConstructor =
-      window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextConstructor) {
-      throw new Error("Web Audio is not supported by this browser");
-    }
-    if (!audioContextRef.current) {
-      audioContextRef.current = new AudioContextConstructor();
-    }
-
-    const context = audioContextRef.current;
-    if (context.state === "suspended") {
-      context.resume().catch((audioError) => {
-        onError(`Unable to start audio: ${audioError.message}`);
-      });
-    }
-    return context;
-  }, [onError]);
+  const getAudioContext = useCallback(
+    () => resumeAudioContext(onError),
+    [onError],
+  );
 
   const updateActiveNotes = useCallback(() => {
     setActiveNotes(
@@ -93,10 +79,7 @@ const usePianoSound = (onError) => {
         return;
       }
 
-      const context = audioContextRef.current;
-      if (context && context.state !== "closed") {
-        voice.player.stop(context.currentTime);
-      }
+      voice.player.stop(getSharedAudioContext().currentTime);
       voicesRef.current.delete(source);
       updateActiveNotes();
     },
@@ -119,10 +102,6 @@ const usePianoSound = (onError) => {
       instrumentRef.current?.stop();
       instrumentRef.current = null;
       voicesRef.current.clear();
-      if (audioContextRef.current && audioContextRef.current.state !== "closed") {
-        audioContextRef.current.close();
-      }
-      audioContextRef.current = null;
     },
     [],
   );
