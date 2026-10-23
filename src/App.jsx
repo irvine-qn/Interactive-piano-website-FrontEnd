@@ -1,9 +1,11 @@
-import { BrowserRouter } from 'react-router-dom';
-import AppRoutes from './routes/AppRoutes';
+import { BrowserRouter } from "react-router-dom";
+import AppRoutes from "./routes/AppRoutes";
 
 const App = () => (
   <BrowserRouter>
-    <AppRoutes />
+    <div className="flex min-h-screen flex-col bg-[var(--color-surface-page)] text-[var(--color-ink)]">
+      <AppRoutes />
+    </div>
   </BrowserRouter>
 );
 
