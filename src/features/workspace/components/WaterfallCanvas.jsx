@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
-import { playNote } from '../audio/toneEngine';
+import * as Tone from 'tone';
 import sheetData from '../audio/merry-christmas.json'; 
 
 const WaterfallCanvas = () => {
@@ -50,14 +50,18 @@ const WaterfallCanvas = () => {
 
     // --- CÁC THÔNG SỐ VẬT LÝ CHO WATERFALL ---
     const PIXELS_PER_SECOND = 150; // Tốc độ rơi: 1 giây nốt đi được 150 pixel
-    let startTime = Date.now();    // Cột mốc thời gian bắt đầu bài nhạc
-    let playedNotes = new Set();   // Bộ nhớ tạm để đánh dấu các nốt đã phát tiếng
 
     const renderLoop = () => {
       ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-      // Thời gian hiện tại của bài hát (bằng giây)
-      const currentTime = (Date.now() - startTime) / 1000;
+      // Chế độ Tự Do không có sheet nhạc nên không vẽ thác nốt
+      if (currentMode === 'FREE_PLAY') {
+        animationFrameId = requestAnimationFrame(renderLoop);
+        return;
+      }
+
+      // Thời gian bài hát lấy từ Tone.Transport -> đồng bộ với Play/Pause/Seek và âm thanh
+      const currentTime = Tone.Transport.seconds;
 
       // CHỈ TOÁN: Lọc ra những nốt ĐANG NẰM TRONG KHUNG HÌNH để tối ưu hiệu suất
       const visibleNotes = sheetData.notes.filter(note => {
@@ -94,23 +98,11 @@ const WaterfallCanvas = () => {
         }
       });
 
-      // NHỊP 3: KÍCH HOẠT ÂM THANH NẾU LÀ AUTO_PLAY
-      if (currentMode === 'AUTO_PLAY') {
-        sheetData.notes.forEach((note, index) => {
-          // Nếu bài nhạc chạy qua thời điểm đánh nốt VÀ nốt chưa được đánh
-          if (currentTime >= note.time && !playedNotes.has(index)) {
-            playNote(note.name);
-            playedNotes.add(index);
-          }
-        });
-      }
-
       animationFrameId = requestAnimationFrame(renderLoop);
     };
 
     const timeoutId = setTimeout(() => {
       updateLayout();
-      startTime = Date.now(); // Reset lại thời gian khi DOM đã sẵn sàng
     }, 50);
 
     const resizeObserver = new ResizeObserver(() => {

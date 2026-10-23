@@ -1,11 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
 import PianoKeyboard from '../components/PianoKeyboard';
 import ControlBar from '../components/ControlBar';
 import WaterfallCanvas from '../components/WaterfallCanvas';
+import { loadSheet, disposeSheet } from '../audio/sheetPlayer';
+import sheetData from '../audio/merry-christmas.json';
 
 const WorkspacePage = () => {
   const { currentMode } = useWorkspaceStore();
+
+  useEffect(() => {
+    loadSheet(sheetData.notes);
+    return disposeSheet;
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#cbf0ff] flex flex-col font-sans">

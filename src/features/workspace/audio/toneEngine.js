@@ -3,8 +3,8 @@ import * as Tone from 'tone';
 // Đặt Limiter ở ngưỡng an toàn để cắt peak đột ngột, không nén gắt làm vỡ tiếng
 const masterLimiter = new Tone.Limiter(-1).toDestination();
 
-// Đặt Master Volume ở mức tiêu chuẩn
-Tone.Destination.volume.value = 0;
+// Hạ Master Volume để chừa headroom khi nhiều nốt chồng lên nhau (chống hard clipping)
+Tone.Destination.volume.value = -6;
 
 // Khởi tạo một Sampler. 
 // Thay vì phải tải toàn bộ 88 file mp3, chúng ta chỉ cần tải một số nốt chuẩn (C, D#, F#, A).
@@ -73,4 +73,10 @@ export const stopAllNotes = () => {
   if (pianoSampler.loaded) {
     pianoSampler.releaseAll();
   }
+};
+
+// Dừng Transport, quay về đầu bài và tắt toàn bộ âm đang ngân
+export const resetPlayback = () => {
+  Tone.Transport.stop();
+  stopAllNotes();
 };

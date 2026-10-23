@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import * as Tone from 'tone';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
+import { stopAllNotes } from '../audio/toneEngine';
 import { Music, BookOpen, PlaySquare, Play, Pause, Volume2 } from 'lucide-react';
 
 const MODES = [
@@ -10,7 +11,7 @@ const MODES = [
 ];
 
 const ControlBar = () => {
-  const { currentMode, setMode, isPlaying, setIsPlaying, duration } = useWorkspaceStore();
+  const { currentMode, setMode, isPlaying, setIsPlaying, duration, clearActiveKeys } = useWorkspaceStore();
   const progressBarRef = useRef(null);
   const currentTimeRef = useRef(null);
   const progressFillRef = useRef(null);
@@ -40,19 +41,27 @@ const ControlBar = () => {
 };
 
   useEffect(() => {
-    Tone.Transport.on('start', () => setIsPlaying(true));
-    Tone.Transport.on('pause', () => setIsPlaying(false));
-    Tone.Transport.on('stop', () => setIsPlaying(false));
+    const handleStart = () => setIsPlaying(true);
+    // Pause/Stop: tắt âm đang ngân và tắt highlight các phím Auto-play
+    const handleHalt = () => {
+      setIsPlaying(false);
+      stopAllNotes();
+      clearActiveKeys();
+    };
+
+    Tone.Transport.on('start', handleStart);
+    Tone.Transport.on('pause', handleHalt);
+    Tone.Transport.on('stop', handleHalt);
 
     requestRef.current = requestAnimationFrame(updateProgress);
 
     return () => {
       cancelAnimationFrame(requestRef.current);
-      Tone.Transport.off('start');
-      Tone.Transport.off('pause');
-      Tone.Transport.off('stop');
+      Tone.Transport.off('start', handleStart);
+      Tone.Transport.off('pause', handleHalt);
+      Tone.Transport.off('stop', handleHalt);
     };
-  }, [setIsPlaying, duration]);
+  }, [setIsPlaying, clearActiveKeys, duration]);
 
   const handlePlay = async () => {
     if (Tone.context.state !== 'running') await Tone.start();
@@ -67,8 +76,9 @@ const ControlBar = () => {
     const newTime = parseFloat(e.target.value);
     Tone.Transport.seconds = newTime;
     
-    // BẮT BUỘC IMPORT VÀ GỌI HÀM NGẮT ÂM TỪ FILE AUDIO ENGINE Ở ĐÂY
-    // stopAllNotes(); 
+    // Tua thì phải ngắt các nốt đang ngân và tắt highlight
+    stopAllNotes();
+    clearActiveKeys();
     
     if (currentTimeRef.current) {
       currentTimeRef.current.innerText = formatTime(newTime);
@@ -133,7 +143,7 @@ const ControlBar = () => {
               className="absolute w-full h-full opacity-0 cursor-pointer z-10"
             />
             {/* Nút thumb hiển thị khi hover */}
-            <div className="absolute h-4 w-4 bg-white border-2 border-[#ff7a1a] rounded-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-0" style={{ left: `calc(${progressFillRef.current?.style.width || '0%'} - 8px)` }}></div>
+            <div id="progress-thumb" className="absolute h-4 w-4 bg-white border-2 border-[#ff7a1a] rounded-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-0" style={{ left: 'calc(0% - 8px)' }}></div>
           </div>
           
           <span className="text-xs font-bold text-gray-500 w-10">{formatTime(duration)}</span>
