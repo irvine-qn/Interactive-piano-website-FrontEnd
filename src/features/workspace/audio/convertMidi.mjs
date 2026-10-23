@@ -28,18 +28,41 @@ const fianoSheet = {
   notes: []
 };
 
-// 5. Trích xuất nốt nhạc
-midi.tracks.forEach((track, index) => {
-  const hand = index === 0 ? 'right' : 'left'; // Track 0 thường là tay phải
+// Lọc ra các track thực sự có chứa nốt nhạc để xử lý
+const tracksWithNotes = midi.tracks.filter(track => track.notes.length > 0);
+const isSingleTrack = tracksWithNotes.length === 1;
 
+// Sử dụng Set để lưu vết và khử trùng lặp (Deduplication)
+const seenNotes = new Set();
+
+// 5. Trích xuất nốt nhạc
+tracksWithNotes.forEach((track, index) => {
   track.notes.forEach(note => {
-    fianoSheet.notes.push({
-      name: note.name,
-      time: note.time,
-      duration: note.duration,
-      hand: hand,
-      velocity: note.velocity
-    });
+    // Thuật toán 1: Phân loại tay đàn (Hand Routing)
+    let hand = 'right';
+    if (isSingleTrack) {
+      // Nếu file bị gộp thành 1 track, tự động chia tay dựa trên cao độ (C4 là MIDI 60)
+      hand = note.midi >= 60 ? 'right' : 'left';
+    } else {
+      // Nếu file có nhiều track chuẩn, giả định track 0 là tay phải, track 1 là tay trái
+      hand = index === 0 ? 'right' : 'left';
+    }
+
+    // Thuật toán 2: Khử trùng lặp nốt đè lên nhau
+    // Làm tròn thời gian đến 3 chữ số thập phân (mili-giây) để tránh sai số float
+    const timeKey = note.time.toFixed(3);
+    const noteKey = `${note.name}-${timeKey}`;
+
+    if (!seenNotes.has(noteKey)) {
+      seenNotes.add(noteKey);
+      fianoSheet.notes.push({
+        name: note.name,
+        time: note.time,
+        duration: note.duration,
+        hand: hand,
+        velocity: note.velocity
+      });
+    }
   });
 });
 

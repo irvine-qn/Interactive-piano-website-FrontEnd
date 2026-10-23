@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import * as Tone from 'tone';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
 import { Music, BookOpen, PlaySquare, Play, Pause, Volume2 } from 'lucide-react';
 
@@ -9,13 +10,75 @@ const MODES = [
 ];
 
 const ControlBar = () => {
-  const { currentMode, setMode } = useWorkspaceStore();
+  const { currentMode, setMode, isPlaying, setIsPlaying, duration } = useWorkspaceStore();
+  const progressBarRef = useRef(null);
+  const currentTimeRef = useRef(null);
+  const progressFillRef = useRef(null);
+  const requestRef = useRef();
+  const isDragging = useRef(false);
+
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
+
+  const updateProgress = () => {
+  if (progressBarRef.current && currentTimeRef.current && progressFillRef.current && !isDragging.current) {
+    const currentTime = Tone.Transport.seconds;
+    progressBarRef.current.value = currentTime;
+    currentTimeRef.current.innerText = formatTime(currentTime);
+    
+    const percentage = duration > 0 ? (currentTime / duration) * 100 : 0;
+    progressFillRef.current.style.width = `${percentage}%`;
+    
+    // Cập nhật vị trí thumb trực tiếp qua DOM để không phụ thuộc re-render
+    const thumb = document.getElementById('progress-thumb');
+    if (thumb) thumb.style.left = `calc(${percentage}% - 8px)`;
+  }
+  requestRef.current = requestAnimationFrame(updateProgress);
+};
+
+  useEffect(() => {
+    Tone.Transport.on('start', () => setIsPlaying(true));
+    Tone.Transport.on('pause', () => setIsPlaying(false));
+    Tone.Transport.on('stop', () => setIsPlaying(false));
+
+    requestRef.current = requestAnimationFrame(updateProgress);
+
+    return () => {
+      cancelAnimationFrame(requestRef.current);
+      Tone.Transport.off('start');
+      Tone.Transport.off('pause');
+      Tone.Transport.off('stop');
+    };
+  }, [setIsPlaying, duration]);
+
+  const handlePlay = async () => {
+    if (Tone.context.state !== 'running') await Tone.start();
+    Tone.Transport.start();
+  };
+
+  const handlePause = () => {
+    Tone.Transport.pause();
+  };
+
+  const handleSeek = (e) => {
+    const newTime = parseFloat(e.target.value);
+    Tone.Transport.seconds = newTime;
+    
+    // BẮT BUỘC IMPORT VÀ GỌI HÀM NGẮT ÂM TỪ FILE AUDIO ENGINE Ở ĐÂY
+    // stopAllNotes(); 
+    
+    if (currentTimeRef.current) {
+      currentTimeRef.current.innerText = formatTime(newTime);
+    }
+  };
 
   return (
     <div className="w-full bg-white px-4 py-3 flex flex-col z-10 relative">
-      
       <div className="w-full flex flex-col md:flex-row items-center justify-between gap-4">
-        {/* Cụm 1: Chuyển đổi chế độ (Mode Selector) */}
+        {/* Mode Selector */}
         <div className="flex bg-gray-100 p-1 rounded-xl shrink-0">
           {MODES.map((mode) => {
             const isActive = currentMode === mode.id;
@@ -36,30 +99,59 @@ const ControlBar = () => {
           })}
         </div>
 
-        {/* Cụm 2: Timeline Slider (Chỉ hiện rõ khi có bài hát - Auto/Practice) */}
+        {/* Timeline Slider */}
         <div className={`flex-1 w-full flex items-center gap-3 px-4 transition-opacity duration-300 ${currentMode === 'FREE_PLAY' ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
-          <span className="text-xs font-bold text-gray-500 w-10 text-right">01:24</span>
+          <span ref={currentTimeRef} className="text-xs font-bold text-gray-500 w-10 text-right">00:00</span>
           
-          <div className="relative flex-1 h-2 bg-gray-200 rounded-full group cursor-pointer">
-            {/* Thanh tiến trình đã chạy */}
-            <div className="absolute top-0 left-0 h-full bg-[#ff7a1a] rounded-full w-1/3"></div>
-            {/* Nút kéo (Thumb) - Chỉ hiện khi di chuột vào */}
-            <div className="absolute top-1/2 left-1/3 -translate-y-1/2 -translate-x-1/2 w-4 h-4 bg-white border-2 border-[#ff7a1a] rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-md"></div>
+          <div className="relative flex-1 h-2 flex items-center group cursor-pointer">
+            {/* Thanh nền xám */}
+            <div className="absolute w-full h-2 bg-gray-200 rounded-full"></div>
+            {/* Thanh màu cam fill */}
+            <div ref={progressFillRef} className="absolute h-2 bg-[#ff7a1a] rounded-full pointer-events-none" style={{ width: '0%' }}></div>
+            {/* Input Range ẩn đè lên để bắt sự kiện kéo */}
+            <input 
+              type="range" 
+              ref={progressBarRef}
+              min="0" 
+              max={duration} 
+              step="0.1"
+              defaultValue="0"
+              onMouseDown={() => isDragging.current = true}
+              onMouseUp={() => isDragging.current = false}
+              onTouchStart={() => isDragging.current = true}
+              onTouchEnd={() => isDragging.current = false}
+              onChange={handleSeek}
+              onInput={(e) => {
+                // Cập nhật UI thanh màu cam mượt mà khi tay đang kéo
+                const val = parseFloat(e.target.value);
+                const percentage = duration > 0 ? (val / duration) * 100 : 0;
+                progressFillRef.current.style.width = `${percentage}%`;
+                const thumb = document.getElementById('progress-thumb');
+                if (thumb) thumb.style.left = `calc(${percentage}% - 8px)`;
+                if (currentTimeRef.current) currentTimeRef.current.innerText = formatTime(val);
+              }}
+              className="absolute w-full h-full opacity-0 cursor-pointer z-10"
+            />
+            {/* Nút thumb hiển thị khi hover */}
+            <div className="absolute h-4 w-4 bg-white border-2 border-[#ff7a1a] rounded-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-0" style={{ left: `calc(${progressFillRef.current?.style.width || '0%'} - 8px)` }}></div>
           </div>
           
-          <span className="text-xs font-bold text-gray-500 w-10">03:45</span>
+          <span className="text-xs font-bold text-gray-500 w-10">{formatTime(duration)}</span>
         </div>
 
-        {/* Cụm 3: Điều khiển trình phát & Âm lượng */}
+        {/* Trình phát & Âm lượng */}
         <div className={`flex items-center gap-3 shrink-0 transition-opacity duration-300 ${currentMode === 'FREE_PLAY' ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
-          <button className="p-3 rounded-full bg-[#ffe8d1] text-[#e8630a] hover:bg-[#ffd9b8] transition-colors">
-            <Play className="w-5 h-5 fill-current" />
-          </button>
-          <button className="p-3 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors">
-            <Pause className="w-5 h-5 fill-current" />
-          </button>
+          {!isPlaying ? (
+            <button onClick={handlePlay} className="p-3 rounded-full bg-[#ffe8d1] text-[#e8630a] hover:bg-[#ffd9b8] transition-colors">
+              <Play className="w-5 h-5 fill-current" />
+            </button>
+          ) : (
+            <button onClick={handlePause} className="p-3 rounded-full bg-[#ffe8d1] text-[#e8630a] hover:bg-[#ffd9b8] transition-colors">
+              <Pause className="w-5 h-5 fill-current" />
+            </button>
+          )}
           
-          <div className="h-6 w-px bg-gray-300 mx-1"></div> {/* Kẻ dọc ngăn cách */}
+          <div className="h-6 w-px bg-gray-300 mx-1"></div>
           
           <button className="flex items-center gap-2 p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors group">
             <Volume2 className="w-5 h-5" />
@@ -69,7 +161,6 @@ const ControlBar = () => {
           </button>
         </div>
       </div>
-
     </div>
   );
 };

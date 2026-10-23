@@ -1,5 +1,10 @@
-// src/features/workspace/audio/toneEngine.js
 import * as Tone from 'tone';
+
+// Đặt Limiter ở ngưỡng an toàn để cắt peak đột ngột, không nén gắt làm vỡ tiếng
+const masterLimiter = new Tone.Limiter(-1).toDestination();
+
+// Đặt Master Volume ở mức tiêu chuẩn
+Tone.Destination.volume.value = 0;
 
 // Khởi tạo một Sampler. 
 // Thay vì phải tải toàn bộ 88 file mp3, chúng ta chỉ cần tải một số nốt chuẩn (C, D#, F#, A).
@@ -40,11 +45,12 @@ export const pianoSampler = new Tone.Sampler({
   // Sử dụng bộ âm thanh Salamander Grand Piano mã nguồn mở được host sẵn trên server của Tone.js
   // (Sau này chúng ta có thể tải về host trên S3 của mình sau)
   baseUrl: "https://tonejs.github.io/audio/salamander/",
-  release: 10,
+  release: 0,
+  volume: -5,
   onload: () => {
     console.log("Fiano Audio Engine: Piano samples loaded!");
   }
-}).toDestination(); // Kết nối đầu ra với loa của máy tính
+}).connect(masterLimiter);
 
 // Hàm phát nốt
 export const playNote = async (note) => {
@@ -59,5 +65,12 @@ export const playNote = async (note) => {
 export const stopNote = (note) => {
   if (pianoSampler.loaded) {
     pianoSampler.triggerRelease(note);
+  }
+};
+
+// Hàm ngắt toàn bộ âm thanh (BẮT BUỘC GỌI HÀM NÀY KHI TUA)
+export const stopAllNotes = () => {
+  if (pianoSampler.loaded) {
+    pianoSampler.releaseAll();
   }
 };
