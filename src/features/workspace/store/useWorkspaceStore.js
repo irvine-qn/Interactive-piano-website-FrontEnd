@@ -6,6 +6,9 @@ export const useWorkspaceStore = create((set, get) => ({
   activeKeys: [],
   isPlaying: false,
   duration: 250,
+  sheet: null, // { id, title, composer, notes, ... } lấy từ API
+  sheetStatus: 'idle', // 'idle' | 'loading' | 'ready' | 'error'
+  sheetError: null,
   
   setMode: (mode) => {
     resetPlayback(); // Đổi chế độ thì dừng Transport, quay về 0:00 và tắt âm đang ngân
@@ -13,6 +16,9 @@ export const useWorkspaceStore = create((set, get) => ({
   },
   setIsPlaying: (status) => set({ isPlaying: status }),
   setDuration: (time) => set({ duration: time }),
+  setSheetLoading: () => set({ sheet: null, sheetStatus: 'loading', sheetError: null }),
+  setSheet: (sheet) => set({ sheet, sheetStatus: 'ready', sheetError: null }),
+  setSheetError: (error) => set({ sheet: null, sheetStatus: 'error', sheetError: error }),
   
   pressKey: (note) => {
     const { activeKeys } = get(); // Đọc state bằng get()

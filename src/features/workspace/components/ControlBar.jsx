@@ -96,9 +96,9 @@ const ControlBar = () => {
               <button
                 key={mode.id}
                 onClick={() => setMode(mode.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 ${
+                className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 ${
                   isActive 
-                    ? 'bg-white text-[#ff7a1a] shadow-sm'
+                    ? 'bg-white text-[#ff7a1a] shadow-xs'
                     : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -152,18 +152,18 @@ const ControlBar = () => {
         {/* Trình phát & Âm lượng */}
         <div className={`flex items-center gap-3 shrink-0 transition-opacity duration-300 ${currentMode === 'FREE_PLAY' ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
           {!isPlaying ? (
-            <button onClick={handlePlay} className="p-3 rounded-full bg-[#ffe8d1] text-[#e8630a] hover:bg-[#ffd9b8] transition-colors">
+            <button onClick={handlePlay} className="cursor-pointer p-3 rounded-full bg-[#ffe8d1] text-[#e8630a] hover:bg-[#ffd9b8] transition-colors">
               <Play className="w-5 h-5 fill-current" />
             </button>
           ) : (
-            <button onClick={handlePause} className="p-3 rounded-full bg-[#ffe8d1] text-[#e8630a] hover:bg-[#ffd9b8] transition-colors">
+            <button onClick={handlePause} className="cursor-pointer p-3 rounded-full bg-[#ffe8d1] text-[#e8630a] hover:bg-[#ffd9b8] transition-colors">
               <Pause className="w-5 h-5 fill-current" />
             </button>
           )}
           
           <div className="h-6 w-px bg-gray-300 mx-1"></div>
           
-          <button className="flex items-center gap-2 p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors group">
+          <button className="cursor-pointer flex items-center gap-2 p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors group">
             <Volume2 className="w-5 h-5" />
             <div className="w-20 h-1.5 bg-gray-200 rounded-full overflow-hidden">
               <div className="w-3/4 h-full bg-[#ff7a1a] rounded-full group-hover:bg-[#e8630a] transition-colors"></div>

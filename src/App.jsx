@@ -1,10 +1,10 @@
-import WorkspacePage from './features/workspace/pages/WorkspacePage';
+import { BrowserRouter } from 'react-router-dom';
+import AppRoutes from './routes/AppRoutes';
 
-function App() {
-  return (
-    // Render trực tiếp trang Workspace ra màn hình chính
-    <WorkspacePage />
-  )
-}
+const App = () => (
+  <BrowserRouter>
+    <AppRoutes />
+  </BrowserRouter>
+);
 
-export default App
+export default App;

@@ -1,12 +1,12 @@
 import React, { useRef, useEffect } from 'react';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
 import * as Tone from 'tone';
-import sheetData from '../audio/merry-christmas.json'; 
 
 const WaterfallCanvas = () => {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
   const { currentMode } = useWorkspaceStore();
+  const notes = useWorkspaceStore((state) => state.sheet?.notes);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -55,7 +55,7 @@ const WaterfallCanvas = () => {
       ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
       // Chế độ Tự Do không có sheet nhạc nên không vẽ thác nốt
-      if (currentMode === 'FREE_PLAY') {
+      if (currentMode === 'FREE_PLAY' || !notes) {
         animationFrameId = requestAnimationFrame(renderLoop);
         return;
       }
@@ -64,7 +64,7 @@ const WaterfallCanvas = () => {
       const currentTime = Tone.Transport.seconds;
 
       // CHỈ TOÁN: Lọc ra những nốt ĐANG NẰM TRONG KHUNG HÌNH để tối ưu hiệu suất
-      const visibleNotes = sheetData.notes.filter(note => {
+      const visibleNotes = notes.filter(note => {
         const noteHeight = note.duration * PIXELS_PER_SECOND;
         const distanceToBottom = (note.time - currentTime) * PIXELS_PER_SECOND;
         const yPos = canvasHeight - distanceToBottom - noteHeight;
@@ -117,10 +117,10 @@ const WaterfallCanvas = () => {
       resizeObserver.disconnect();
       cancelAnimationFrame(animationFrameId);
     };
-  }, [currentMode]);
+  }, [currentMode, notes]);
 
   return (
-    <div ref={containerRef} className="absolute inset-0 w-full h-full bg-[#111] bg-opacity-10">
+    <div ref={containerRef} className="absolute inset-0 w-full h-full bg-[#111]/10">
       <canvas ref={canvasRef} className="block" />
     </div>
   );

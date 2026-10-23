@@ -12,7 +12,7 @@ const Key = ({ note, hint, showHint = true, isBlack, isActive, onMouseDown, onMo
         flex flex-col justify-end items-center pb-1 md:pb-2 cursor-pointer select-none border border-gray-400
         transition-all duration-75 ease-in-out w-full h-full overflow-hidden min-w-0
         ${isBlack 
-          ? 'bg-black text-white rounded-b-sm' 
+          ? 'bg-black text-white rounded-b-xs' 
           : 'bg-white text-black rounded-b-md relative z-0'
         }
         ${isActive && isBlack ? 'bg-gray-700' : ''}
