@@ -1,38 +1,25 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import Soundfont from 'soundfont-player';
-import { getAudioContext as getSharedAudioContext, resumeAudioContext } from "./audioContext";
-
-const PIANO_INSTRUMENT = "acoustic_grand_piano";
-// soundfont-player mặc định gain = 1
-const NOTE_GAIN = 2;
+import * as Tone from "tone";
+import { pianoSampler } from "../../piano/audio/toneEngine";
 
 const usePianoSound = (onError) => {
   const [activeNotes, setActiveNotes] = useState(new Set());
   const [isLoading, setIsLoading] = useState(true);
-  const instrumentRef = useRef(null);
   const voicesRef = useRef(new Map());
-
-  const getAudioContext = useCallback(
-    () => resumeAudioContext(onError),
-    [onError],
-  );
+  const noteCountsRef = useRef(new Map());
 
   const updateActiveNotes = useCallback(() => {
     setActiveNotes(
-      new Set(Array.from(voicesRef.current.values(), (voice) => voice.note)),
+      new Set(voicesRef.current.values()),
     );
   }, []);
 
   useEffect(() => {
     let cancelled = false;
 
-    Promise.resolve()
-      .then(() => Soundfont.instrument(getAudioContext(), PIANO_INSTRUMENT))
-      .then((instrument) => {
-        if (!cancelled) {
-          instrumentRef.current = instrument;
-          setIsLoading(false);
-        }
+    Tone.loaded()
+      .then(() => {
+        if (!cancelled) setIsLoading(false);
       })
       .catch((loadError) => {
         if (!cancelled) {
@@ -44,32 +31,29 @@ const usePianoSound = (onError) => {
     return () => {
       cancelled = true;
     };
-  }, [getAudioContext, onError]);
+  }, [onError]);
 
   const startNote = useCallback(
     (note, source) => {
-      if (voicesRef.current.has(source) || !instrumentRef.current) {
+      if (voicesRef.current.has(source) || !pianoSampler.loaded) {
         return;
       }
       try {
-        const context = getAudioContext();
-        const player = instrumentRef.current.play(note.midi, context.currentTime, {
-          gain: NOTE_GAIN,
-        });
-        if (!player) {
-          throw new Error("Piano sample is missing");
+        if (Tone.getContext().state !== "running") {
+          Tone.start().catch((audioError) =>
+            onError(`Unable to start audio: ${audioError.message}`),
+          );
         }
-
-        voicesRef.current.set(source, {
-          note: note.name,
-          player,
-        });
+        const count = noteCountsRef.current.get(note.name) ?? 0;
+        if (count === 0) pianoSampler.triggerAttack(note.name);
+        noteCountsRef.current.set(note.name, count + 1);
+        voicesRef.current.set(source, note.name);
         updateActiveNotes();
       } catch (audioError) {
         onError(`Unable to play ${note.name}: ${audioError.message}`);
       }
     },
-    [getAudioContext, onError, updateActiveNotes],
+    [onError, updateActiveNotes],
   );
 
   const releaseNote = useCallback(
@@ -79,7 +63,13 @@ const usePianoSound = (onError) => {
         return;
       }
 
-      voice.player.stop(getSharedAudioContext().currentTime);
+      const count = noteCountsRef.current.get(voice) ?? 0;
+      if (count <= 1) {
+        pianoSampler.triggerRelease(voice);
+        noteCountsRef.current.delete(voice);
+      } else {
+        noteCountsRef.current.set(voice, count - 1);
+      }
       voicesRef.current.delete(source);
       updateActiveNotes();
     },
@@ -99,9 +89,11 @@ const usePianoSound = (onError) => {
 
   useEffect(
     () => () => {
-      instrumentRef.current?.stop();
-      instrumentRef.current = null;
+      new Set(voicesRef.current.values()).forEach((note) =>
+        pianoSampler.triggerRelease(note),
+      );
       voicesRef.current.clear();
+      noteCountsRef.current.clear();
     },
     [],
   );

@@ -1,12 +1,25 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import * as Tone from "tone";
 import { getPianoConfig } from "../api/pianoApi";
-import { resumeAudioContext } from "./audioContext";
 
 const useMetronome = () => {
   const [config, setConfig] = useState(null);
   const [bpm, setBpm] = useState(null);
   const [enabled, setEnabled] = useState(false);
   const [error, setError] = useState("");
+  const synthRef = useRef(null);
+
+  useEffect(() => {
+    synthRef.current = new Tone.Synth({
+      oscillator: { type: "sine" },
+      envelope: { attack: 0.004, decay: 0.04, sustain: 0, release: 0.01 },
+    }).toDestination();
+
+    return () => {
+      synthRef.current?.dispose();
+      synthRef.current = null;
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -44,19 +57,7 @@ const useMetronome = () => {
   }, []);
 
   const playClick = useCallback(() => {
-    const context = resumeAudioContext(setError);
-    const oscillator = context.createOscillator();
-    const gain = context.createGain();
-    const now = context.currentTime;
-    oscillator.type = "sine";
-    oscillator.frequency.setValueAtTime(880, now);
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(0.12, now + 0.004);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
-    oscillator.connect(gain);
-    gain.connect(context.destination);
-    oscillator.start(now);
-    oscillator.stop(now + 0.05);
+    synthRef.current?.triggerAttackRelease("A5", 0.05, Tone.now(), 0.12);
   }, []);
 
   useEffect(() => {
@@ -82,7 +83,10 @@ const useMetronome = () => {
   const toggleMetronome = () => {
     if (!enabled) {
       try {
-        resumeAudioContext(setError);
+        Tone.start().catch((audioError) => {
+          setError(`Unable to start metronome: ${audioError.message}`);
+          setEnabled(false);
+        });
         setError("");
         setEnabled(true);
       } catch (audioError) {
