@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
 import * as Tone from 'tone';
 
