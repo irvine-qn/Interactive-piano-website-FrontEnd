@@ -6,7 +6,10 @@ import { Search } from "lucide-react";
 
 const NAV_ITEMS = [
   { to: "/", label: "Piano" },
-  { to: "/library", label: "Sheet library" },
+  { to: "/library", label: "Library" },
+  { to: "/workspace", label: "Practice_sample" },
+  { to: "/upload", label: "Upload" },
+  { to: "/pro5", label: "Profile" },
 ];
 
 const Navbar = () => (
