@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { playNote, stopNote, resetPlayback } from '../audio/toneEngine'; // Import động cơ âm thanh
+import { playNote, stopNote, resetPlayback } from '../../piano/audio/toneEngine'; // Import động cơ âm thanh
 
 export const useWorkspaceStore = create((set, get) => ({
   currentMode: 'FREE_PLAY', // 'FREE_PLAY' | 'PRACTICE' | 'AUTO_PLAY'
@@ -38,7 +38,6 @@ export const useWorkspaceStore = create((set, get) => ({
     }
   },
 
-  // Chỉ đổi màu phím (không phát tiếng) - dùng cho Auto-play, âm thanh do Tone.Part lo
   highlightKey: (note) => {
     const { activeKeys } = get();
     if (!activeKeys.includes(note)) set({ activeKeys: [...activeKeys, note] });

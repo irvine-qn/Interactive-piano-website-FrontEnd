@@ -1,13 +1,13 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import * as Tone from 'tone';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
-import { stopAllNotes } from '../audio/toneEngine';
+import { stopAllNotes } from '../../piano/audio/toneEngine';
 import { Music, BookOpen, PlaySquare, Play, Pause, Volume2 } from 'lucide-react';
 
 const MODES = [
-  { id: 'FREE_PLAY', label: 'Tự Do', icon: <Music className="w-4 h-4" /> },
-  { id: 'PRACTICE', label: 'Luyện Tập', icon: <BookOpen className="w-4 h-4" /> },
-  { id: 'AUTO_PLAY', label: 'Tự Động', icon: <PlaySquare className="w-4 h-4" /> },
+  { id: 'FREE_PLAY', label: 'Free', icon: <Music className="w-4 h-4" /> },
+  { id: 'PRACTICE', label: 'Practice', icon: <BookOpen className="w-4 h-4" /> },
+  { id: 'AUTO_PLAY', label: 'Auto', icon: <PlaySquare className="w-4 h-4" /> },
 ];
 
 const ControlBar = () => {
@@ -24,23 +24,27 @@ const ControlBar = () => {
     return `${m}:${s}`;
   };
 
-  const updateProgress = () => {
-  if (progressBarRef.current && currentTimeRef.current && progressFillRef.current && !isDragging.current) {
-    const currentTime = Tone.Transport.seconds;
-    progressBarRef.current.value = currentTime;
-    currentTimeRef.current.innerText = formatTime(currentTime);
-    
-    const percentage = duration > 0 ? (currentTime / duration) * 100 : 0;
-    progressFillRef.current.style.width = `${percentage}%`;
-    
-    // Cập nhật vị trí thumb trực tiếp qua DOM để không phụ thuộc re-render
-    const thumb = document.getElementById('progress-thumb');
-    if (thumb) thumb.style.left = `calc(${percentage}% - 8px)`;
-  }
-  requestRef.current = requestAnimationFrame(updateProgress);
-};
-
   useEffect(() => {
+    function updateProgress() {
+      if (
+        progressBarRef.current &&
+        currentTimeRef.current &&
+        progressFillRef.current &&
+        !isDragging.current
+      ) {
+        const currentTime = Tone.Transport.seconds;
+        progressBarRef.current.value = currentTime;
+        currentTimeRef.current.innerText = formatTime(currentTime);
+
+        const percentage = duration > 0 ? (currentTime / duration) * 100 : 0;
+        progressFillRef.current.style.width = `${percentage}%`;
+
+        const thumb = document.getElementById('progress-thumb');
+        if (thumb) thumb.style.left = `calc(${percentage}% - 8px)`;
+      }
+      requestRef.current = requestAnimationFrame(updateProgress);
+    }
+
     const handleStart = () => setIsPlaying(true);
     // Pause/Stop: tắt âm đang ngân và tắt highlight các phím Auto-play
     const handleHalt = () => {

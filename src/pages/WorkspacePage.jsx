@@ -1,9 +1,8 @@
-import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useWorkspaceStore } from '../features/workspace/store/useWorkspaceStore';
 import PianoKeyboard from '../features/workspace/components/PianoKeyboard';
 import ControlBar from '../features/workspace/components/ControlBar';
-import WaterfallCanvas from '../features/workspace/components/WaterfallCanvas';
+import WaterfallCanvas from '../features/workspace/canvas/practiceWaterfall';
 import { useSheetLoader } from '../features/workspace/hooks/useSheetLoader';
 import { DEFAULT_SHEET_ID } from '../features/workspace/config/sheet';
 
@@ -15,7 +14,6 @@ const WorkspacePage = () => {
   return (
     <div className="min-h-screen bg-[#cbf0ff] flex flex-col font-sans">
       
-      {/* TẦNG 1: HEADER (INFO SHEET) */}
       <div className="w-full pt-4 pb-4 text-center shrink-0">
         <h1 className="text-3xl font-black text-gray-800 tracking-wider">
           FIANO<span className="text-[#ff7a1a]">.</span>
@@ -27,16 +25,11 @@ const WorkspacePage = () => {
         )}
       </div>
 
-      {/* TẦNG 2: CONTROL BAR */}
       <div className="w-full border-y border-gray-300 shadow-xs shrink-0">
         <ControlBar />
       </div>
 
-      {/* TẦNG 3 + 4: KHU VỰC CANAVAS & PIANO */}
-      {/* Đã gộp thẻ div bị thừa. Dùng flex-1 trực tiếp ở đây để đẩy khu vực này lấp đầy màn hình */}
       <div className="flex-1 flex flex-col w-full mx-auto px-4 mt-2">
-          
-          {/* TẦNG 3: WATERFALL CANVAS CONTAINER (Sẽ tự động chiếm hết khoảng trống nhờ flex-1) */}
           <div className="flex-1 relative w-full bg-[#f8f9fa]/90 border-b-4 border-[#ff7a1a] rounded-t-lg overflow-hidden">
              <WaterfallCanvas />
              {sheetStatus === 'loading' && (

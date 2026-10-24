@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import Key from './Key';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
 import { KEYBOARD_TO_NOTE_MAP, NOTE_TO_KEYBOARD_MAP } from '../config/keyMapping';
@@ -58,13 +58,12 @@ const PianoKeyboard = () => {
   return (
     <div className="flex w-full p-2 sm:p-4 bg-gray-900 rounded-b-lg shadow-2xl h-[120px] sm:h-[180px]">
       <div className="flex w-full h-full relative">
-        {whiteKeys.map((whiteKey, idx) => {
+        {whiteKeys.map((whiteKey) => {
           const originalIdx = displayedKeys.findIndex(k => k.note === whiteKey.note);
           const nextKey = displayedKeys[originalIdx + 1];
           const hasBlackKeyAfter = nextKey && nextKey.isBlack;
 
           return (
-            // Thêm min-w-0 ở đây để flexbox cho phép ép cực mỏng
             <div key={whiteKey.note} className="flex-1 relative h-full min-w-0">
                <Key
                  note={whiteKey.note}

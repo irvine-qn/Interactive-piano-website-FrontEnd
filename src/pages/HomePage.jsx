@@ -1,6 +1,6 @@
 import Footer from "../components/common/footer";
-import Metronome from "../features/workspace/components/metronome";
-import Piano from "../features/workspace/components/piano";
+import Metronome from "../features/home/components/metronome";
+import Piano from "../features/home/components/piano";
 
 const HomePage = () => (
   <div className="flex flex-1 flex-col">

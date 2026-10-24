@@ -1,5 +1,3 @@
-import React from 'react';
-
 const Key = ({ note, hint, showHint = true, isBlack, isActive, onMouseDown, onMouseUp }) => {
   return (
     <div
