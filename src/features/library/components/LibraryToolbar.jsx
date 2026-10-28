@@ -104,21 +104,26 @@ const SortSelect = ({ value, onChange }) => {
   );
 };
 
-// Thanh công cụ của Library: tìm kiếm, số bài đang hiển thị, sắp xếp
-const LibraryToolbar = ({ query, meta, shownCount, onSearch, onSortChange }) => (
+// Thanh công cụ của Library: tìm kiếm, số bài đang hiển thị, sắp xếp; `children` là hàng bộ lọc bên dưới
+const LibraryToolbar = ({ query, meta, shownCount, onSearch, onSortChange, children }) => (
   <section
-    aria-label="Tìm kiếm và sắp xếp"
-    className="flex flex-wrap items-center gap-x-6 gap-y-3 border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-4 py-3.5 shadow-[var(--shadow-hard)]"
+    aria-label="Tìm kiếm, sắp xếp và lọc"
+    className="flex flex-col border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-4 py-3.5 shadow-[var(--shadow-hard)]"
   >
-    <SearchBox value={query.q} onSearch={onSearch} />
-    <div className="ml-auto flex flex-wrap items-center gap-x-6 gap-y-3">
-      {meta && (
-        <p aria-live="polite" className="m-0 text-sm text-[var(--color-neutral-500)]">
-          Hiển thị {shownCount} / {meta.total.toLocaleString('en')} bản
-        </p>
-      )}
-      <SortSelect value={query.sort} onChange={onSortChange} />
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+      <SearchBox value={query.q} onSearch={onSearch} />
+      <div className="ml-auto flex flex-wrap items-center gap-x-6 gap-y-3">
+        {meta && (
+          <p aria-live="polite" className="m-0 text-sm text-[var(--color-neutral-500)]">
+            Hiển thị {shownCount} / {meta.total.toLocaleString('en')} bản
+          </p>
+        )}
+        <SortSelect value={query.sort} onChange={onSortChange} />
+      </div>
     </div>
+    {children && (
+      <div className="mt-3.5 border-0 border-t-2 border-dashed border-[var(--color-line-dashed)] pt-3.5">{children}</div>
+    )}
   </section>
 );
 
