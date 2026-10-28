@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import HomePage from "../pages/HomePage";
-import WorkspacePage from "../pages/sheet/WorkspacePage";
+import WorkspacePage from "../pages/WorkspacePage";
 
 const AppRoutes = () => (
   <Routes>

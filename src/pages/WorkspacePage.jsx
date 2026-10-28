@@ -1,11 +1,11 @@
 import { useParams } from "react-router-dom";
-import { useWorkspaceStore } from "../../features/workspace/store/useWorkspaceStore";
-import PianoKeyboard from "../../features/workspace/components/PianoKeyboard";
-import ControlBar from "../../features/workspace/components/ControlBar";
-import WaterfallCanvas from "../../features/workspace/canvas/practiceWaterfall";
-import { useSheetLoader } from "../../features/workspace/hooks/useSheetLoader";
-import { DEFAULT_SHEET_ID } from "../../features/workspace/config/sheet";
-import Footer from "../../components/common/footer";
+import { useWorkspaceStore } from "../features/workspace/store/useWorkspaceStore";
+import PianoKeyboard from "../features/workspace/components/PianoKeyboard";
+import ControlBar from "../features/workspace/components/ControlBar";
+import WaterfallCanvas from "../features/workspace/canvas/practiceWaterfall";
+import { useSheetLoader } from "../features/workspace/hooks/useSheetLoader";
+import { DEFAULT_SHEET_ID } from "../features/workspace/config/sheet";
+import Footer from "../components/common/footer";
 
 const WorkspacePage = () => {
   const { sheet, sheetStatus, sheetError } = useWorkspaceStore();

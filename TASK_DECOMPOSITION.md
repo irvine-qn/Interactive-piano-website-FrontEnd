@@ -18,7 +18,7 @@
 | :--- | :--- | :--- | :--- |
 | **C-01** `[BE]` | API prefix `/api/v1` | Đổi mount point trong `src/app.js` từ `/api` sang `/api/v1` cho `workspace.routes` và `sheets.routes`. Cập nhật toàn bộ ví dụ trong README. Phải merge cùng lúc với C-02. | Done |
 | **C-02** `[FE]` | axios baseURL `/api/v1` | Sửa `src/lib/axios.js`: `baseURL = ${API_BASE_URL}/api/v1`. Không sửa `features/home/api/pianoApi.js` (đường dẫn tương đối `/piano` vẫn đúng). Kiểm tra Home vẫn tải được cấu hình piano/metronome. Phụ thuộc: C-01. | Done |
-| **C-03** `[FE]` | Chuẩn hoá thư mục `pages/` | Chuyển `pages/sheet/WorkspacePage.jsx` thành `pages/WorkspacePage.jsx`, xoá thư mục `pages/sheet/`, sửa import trong `routes/AppRoutes.jsx`. Trang sau này đặt phẳng trong `pages/` (`LibraryPage`, `NotFoundPage`, ...). | To Do |
+| **C-03** `[FE]` | Chuẩn hoá thư mục `pages/` | Chuyển `pages/sheet/WorkspacePage.jsx` thành `pages/WorkspacePage.jsx`, xoá thư mục `pages/sheet/`, sửa import trong `routes/AppRoutes.jsx`. Trang sau này đặt phẳng trong `pages/` (`LibraryPage`, `NotFoundPage`, ...). | Done |
 | **C-04** `[FE]` | Navbar: chữ thương hiệu mới | Trong `components/common/navbar.jsx`, thay ảnh `fiano-logo.png` bằng chữ `FIANO` + dấu chấm màu `--color-brand` (giống tầng 1 hiện tại của WorkspacePage), dùng design token. **Giữ nguyên con cáo mascot** và vị trí. Không đổi menu và ô search. | To Do |
 | **C-05** `[FE]` | Tách bundle theo route | Dùng `React.lazy` + `Suspense` trong `routes/AppRoutes.jsx` cho các page để Tone.js không nằm trong bundle chính. So sánh kích thước `dist/assets/*.js` trước và sau. Làm cuối phiên. | To Do |
 
@@ -101,9 +101,9 @@
 
 | Sub-Task | Component | Contract & Constraints | Status |
 | :--- | :--- | :--- | :--- |
-| **L-BE-01** `[BE]` | Postgres local bằng Docker | Tạo `docker-compose.yml` (postgres:16, volume, port 5432), `.env.example` có `DATABASE_URL`, README hướng dẫn `docker compose up -d`. Không commit `.env`. | To Do |
-| **L-BE-02** `[BE]` | Cài Prisma | Cài `prisma` + `@prisma/client`, tạo `prisma/schema.prisma` (chỉ datasource + generator), `src/lib/prisma.js` (singleton client, disconnect khi tắt server). Script npm: `db:migrate`, `db:seed`, `db:studio`. | To Do |
-| **L-BE-03** `[BE]` | Model `Sheet` + migration | Model `Sheet`: `id` (slug, PK), `title`, `subtitle?`, `composer`, `difficulty` (enum EASY/MEDIUM/HARD/EXPERT), `tags String[]`, `bpm`, `timeSignature Int[]`, `keySignature?`, `durationSec`, `noteCount`, `views` (mặc định 0), `likes` (mặc định 0), `coverColor`, `notes Json`, `createdAt`, `updatedAt`. Migration `init_sheets`. Cột `uploaderId` sẽ thêm sau khi có User/Auth. | To Do |
+| **L-BE-01** `[BE]` | Postgres local bằng Docker | Tạo `docker-compose.yml` (postgres:16, volume, port 5432), `.env.example` có `DATABASE_URL`, README hướng dẫn `docker compose up -d`. Không commit `.env`. | Done |
+| **L-BE-02** `[BE]` | Cài Prisma | Cài `prisma@7` + `@prisma/client` + `@prisma/adapter-pg` + `pg`, tạo `prisma.config.js`, `prisma/schema.prisma` (chỉ datasource + generator `prisma-client-js`), `src/lib/prisma.js` (singleton client, disconnect khi tắt server). Script npm: `postinstall` (generate), `db:generate`, `db:migrate`, `db:studio`. | Done |
+| **L-BE-03** `[BE]` | Model `Sheet` + migration | Model `Sheet`: `id` (slug, PK), `title`, `subtitle?`, `composer`, `difficulty` (enum EASY/MEDIUM/HARD/EXPERT), `tags String[]`, `bpm`, `timeSignature Int[]`, `keySignature?`, `durationSec`, `noteCount`, `views` (mặc định 0), `likes` (mặc định 0), `coverColor`, `notes Json`, `createdAt`, `updatedAt`. Migration `init_sheets`. Cột `uploaderId` sẽ thêm sau khi có User/Auth. | Done |
 
 ### Backend: Dữ liệu bài nhạc (seed)
 
@@ -112,17 +112,17 @@
 | **L-BE-04A** `[BE]` | Tool convert: phân tích track | Tạo `scripts/midi-to-sheet.mjs` (tool seed riêng, **không đụng `convertMidi.mjs`** vì file đó để dành cho engine Upload). Chế độ `--inspect` in bảng track: tên, nhạc cụ (GM program), channel, số nốt, khoảng cao độ, cao độ trung bình. Track lấy theo `--tracks 0,2` (catalog khai báo). Chỉ khi không khai báo mới tự chọn track piano (program 0–7, bỏ track trống). | Done |
 | **L-BE-04B** `[BE]` | Tool convert: chia tay & xuất JSON | Chia tay: nếu có 2+ track piano thì track có cao độ trung bình thấp hơn là tay trái, cao hơn là tay phải. Nếu chỉ có 1 track thì chia theo điểm cắt C4. Lọc nốt ngoài 88 phím, khử nốt trùng, sắp theo `time`. Xuất `{ metadata: { bpm, timeSignature, keySignature? }, notes: [{ midi, name, time, duration, velocity, hand }] }`. Phụ thuộc: L-BE-04A. | Done |
 | **L-BE-05** `[BE]` | Convert các bài nhạc | Tạo `src/data/sheets/catalog.json`: mỗi bài có `id`, `midiFile`, `tracks` (track cần lấy, khai báo tường minh), title, subtitle, composer, difficulty (`Easy→EASY`, `Normal→MEDIUM`, `Hard→HARD`), tags (1 thể loại), views/likes mẫu, coverColor. Copy 8 file `.mid` từ `Assets/MIDI-music/` vào `src/data/sheets/midi/` (tên file theo `id`). Script `npm run sheets:build` convert toàn bộ catalog ra `src/data/sheets/<id>.json`. Merry Christmas lấy track `0,1` (Piano + Music Box), sửa lỗi nhãn tay bị ngược. Phụ thuộc: L-BE-04B. | Done |
-| **L-BE-06** `[BE]` | Seed script | `prisma/seed.js` đọc `catalog.json` + JSON nốt, tính `durationSec`/`noteCount`, `upsert` theo `id` (chạy lại nhiều lần không bị trùng). Phụ thuộc: L-BE-03, L-BE-05. | To Do |
+| **L-BE-06** `[BE]` | Seed script | `prisma/seed.js` đọc `catalog.json` + JSON nốt, tính `durationSec`/`noteCount`, `upsert` theo `id` (chạy lại nhiều lần không bị trùng). Khai báo `migrations.seed` trong `prisma.config.js` + script `db:seed`. Phụ thuộc: L-BE-03, L-BE-05. | Done |
 
 ### Backend: API
 
 | Sub-Task | Component | Contract & Constraints | Status |
 | :--- | :--- | :--- | :--- |
-| **L-BE-07** `[BE]` | Repository Prisma | Tạo `sheets.repository.js` (`findMany` có where/orderBy/skip/take, **không select `notes`**; `findById` có `notes`; `count`). `sheets.service.js` dùng repository thay cho Map trong RAM. Xoá `sheets.catalog.js`. Response của `GET /sheets` và `GET /sheets/:id` **giữ nguyên contract**. Phụ thuộc: L-BE-06, C-01. | To Do |
-| **L-BE-08** `[BE]` | Mở rộng list & summary | Summary thêm `views`, `likes`, `coverColor`, `subtitle`, `keySignature`. Query: `sort` = `popular` (views) \| `likes` \| `newest` \| `title` (mặc định `popular`), thêm lọc `tag`. Cập nhật validation trong `sheets.schema.js`. Phụ thuộc: L-BE-07. | To Do |
-| **L-BE-09** `[BE]` | `GET /api/v1/sheets/tags` | Trả danh sách tag kèm số bài, dùng cho thanh lọc. Khai báo route **trước** `/sheets/:id`. Phụ thuộc: L-BE-07. | To Do |
-| **L-BE-10** `[BE]` | `POST /api/v1/sheets/:id/view` | Tăng `views` lên 1 (atomic `increment`), trả `{ views }`. Trả 404 `SHEET_NOT_FOUND` nếu không có bài. Không cần auth. Phụ thuộc: L-BE-07. | To Do |
-| **L-BE-11** `[BE]` | Review BE | Test tay bằng Postman hoặc curl mọi endpoint (cả trường hợp lỗi 422/404), cập nhật README (setup DB, API v1, các endpoint mới). | To Do |
+| **L-BE-07** `[BE]` | Repository Prisma | Tạo `sheets.repository.js` (`findMany` có where/orderBy/skip/take, **không select `notes`**; `findById` có `notes`; `count`). `sheets.service.js` dùng repository thay cho Map trong RAM. Xoá `sheets.catalog.js`. Response của `GET /sheets` và `GET /sheets/:id` **giữ nguyên contract**. Phụ thuộc: L-BE-06, C-01. | Done |
+| **L-BE-08** `[BE]` | Mở rộng list & summary | Summary thêm `views`, `likes`, `coverColor`, `subtitle`, `keySignature`. Query: `sort` = `popular` (views) \| `likes` \| `newest` \| `title` (mặc định `popular`), thêm lọc `tag`. Cập nhật validation trong `sheets.schema.js`. Phụ thuộc: L-BE-07. | Done |
+| **L-BE-09** `[BE]` | `GET /api/v1/sheets/tags` | Trả danh sách tag kèm số bài, dùng cho thanh lọc. Khai báo route **trước** `/sheets/:id`. Phụ thuộc: L-BE-07. | Done |
+| **L-BE-10** `[BE]` | `POST /api/v1/sheets/:id/view` | Tăng `views` lên 1 (atomic `increment`), trả `{ views }`. Trả 404 `SHEET_NOT_FOUND` nếu không có bài. Không cần auth. Phụ thuộc: L-BE-07. | Done |
+| **L-BE-11** `[BE]` | Review BE | Test tay bằng Postman hoặc curl mọi endpoint (cả trường hợp lỗi 422/404), cập nhật README (setup DB, API v1, các endpoint mới). | Done |
 
 ### Frontend
 
