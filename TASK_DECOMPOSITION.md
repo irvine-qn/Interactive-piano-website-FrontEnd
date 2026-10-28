@@ -134,7 +134,7 @@
 | **L-FE-04** `[FE]` | `SheetCover` | Ảnh bìa vẽ bằng CSS/SVG: nền pastel theo `coverColor`, hình bản nhạc dùng chung, badge độ khó (vd. *Khó*), nhãn `MIDI`. Không có nhãn PDF. | Done |
 | **L-FE-05** `[FE]` | `SheetCard` | Cover + tiêu đề + tác giả + views/likes/thời lượng + nút *Luyện tập* (link `/workspace/:id`). Ẩn nút Like/Thêm vào collection (chờ User). Helper `utils/format.js` (`45.2K`, `03:45`). Phụ thuộc: L-FE-04. | Done |
 | **L-FE-06** `[FE]` | `SheetGrid` + trạng thái | Lưới 4 cột (desktop), skeleton khi đang tải, trạng thái rỗng (*Không tìm thấy bản nhạc*), lỗi + nút Thử lại. Phụ thuộc: L-FE-05. | Done |
-| **L-FE-07** `[FE]` | Toolbar: tìm kiếm & sắp xếp | Ô tìm kiếm (debounce 300ms), dòng *Hiển thị x / N bản*, dropdown sắp xếp (Phổ biến nhất, Lượt thích, Mới nhất, Tên). Theo thiết kế `Sheet_Library_Cartoon 3`. Phụ thuộc: L-FE-02. | To Do |
+| **L-FE-07** `[FE]` | Toolbar: tìm kiếm & sắp xếp | Ô tìm kiếm (debounce 300ms), dòng *Hiển thị x / N bản*, dropdown sắp xếp (Phổ biến nhất, Lượt thích, Mới nhất, Tên). Theo thiết kế `Sheet_Library_Cartoon 3`. Phụ thuộc: L-FE-02. | Done |
 | **L-FE-08** `[FE]` | Bộ lọc độ khó & thể loại | Segmented độ khó (Tất cả/Dễ/Trung bình/Khó/Chuyên gia) + chip tag (từ `getTags`). Phụ thuộc: L-FE-02, L-BE-09. | To Do |
 | **L-FE-09** `[FE]` | Phân trang | `Pagination`: prev/next, số trang có `…`, *Trang x trên y*, disable ở 2 đầu, cuộn lên đầu lưới khi đổi trang. Phụ thuộc: L-FE-02. | To Do |
 | **L-FE-10** `[FE]` | Review Library | `lint` + `build`, test thủ công (tìm kiếm, lọc, sắp xếp, phân trang, F5 giữ URL, BE tắt thì hiện lỗi), cập nhật README FE. | To Do |
