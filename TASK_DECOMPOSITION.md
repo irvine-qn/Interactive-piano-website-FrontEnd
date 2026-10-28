@@ -137,7 +137,7 @@
 | **L-FE-07** `[FE]` | Toolbar: tìm kiếm & sắp xếp | Ô tìm kiếm (debounce 300ms), dòng *Hiển thị x / N bản*, dropdown sắp xếp (Phổ biến nhất, Lượt thích, Mới nhất, Tên). Theo thiết kế `Sheet_Library_Cartoon 3`. Phụ thuộc: L-FE-02. | Done |
 | **L-FE-08** `[FE]` | Bộ lọc độ khó & thể loại | Segmented độ khó (Tất cả/Dễ/Trung bình/Khó/Chuyên gia) + chip tag (từ `getTags`). Phụ thuộc: L-FE-02, L-BE-09. | Done |
 | **L-FE-09** `[FE]` | Phân trang | `Pagination`: prev/next, số trang có `…`, *Trang x trên y*, disable ở 2 đầu, cuộn lên đầu lưới khi đổi trang. Phụ thuộc: L-FE-02. | Done |
-| **L-FE-10** `[FE]` | Review Library | `lint` + `build`, test thủ công (tìm kiếm, lọc, sắp xếp, phân trang, F5 giữ URL, BE tắt thì hiện lỗi), cập nhật README FE. | To Do |
+| **L-FE-10** `[FE]` | Review Library | `lint` + `build`, test thủ công (tìm kiếm, lọc, sắp xếp, phân trang, F5 giữ URL, BE tắt thì hiện lỗi), cập nhật README FE. | Done |
 
 ## Feature: User
 ### Sub feature: User profile

@@ -19,13 +19,14 @@ const LibraryBrowser = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Link cũ trỏ quá số trang hiện có (vd. ?page=99) thì chuyển về trang cuối
+  // Link cũ trỏ quá số trang hiện có (vd. ?page=99) thì chuyển về trang cuối.
+  // Trong lúc chuyển vẫn coi là đang tải để không nháy lên "Không tìm thấy bản nhạc".
   const lastPage = meta?.totalPages ?? 0;
+  const isPageOutOfRange = status === 'success' && lastPage > 0 && query.page > lastPage;
   useEffect(() => {
-    if (status === 'success' && lastPage > 0 && query.page > lastPage) {
-      updateQuery({ page: lastPage }, { replace: true });
-    }
-  }, [status, lastPage, query.page, updateQuery]);
+    if (isPageOutOfRange) updateQuery({ page: lastPage }, { replace: true });
+  }, [isPageOutOfRange, lastPage, updateQuery]);
+  const gridStatus = isPageOutOfRange ? 'loading' : status;
 
   return (
     <>
@@ -38,7 +39,7 @@ const LibraryBrowser = () => {
       >
         <LibraryFilters difficulty={query.difficulty} tag={query.tag} tags={tags} onChange={updateQuery} />
       </LibraryToolbar>
-      <SheetGrid sheets={sheets} status={status} error={error} onRetry={retry} skeletonCount={PAGE_SIZE} />
+      <SheetGrid sheets={sheets} status={gridStatus} error={error} onRetry={retry} skeletonCount={PAGE_SIZE} />
       {meta && meta.total > 0 && status !== 'error' && (
         <Pagination page={query.page} totalPages={meta.totalPages} onChange={handlePageChange} />
       )}
