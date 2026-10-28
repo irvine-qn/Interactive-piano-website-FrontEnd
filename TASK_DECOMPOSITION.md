@@ -129,7 +129,7 @@
 | Sub-Task | Component | Contract & Constraints | Status |
 | :--- | :--- | :--- | :--- |
 | **L-FE-01** `[FE]` | API layer | `features/library/api/libraryApi.js`: `getSheets(params, { signal })`, `getTags({ signal })`. | Done |
-| **L-FE-02** `[FE]` | Hook query theo URL | `features/library/hooks/useLibraryQuery.js`: đọc/ghi `q, sort, difficulty, tag, page` qua `useSearchParams` (URL là nguồn sự thật, F5 hoặc share link vẫn giữ bộ lọc), gọi API, huỷ request cũ, trạng thái loading/error/retry. Đổi bộ lọc thì về page 1. Không cần Zustand. Phụ thuộc: L-FE-01. | To Do |
+| **L-FE-02** `[FE]` | Hook query theo URL | `features/library/hooks/useLibraryQuery.js`: đọc/ghi `q, sort, difficulty, tag, page` qua `useSearchParams` (URL là nguồn sự thật, F5 hoặc share link vẫn giữ bộ lọc), gọi API, huỷ request cũ, trạng thái loading/error/retry. Đổi bộ lọc thì về page 1. Không cần Zustand. Phụ thuộc: L-FE-01. | Done |
 | **L-FE-03** `[FE]` | LibraryPage + route | `pages/LibraryPage.jsx` (chỉ ghép component) + route `/library` trong `AppRoutes.jsx`. Khung trang + Footer. Phụ thuộc: C-03. | To Do |
 | **L-FE-04** `[FE]` | `SheetCover` | Ảnh bìa vẽ bằng CSS/SVG: nền pastel theo `coverColor`, hình bản nhạc dùng chung, badge độ khó (vd. *Khó*), nhãn `MIDI`. Không có nhãn PDF. | To Do |
 | **L-FE-05** `[FE]` | `SheetCard` | Cover + tiêu đề + tác giả + views/likes/thời lượng + nút *Luyện tập* (link `/workspace/:id`). Ẩn nút Like/Thêm vào collection (chờ User). Helper `utils/format.js` (`45.2K`, `03:45`). Phụ thuộc: L-FE-04. | To Do |
