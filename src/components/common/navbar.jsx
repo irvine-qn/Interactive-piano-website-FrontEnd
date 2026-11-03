@@ -4,17 +4,18 @@ import fianoLogo from "../../assets/virtual-piano-assets/fiano-logo.png";
 import foxMascot from "../../assets/virtual-piano-assets/fox-mascot.png";
 import { LogOut, Search, User } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
+import { ROUTES } from "../../config/routes";
 
 const NAV_ITEMS = [
-  { to: "/", label: "Piano" },
-  { to: "/library", label: "Library" },
-  { to: "/workspace", label: "Practice_sample" },
-  { to: "/upload", label: "Upload" },
-  { to: "/login", label: "Login", guestOnly: true },
-  { to: "/register", label: "Register", guestOnly: true },
+  { to: ROUTES.HOME, label: "Piano" },
+  { to: ROUTES.LIBRARY, label: "Library" },
+  { to: ROUTES.WORKSPACE, label: "Practice_sample" },
+  { to: ROUTES.UPLOAD, label: "Upload" },
+  { to: ROUTES.LOGIN, label: "Login", guestOnly: true },
+  { to: ROUTES.REGISTER, label: "Register", guestOnly: true },
 ];
 
-const AUTH_PATHS = ["/login", "/register", "/forgot-password"];
+const AUTH_PATHS = [ROUTES.LOGIN, ROUTES.REGISTER, ROUTES.FORGOT_PASSWORD];
 
 const Navbar = () => {
   const location = useLocation();
@@ -28,14 +29,14 @@ const Navbar = () => {
 
   const handleLogout = () => {
     clearAuth();
-    navigate("/", { replace: true });
+    navigate(ROUTES.HOME, { replace: true });
   };
 
   return (
     <header className="relative z-20 border-b-4 border-[var(--color-ink)] bg-[linear-gradient(to_bottom,var(--color-sky-1)_0_16px,var(--color-sky-2)_16px_32px,var(--color-sky-3)_32px_48px,var(--color-sky-4)_48px_64px,var(--color-sky-5)_64px_80px,var(--color-sky-6)_80px)]">
       <div className="relative mx-auto flex h-[92px] w-full max-w-[1600px] items-center gap-6 px-4">
         <NavLink
-          to="/"
+          to={ROUTES.HOME}
           aria-label="Fiano home"
           className="flex shrink-0 items-center"
         >
@@ -69,7 +70,7 @@ const Navbar = () => {
             <NavLink
               key={item.to}
               to={item.to}
-              state={item.to === "/login" ? { from } : undefined}
+              state={item.to === ROUTES.LOGIN ? { from } : undefined}
               end
               className={({ isActive }) =>
                 `flex h-9 items-center border-2 border-[var(--color-ink)] px-[18px] text-[15px] font-bold no-underline shadow-[var(--shadow-hard-sm)] ${
@@ -105,7 +106,7 @@ const Navbar = () => {
                   {user.displayName}
                 </p>
                 <NavLink
-                  to="/profile"
+                  to={ROUTES.PROFILE}
                   role="menuitem"
                   className="flex items-center gap-2 px-4 py-3 text-sm font-semibold text-[var(--color-ink)] no-underline hover:bg-[var(--color-brand-tint)]"
                 >

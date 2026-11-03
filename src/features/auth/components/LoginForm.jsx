@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { LogIn } from "lucide-react";
 import { loginUser } from "../api/authApi";
 import { useAuthStore } from "../../../store/useAuthStore";
+import { ROUTES } from "../../../config/routes";
 import { FieldLabel, FormError, PasswordInput, inputClass } from "./AuthFormFields";
 
 const LoginForm = () => {
@@ -20,7 +21,7 @@ const LoginForm = () => {
     setLoading(true);
     try {
       setAuth(await loginUser({ identifier, password }));
-      navigate(location.state?.from || "/", { replace: true });
+      navigate(location.state?.from || ROUTES.HOME, { replace: true });
     } catch (err) {
       setError(err?.error?.message || "Đăng nhập thất bại. Vui lòng thử lại.");
     } finally {
@@ -64,7 +65,7 @@ const LoginForm = () => {
         />
         <div className="mt-3 flex justify-end">
           <Link
-            to="/forgot-password"
+            to={ROUTES.FORGOT_PASSWORD}
             className="text-sm font-bold text-[var(--color-brand-strong)] no-underline"
           >
             Quên mật khẩu?
@@ -96,7 +97,7 @@ const LoginForm = () => {
 
       <p className="m-0 text-center text-sm font-medium text-[var(--color-neutral-600)]">
         Chưa có tài khoản?{" "}
-        <Link to="/register" className="ml-2 font-bold text-[var(--color-brand-strong)] no-underline">
+        <Link to={ROUTES.REGISTER} className="ml-2 font-bold text-[var(--color-brand-strong)] no-underline">
           Đăng ký ngay
         </Link>
       </p>

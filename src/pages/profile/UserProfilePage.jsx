@@ -1,12 +1,13 @@
 import { Navigate } from "react-router-dom";
 import Footer from "../../components/common/footer";
 import { useAuthStore } from "../../store/useAuthStore";
+import { ROUTES } from "../../config/routes";
 
 const UserProfilePage = () => {
   const user = useAuthStore((state) => state.user);
 
   if (!user)
-    return <Navigate to="/login" replace state={{ from: "/profile" }} />;
+    return <Navigate to={ROUTES.LOGIN} replace state={{ from: ROUTES.PROFILE }} />;
 
   return (
     <div className="flex flex-1 flex-col">

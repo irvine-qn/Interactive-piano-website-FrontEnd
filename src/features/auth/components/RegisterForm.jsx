@@ -4,6 +4,13 @@ import { SquareCheck, UserPlus } from "lucide-react";
 import { registerUser } from "../api/authApi";
 import { FieldLabel, FormError, PasswordInput, inputClass } from "./AuthFormFields";
 import { useAuthStore } from "../../../store/useAuthStore";
+import { ROUTES } from "../../../config/routes";
+import {
+  DISPLAY_NAME_MAX_LENGTH,
+  PASSWORD_REGEX,
+  USERNAME_MAX_LENGTH,
+  USERNAME_REGEX,
+} from "../../../config/auth";
 
 const STRENGTH_LEVELS = [
   { label: "Yếu", textClass: "text-[var(--color-danger)]" },
@@ -20,8 +27,9 @@ const STRENGTH_BAR_COLORS = [
   "bg-[var(--color-success)]",
 ];
 
-const validateUsername = (val) => /^[a-z0-9]+$/.test(val);
-const validatePassword = (val) => /^(?=.*[A-Z])(?=.*\d).{8,}$/.test(val);
+const validateUsername = (val) =>
+  val.length <= USERNAME_MAX_LENGTH && USERNAME_REGEX.test(val);
+const validatePassword = (val) => PASSWORD_REGEX.test(val);
 const hasSpecialChar = (val) => /[^A-Za-z0-9]/.test(val);
 
 const getPasswordScore = (val) =>
@@ -79,7 +87,7 @@ const RegisterForm = () => {
           password,
         }),
       );
-      navigate("/profile", { replace: true });
+      navigate(ROUTES.PROFILE, { replace: true });
     } catch (err) {
       setError(err?.error?.message || "Đăng ký thất bại. Vui lòng thử lại.");
     } finally {
@@ -110,6 +118,7 @@ const RegisterForm = () => {
             onChange={(e) => setDisplayName(e.target.value)}
             required
             autoComplete="name"
+            maxLength={DISPLAY_NAME_MAX_LENGTH}
             placeholder="Nguyễn Văn A"
             className={inputClass}
           />
@@ -124,6 +133,7 @@ const RegisterForm = () => {
               onChange={(e) => setUsername(e.target.value)}
               required
               autoComplete="username"
+              maxLength={USERNAME_MAX_LENGTH}
               placeholder="chỉ chữ thường và số"
               className={`${inputClass} pr-12`}
             />
@@ -209,7 +219,7 @@ const RegisterForm = () => {
       <p className="m-0 text-center text-sm font-medium text-[var(--color-neutral-600)]">
         Đã có tài khoản?{" "}
         <Link
-          to="/login"
+          to={ROUTES.LOGIN}
           className="ml-2 font-bold text-[var(--color-brand-strong)] no-underline"
         >
           Đăng nhập

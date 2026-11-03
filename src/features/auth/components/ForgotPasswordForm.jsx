@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { forgotPassword } from "../api/authApi";
+import { ROUTES } from "../../../config/routes";
 
 const ForgotPasswordForm = () => {
   const [email, setEmail] = useState("");
@@ -26,7 +27,7 @@ const ForgotPasswordForm = () => {
     return (
       <div>
         <p>Email đặt lại mật khẩu đã được gửi. Vui lòng kiểm tra hộp thư.</p>
-        <Link to="/login">Quay lại đăng nhập</Link>
+        <Link to={ROUTES.LOGIN}>Quay lại đăng nhập</Link>
       </div>
     );
   }
@@ -55,7 +56,7 @@ const ForgotPasswordForm = () => {
       </button>
 
       <p>
-        <Link to="/login">Quay lại đăng nhập</Link>
+        <Link to={ROUTES.LOGIN}>Quay lại đăng nhập</Link>
       </p>
     </form>
   );

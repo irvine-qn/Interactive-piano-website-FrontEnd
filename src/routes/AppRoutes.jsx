@@ -5,15 +5,16 @@ import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
 import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage";
 import UserProfilePage from "../pages/profile/UserProfilePage";
+import { ROUTES } from "../config/routes";
 
 const AppRoutes = () => (
   <Routes>
-    <Route path="/" element={<HomePage />} />
-    <Route path="/workspace/:sheetId?" element={<WorkspacePage />} />
-    <Route path="/login" element={<LoginPage />} />
-    <Route path="/register" element={<RegisterPage />} />
-    <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-    <Route path="/profile" element={<UserProfilePage />} />
+    <Route path={ROUTES.HOME} element={<HomePage />} />
+    <Route path={`${ROUTES.WORKSPACE}/:sheetId?`} element={<WorkspacePage />} />
+    <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+    <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
+    <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
+    <Route path={ROUTES.PROFILE} element={<UserProfilePage />} />
   </Routes>
 );
 
