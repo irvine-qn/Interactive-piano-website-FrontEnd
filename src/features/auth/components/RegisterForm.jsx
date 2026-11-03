@@ -1,8 +1,19 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff, SquareCheck, UserPlus } from "lucide-react";
+import { SquareCheck, UserPlus } from "lucide-react";
 import { registerUser } from "../api/authApi";
 import { useAuthStore } from "../../../store/useAuthStore";
+import { ROUTES } from "../../../config/routes";
+import {
+  DIGIT_REGEX,
+  DISPLAY_NAME_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
+  SPECIAL_CHAR_REGEX,
+  UPPERCASE_REGEX,
+  USERNAME_MAX_LENGTH,
+  USERNAME_REGEX,
+} from "../../../config/auth";
+import { FieldLabel, FormError, PasswordInput, inputClass } from "./AuthFormFields";
 
 const STRENGTH_LEVELS = [
   { label: "Yếu", textClass: "text-[var(--color-danger)]" },
@@ -19,58 +30,19 @@ const STRENGTH_BAR_COLORS = [
   "bg-[var(--color-success)]",
 ];
 
-const inputClass =
-  "h-12 w-full border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-4 font-[inherit] text-sm text-[var(--color-ink)] outline-none placeholder:text-[var(--color-neutral-300)] focus:border-[var(--color-brand)] focus:shadow-[var(--shadow-hard-sm)]";
+const validateUsername = (val) =>
+  val.length <= USERNAME_MAX_LENGTH && USERNAME_REGEX.test(val);
 
-const validateUsername = (val) => /^[a-z0-9]+$/.test(val);
-const validatePassword = (val) => /^(?=.*[A-Z])(?=.*\d).{8,}$/.test(val);
-const hasSpecialChar = (val) => /[^A-Za-z0-9]/.test(val);
+const hasMinLength = (val) => val.length >= PASSWORD_MIN_LENGTH;
+const hasUppercase = (val) => UPPERCASE_REGEX.test(val);
+const hasDigit = (val) => DIGIT_REGEX.test(val);
+const hasSpecialChar = (val) => SPECIAL_CHAR_REGEX.test(val);
+
+const validatePassword = (val) =>
+  hasMinLength(val) && hasUppercase(val) && hasDigit(val);
 
 const getPasswordScore = (val) =>
-  [
-    val.length >= 8,
-    /[A-Z]/.test(val),
-    /\d/.test(val),
-    hasSpecialChar(val),
-  ].filter(Boolean).length;
-
-const FieldLabel = ({ htmlFor, children }) => (
-  <label
-    htmlFor={htmlFor}
-    className="mb-2 block text-sm font-bold text-[var(--color-ink)]"
-  >
-    {children}
-    <span className="ml-2 text-[var(--color-danger)]">*</span>
-  </label>
-);
-
-const PasswordInput = ({ id, value, onChange, autoComplete, placeholder }) => {
-  const [visible, setVisible] = useState(false);
-  const Icon = visible ? EyeOff : Eye;
-
-  return (
-    <div className="relative">
-      <input
-        id={id}
-        type={visible ? "text" : "password"}
-        value={value}
-        onChange={onChange}
-        required
-        autoComplete={autoComplete}
-        placeholder={placeholder}
-        className={`${inputClass} pr-12`}
-      />
-      <button
-        type="button"
-        onClick={() => setVisible((v) => !v)}
-        aria-label={visible ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
-        className="absolute right-3 top-1/2 flex -translate-y-1/2 cursor-pointer border-0 bg-transparent p-1 text-[var(--color-ink)]"
-      >
-        <Icon aria-hidden="true" className="h-4 w-4" />
-      </button>
-    </div>
-  );
-};
+  [hasMinLength(val), hasUppercase(val), hasDigit(val), hasSpecialChar(val)].filter(Boolean).length;
 
 const RegisterForm = () => {
   const navigate = useNavigate();
@@ -119,7 +91,7 @@ const RegisterForm = () => {
           password,
         }),
       );
-      navigate("/profile", { replace: true });
+      navigate(ROUTES.PROFILE, { replace: true });
     } catch (err) {
       setError(err?.error?.message || "Đăng ký thất bại. Vui lòng thử lại.");
     } finally {
@@ -138,14 +110,7 @@ const RegisterForm = () => {
         </p>
       </div>
 
-      {error && (
-        <p
-          role="alert"
-          className="m-0 border-2 border-[var(--color-danger)] bg-[var(--color-danger-wash)] px-4 py-3 text-sm font-semibold text-[var(--color-danger-strong)]"
-        >
-          {error}
-        </p>
-      )}
+      <FormError message={error} />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
@@ -157,6 +122,7 @@ const RegisterForm = () => {
             onChange={(e) => setDisplayName(e.target.value)}
             required
             autoComplete="name"
+            maxLength={DISPLAY_NAME_MAX_LENGTH}
             placeholder="Nguyễn Văn A"
             className={inputClass}
           />
@@ -171,6 +137,7 @@ const RegisterForm = () => {
               onChange={(e) => setUsername(e.target.value)}
               required
               autoComplete="username"
+              maxLength={USERNAME_MAX_LENGTH}
               placeholder="chỉ chữ thường và số"
               className={`${inputClass} pr-12`}
             />
@@ -256,7 +223,7 @@ const RegisterForm = () => {
       <p className="m-0 text-center text-sm font-medium text-[var(--color-neutral-600)]">
         Đã có tài khoản?{" "}
         <Link
-          to="/login"
+          to={ROUTES.LOGIN}
           className="ml-2 font-bold text-[var(--color-brand-strong)] no-underline"
         >
           Đăng nhập

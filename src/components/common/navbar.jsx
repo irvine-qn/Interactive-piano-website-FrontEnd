@@ -4,38 +4,41 @@ import fianoLogo from "../../assets/virtual-piano-assets/fiano-logo.png";
 import foxMascot from "../../assets/virtual-piano-assets/fox-mascot.png";
 import { LogOut, Search, User } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
+import { ROUTES } from "../../config/routes";
 
 const NAV_ITEMS = [
-  { to: "/", label: "Piano" },
-  { to: "/library", label: "Library" },
-  { to: "/workspace", label: "Practice_sample" },
-  { to: "/upload", label: "Upload" },
-  { to: "/login", label: "Login", guestOnly: true },
-  { to: "/register", label: "Register", guestOnly: true },
+  { to: ROUTES.HOME, label: "Piano" },
+  { to: ROUTES.LIBRARY, label: "Library" },
+  { to: ROUTES.WORKSPACE, label: "Practice_sample" },
+  { to: ROUTES.UPLOAD, label: "Upload", authOnly: true },
+  { to: ROUTES.LOGIN, label: "Login", guestOnly: true },
+  { to: ROUTES.REGISTER, label: "Register", guestOnly: true },
 ];
 
-const AUTH_PATHS = ["/login", "/register", "/forgot-password"];
+const AUTH_PATHS = [ROUTES.LOGIN, ROUTES.REGISTER, ROUTES.FORGOT_PASSWORD];
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
   const clearAuth = useAuthStore((state) => state.clearAuth);
-  const navItems = NAV_ITEMS.filter((item) => !(user && item.guestOnly));
+  const navItems = NAV_ITEMS.filter((item) =>
+    user ? !item.guestOnly : !item.authOnly,
+  );
   const from = AUTH_PATHS.includes(location.pathname)
     ? location.state?.from
     : `${location.pathname}${location.search}`;
 
   const handleLogout = () => {
     clearAuth();
-    navigate("/", { replace: true });
+    navigate(ROUTES.HOME, { replace: true });
   };
 
   return (
     <header className="relative z-20 border-b-4 border-[var(--color-ink)] bg-[linear-gradient(to_bottom,var(--color-sky-1)_0_16px,var(--color-sky-2)_16px_32px,var(--color-sky-3)_32px_48px,var(--color-sky-4)_48px_64px,var(--color-sky-5)_64px_80px,var(--color-sky-6)_80px)]">
       <div className="relative mx-auto flex h-[92px] w-full max-w-[1600px] items-center gap-6 px-4">
         <NavLink
-          to="/"
+          to={ROUTES.HOME}
           aria-label="Fiano home"
           className="flex shrink-0 items-center"
         >
@@ -69,7 +72,7 @@ const Navbar = () => {
             <NavLink
               key={item.to}
               to={item.to}
-              state={item.to === "/login" ? { from } : undefined}
+              state={item.to === ROUTES.LOGIN ? { from } : undefined}
               end
               className={({ isActive }) =>
                 `flex h-9 items-center border-2 border-[var(--color-ink)] px-[18px] text-[15px] font-bold no-underline shadow-[var(--shadow-hard-sm)] ${
@@ -83,19 +86,19 @@ const Navbar = () => {
             </NavLink>
           ))}
         </nav>
-        <div className="group relative ml-auto shrink-0">
-          <button
-            type="button"
-            aria-haspopup={user ? "menu" : undefined}
-            className="avatar flex cursor-pointer border-0 bg-transparent p-0"
-          >
-            <img
-              src={defaultAvatar}
-              alt="User avatar"
-              className="avatar h-10 w-10 border-[2.5px] border-[var(--color-ink)] object-cover"
-            />
-          </button>
-          {user && (
+        {user && (
+          <div className="group relative ml-auto shrink-0">
+            <button
+              type="button"
+              aria-haspopup="menu"
+              className="avatar flex cursor-pointer border-0 bg-transparent p-0"
+            >
+              <img
+                src={defaultAvatar}
+                alt="User avatar"
+                className="avatar h-10 w-10 border-[2.5px] border-[var(--color-ink)] object-cover"
+              />
+            </button>
             <div className="invisible absolute right-0 top-full pt-3 opacity-0 transition-opacity group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
               <div
                 role="menu"
@@ -105,7 +108,7 @@ const Navbar = () => {
                   {user.displayName}
                 </p>
                 <NavLink
-                  to="/profile"
+                  to={ROUTES.PROFILE}
                   role="menuitem"
                   className="flex items-center gap-2 px-4 py-3 text-sm font-semibold text-[var(--color-ink)] no-underline hover:bg-[var(--color-brand-tint)]"
                 >
@@ -123,8 +126,8 @@ const Navbar = () => {
                 </button>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </header>
   );
