@@ -10,7 +10,7 @@ const Metronome = () => {
   const sliderFill =
     ((sliderValue - sliderMin) / (sliderMax - sliderMin)) * 100;
   const stepButtonClass =
-    "flex h-7 w-7 cursor-pointer items-center justify-center p-0 border-[1.5px] border-[var(--color-ink)] bg-[var(--color-surface-card)] text-[var(--color-ink)] shadow-[var(--shadow-hard-sm)] disabled:bg-[var(--color-surface-disabled)] disabled:text-[var(--color-line-disabled)]";
+    "flex h-7 w-7 cursor-pointer items-center justify-center p-0 border-[1.5px] border-[var(--color-ink)] bg-[var(--color-surface-card)] text-[var(--color-ink)] disabled:bg-[var(--color-surface-disabled)] disabled:text-[var(--color-line-disabled)]";
 
   return (
     <section
@@ -22,7 +22,7 @@ const Metronome = () => {
         onClick={toggleMetronome}
         disabled={!config}
         aria-pressed={enabled}
-        className={`flex h-9 w-40 cursor-pointer items-center font-[inherit] justify-center gap-2 border-2 border-[var(--color-ink)] text-sm font-bold text-[var(--color-brand-deep)] shadow-[var(--shadow-hard-sm)] disabled:bg-[var(--color-surface-disabled)] ${
+        className={`flex h-9 w-40 cursor-pointer items-center font-[inherit] justify-center gap-2 border-2 border-[var(--color-ink)] text-sm font-bold text-[var(--color-brand-deep)] disabled:bg-[var(--color-surface-disabled)] ${
           enabled
             ? "bg-[var(--color-brand-tint)]"
             : "bg-[var(--color-surface-card)]"
@@ -32,7 +32,7 @@ const Metronome = () => {
           aria-hidden="true"
           className="h-4 w-4 text-[var(--color-brand-strong)]"
         />
-        Metronome {enabled ? "Bật" : "Tắt"}
+        Metronome {enabled ? "On" : "Off"}
       </button>
       <div className="flex h-11 items-center gap-3 border-2 border-[var(--color-ink)] bg-[var(--color-surface-soft)] px-[10px]">
         <button

@@ -28,7 +28,7 @@ const WorkspacePage = () => {
         )}
       </div>
 
-      <div className="w-full border-y border-gray-300 shadow-xs shrink-0">
+      <div className="w-full border-y border-gray-300 shrink-0">
         <ControlBar />
       </div>
 
@@ -37,7 +37,7 @@ const WorkspacePage = () => {
           <WaterfallCanvas />
           {sheetStatus === "loading" && (
             <div className="absolute inset-0 flex items-center justify-center text-sm font-bold text-gray-600">
-              Đang tải bản nhạc...
+              Loading sheet...
             </div>
           )}
           {sheetStatus === "error" && (
@@ -49,7 +49,7 @@ const WorkspacePage = () => {
                 onClick={reloadSheet}
                 className="cursor-pointer px-4 py-2 rounded-lg bg-[#ff7a1a] text-white text-sm font-bold hover:bg-[#e8630a] transition-colors"
               >
-                Thử lại
+                Try again
               </button>
             </div>
           )}

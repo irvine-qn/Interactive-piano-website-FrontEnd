@@ -61,7 +61,7 @@ const Navbar = () => {
     ));
 
   return (
-    <header className="relative z-20 border-b-4 border-[var(--color-ink)] bg-[var(--color-sky-3)]">
+    <header className="relative z-20 border-b-4 border-[var(--color-ink)] bg-[linear-gradient(to_bottom,var(--color-sky-1)_0_16px,var(--color-sky-2)_16px_32px,var(--color-sky-3)_32px_48px,var(--color-sky-4)_48px_64px,var(--color-sky-5)_64px_80px,var(--color-sky-6)_80px)]">
       <div className="relative mx-auto flex h-[92px] w-full max-w-[1600px] items-center gap-6 px-4">
         <NavLink
           to={ROUTES.HOME}

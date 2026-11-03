@@ -5,8 +5,8 @@ import RegisterForm from "../../features/auth/components/RegisterForm";
 const RegisterPage = () => (
   <div className="flex flex-1 flex-col">
     <AuthLayout
-      title="Bắt đầu cùng Fiano!"
-      subtitle="Tạo tài khoản miễn phí, luyện đàn mỗi ngày."
+      title="Get started with Fiano!"
+      subtitle="Create a free account and practice every day."
     >
       <RegisterForm />
     </AuthLayout>

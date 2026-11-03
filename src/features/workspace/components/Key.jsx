@@ -14,7 +14,7 @@ const Key = ({ note, hint, showHint = true, isBlack, isActive, onMouseDown, onMo
           : 'bg-white text-black rounded-b-md relative z-0'
         }
         ${isActive && isBlack ? 'bg-gray-700' : ''}
-        ${isActive && !isBlack ? 'bg-gray-300 shadow-[inset_0_4px_10px_rgba(0,0,0,0.2)]' : 'shadow-[0_4px_6px_rgba(0,0,0,0.1)]'}
+        ${isActive && !isBlack ? 'bg-gray-300' : ''}
       `}
     >
       {/* Dùng hidden md:block để TỰ ĐỘNG ẨN CHỮ trên màn hình nhỏ/điện thoại */}

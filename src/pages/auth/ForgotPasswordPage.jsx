@@ -5,8 +5,8 @@ import ForgotPasswordForm from "../../features/auth/components/ForgotPasswordFor
 const ForgotPasswordPage = () => (
   <div className="flex flex-1 flex-col">
     <AuthLayout
-      title="Đừng lo lắng!"
-      subtitle="Chúng mình sẽ giúp bạn lấy lại mật khẩu."
+      title="Don't worry!"
+      subtitle="We'll help you get back into your account."
     >
       <ForgotPasswordForm />
     </AuthLayout>

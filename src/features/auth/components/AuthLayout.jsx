@@ -24,7 +24,7 @@ const AuthLayout = ({ title, subtitle, children }) => (
     ))}
 
     <section className="grid w-full max-w-[1120px] grid-cols-1 border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] lg:grid-cols-2">
-      <div className="relative hidden min-h-[640px] flex-col overflow-hidden border-r-2 border-[var(--color-ink)] bg-[var(--color-sky-3)] lg:flex">
+      <div className="relative hidden min-h-[640px] flex-col overflow-hidden border-r-2 border-[var(--color-ink)] bg-[linear-gradient(to_bottom,var(--color-sky-1)_0_16%,var(--color-sky-2)_16%_33%,var(--color-sky-3)_33%_50%,var(--color-sky-4)_50%_66%,var(--color-sky-5)_66%_83%,var(--color-sky-6)_83%)] lg:flex">
         <Sun
           aria-hidden="true"
           className="absolute right-8 top-8 h-14 w-14 fill-[var(--color-sun)] text-[var(--color-sun-ray)]"

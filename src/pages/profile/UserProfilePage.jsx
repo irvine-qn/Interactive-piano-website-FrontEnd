@@ -14,10 +14,10 @@ const UserProfilePage = () => {
             role="status"
             className="mb-6 mt-0 border-2 border-[var(--color-success-border)] bg-[var(--color-success-banner)] px-4 py-3 text-sm font-semibold text-[var(--color-success-deep)]"
           >
-            Chào mừng {user.displayName} đến với Fiano! Tài khoản của bạn đã được tạo.
+            Welcome to Fiano, {user.displayName}! Your account has been created.
           </p>
         )}
-        <section className="border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-10 py-8 shadow-[var(--shadow-hard)]">
+        <section className="border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-10 py-8">
           <h1 className="m-0 text-[30px] font-extrabold text-[var(--color-ink)]">
             {user.displayName}
           </h1>

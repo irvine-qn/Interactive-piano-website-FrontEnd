@@ -24,7 +24,7 @@ apiClient.interceptors.response.use(
     return Promise.reject({
       status: error.response?.status ?? null,
       code: apiError?.code ?? 'NETWORK_ERROR',
-      message: apiError?.message ?? 'Không thể kết nối tới máy chủ',
+      message: apiError?.message ?? 'Unable to connect to the server',
     });
   },
 );
