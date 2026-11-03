@@ -1,4 +1,6 @@
-const BASE_URL = "/api/v1/auth";
+import { API_BASE_URL } from "../../../config/api";
+
+const BASE_URL = `${API_BASE_URL}/api/v1/auth`;
 
 export async function loginUser({ identifier, password }) {
   const res = await fetch(`${BASE_URL}/login`, {
@@ -10,11 +12,11 @@ export async function loginUser({ identifier, password }) {
   return res.json();
 }
 
-export async function registerUser({ username, email, password }) {
+export async function registerUser({ displayName, username, email, password }) {
   const res = await fetch(`${BASE_URL}/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, email, password }),
+    body: JSON.stringify({ displayName, username, email, password }),
   });
   if (!res.ok) throw await res.json();
   return res.json();
