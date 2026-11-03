@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff, SquareCheck, UserPlus } from "lucide-react";
+import { SquareCheck, UserPlus } from "lucide-react";
 import { registerUser } from "../api/authApi";
+import { FieldLabel, FormError, PasswordInput, inputClass } from "./AuthFormFields";
 import { useAuthStore } from "../../../store/useAuthStore";
 
 const STRENGTH_LEVELS = [
@@ -19,9 +20,6 @@ const STRENGTH_BAR_COLORS = [
   "bg-[var(--color-success)]",
 ];
 
-const inputClass =
-  "h-12 w-full border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-4 font-[inherit] text-sm text-[var(--color-ink)] outline-none placeholder:text-[var(--color-neutral-300)] focus:border-[var(--color-brand)] focus:shadow-[var(--shadow-hard-sm)]";
-
 const validateUsername = (val) => /^[a-z0-9]+$/.test(val);
 const validatePassword = (val) => /^(?=.*[A-Z])(?=.*\d).{8,}$/.test(val);
 const hasSpecialChar = (val) => /[^A-Za-z0-9]/.test(val);
@@ -33,44 +31,6 @@ const getPasswordScore = (val) =>
     /\d/.test(val),
     hasSpecialChar(val),
   ].filter(Boolean).length;
-
-const FieldLabel = ({ htmlFor, children }) => (
-  <label
-    htmlFor={htmlFor}
-    className="mb-2 block text-sm font-bold text-[var(--color-ink)]"
-  >
-    {children}
-    <span className="ml-2 text-[var(--color-danger)]">*</span>
-  </label>
-);
-
-const PasswordInput = ({ id, value, onChange, autoComplete, placeholder }) => {
-  const [visible, setVisible] = useState(false);
-  const Icon = visible ? EyeOff : Eye;
-
-  return (
-    <div className="relative">
-      <input
-        id={id}
-        type={visible ? "text" : "password"}
-        value={value}
-        onChange={onChange}
-        required
-        autoComplete={autoComplete}
-        placeholder={placeholder}
-        className={`${inputClass} pr-12`}
-      />
-      <button
-        type="button"
-        onClick={() => setVisible((v) => !v)}
-        aria-label={visible ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
-        className="absolute right-3 top-1/2 flex -translate-y-1/2 cursor-pointer border-0 bg-transparent p-1 text-[var(--color-ink)]"
-      >
-        <Icon aria-hidden="true" className="h-4 w-4" />
-      </button>
-    </div>
-  );
-};
 
 const RegisterForm = () => {
   const navigate = useNavigate();
@@ -138,14 +98,7 @@ const RegisterForm = () => {
         </p>
       </div>
 
-      {error && (
-        <p
-          role="alert"
-          className="m-0 border-2 border-[var(--color-danger)] bg-[var(--color-danger-wash)] px-4 py-3 text-sm font-semibold text-[var(--color-danger-strong)]"
-        >
-          {error}
-        </p>
-      )}
+      <FormError message={error} />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
