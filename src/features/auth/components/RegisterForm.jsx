@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { SquareCheck, UserPlus } from "lucide-react";
 import { registerUser } from "../api/authApi";
 import { useAuthStore } from "../../../store/useAuthStore";
 import { ROUTES } from "../../../config/routes";
 import {
   DIGIT_REGEX,
+  EMAIL_REGEX,
   DISPLAY_NAME_MAX_LENGTH,
   PASSWORD_MIN_LENGTH,
   SPECIAL_CHAR_REGEX,
@@ -46,6 +47,7 @@ const getPasswordScore = (val) =>
 
 const RegisterForm = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const setAuth = useAuthStore((state) => state.setAuth);
   const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState("");
@@ -72,6 +74,10 @@ const RegisterForm = () => {
       );
       return;
     }
+    if (!EMAIL_REGEX.test(email.trim())) {
+      setError("Email không hợp lệ.");
+      return;
+    }
     if (!validatePassword(password)) {
       setError("Mật khẩu tối thiểu 8 ký tự, ít nhất 1 chữ hoa và 1 chữ số.");
       return;
@@ -87,13 +93,13 @@ const RegisterForm = () => {
         await registerUser({
           displayName: displayName.trim(),
           username,
-          email,
+          email: email.trim(),
           password,
         }),
       );
-      navigate(ROUTES.PROFILE, { replace: true });
+      navigate(ROUTES.PROFILE, { replace: true, state: { welcome: true } });
     } catch (err) {
-      setError(err?.error?.message || "Đăng ký thất bại. Vui lòng thử lại.");
+      setError(err?.message || "Đăng ký thất bại. Vui lòng thử lại.");
     } finally {
       setLoading(false);
     }
@@ -224,6 +230,7 @@ const RegisterForm = () => {
         Đã có tài khoản?{" "}
         <Link
           to={ROUTES.LOGIN}
+          state={location.state}
           className="ml-2 font-bold text-[var(--color-brand-strong)] no-underline"
         >
           Đăng nhập
