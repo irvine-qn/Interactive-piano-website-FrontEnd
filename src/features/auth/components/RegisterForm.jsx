@@ -6,8 +6,11 @@ import { FieldLabel, FormError, PasswordInput, inputClass } from "./AuthFormFiel
 import { useAuthStore } from "../../../store/useAuthStore";
 import { ROUTES } from "../../../config/routes";
 import {
+  DIGIT_REGEX,
   DISPLAY_NAME_MAX_LENGTH,
-  PASSWORD_REGEX,
+  PASSWORD_MIN_LENGTH,
+  SPECIAL_CHAR_REGEX,
+  UPPERCASE_REGEX,
   USERNAME_MAX_LENGTH,
   USERNAME_REGEX,
 } from "../../../config/auth";
@@ -29,16 +32,16 @@ const STRENGTH_BAR_COLORS = [
 
 const validateUsername = (val) =>
   val.length <= USERNAME_MAX_LENGTH && USERNAME_REGEX.test(val);
-const validatePassword = (val) => PASSWORD_REGEX.test(val);
-const hasSpecialChar = (val) => /[^A-Za-z0-9]/.test(val);
+const hasMinLength = (val) => val.length >= PASSWORD_MIN_LENGTH;
+const hasUppercase = (val) => UPPERCASE_REGEX.test(val);
+const hasDigit = (val) => DIGIT_REGEX.test(val);
+const hasSpecialChar = (val) => SPECIAL_CHAR_REGEX.test(val);
+
+const validatePassword = (val) =>
+  hasMinLength(val) && hasUppercase(val) && hasDigit(val);
 
 const getPasswordScore = (val) =>
-  [
-    val.length >= 8,
-    /[A-Z]/.test(val),
-    /\d/.test(val),
-    hasSpecialChar(val),
-  ].filter(Boolean).length;
+  [hasMinLength(val), hasUppercase(val), hasDigit(val), hasSpecialChar(val)].filter(Boolean).length;
 
 const RegisterForm = () => {
   const navigate = useNavigate();
