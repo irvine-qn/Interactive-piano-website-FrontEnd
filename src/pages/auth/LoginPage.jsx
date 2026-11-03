@@ -1,10 +1,14 @@
+import Footer from "../../components/common/footer";
+import AuthLayout from "../../features/auth/components/AuthLayout";
 import LoginForm from "../../features/auth/components/LoginForm";
 
 const LoginPage = () => (
-  <main>
-    <h1>Đăng nhập</h1>
-    <LoginForm />
-  </main>
+  <div className="flex flex-1 flex-col">
+    <AuthLayout title="Chào mừng trở lại!" subtitle="Tiếp tục hành trình luyện piano của bạn.">
+      <LoginForm />
+    </AuthLayout>
+    <Footer />
+  </div>
 );
 
 export default LoginPage;
