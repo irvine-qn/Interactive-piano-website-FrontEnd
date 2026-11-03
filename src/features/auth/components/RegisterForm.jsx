@@ -1,22 +1,89 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Eye, EyeOff, SquareCheck, UserPlus } from "lucide-react";
 import { registerUser } from "../api/authApi";
+
+const STRENGTH_LEVELS = [
+  { label: "Yếu", textClass: "text-[var(--color-danger)]" },
+  { label: "Yếu", textClass: "text-[var(--color-danger)]" },
+  { label: "Trung bình", textClass: "text-[var(--color-warning)]" },
+  { label: "Khá tốt", textClass: "text-[var(--color-success)]" },
+  { label: "Mạnh", textClass: "text-[var(--color-success)]" },
+];
+
+const STRENGTH_BAR_COLORS = [
+  "bg-[var(--color-danger)]",
+  "bg-[var(--color-sun-ray)]",
+  "bg-[var(--color-success-bright)]",
+  "bg-[var(--color-success)]",
+];
+
+const inputClass =
+  "h-12 w-full border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-4 font-[inherit] text-sm text-[var(--color-ink)] outline-none placeholder:text-[var(--color-neutral-300)] focus:border-[var(--color-brand)] focus:shadow-[var(--shadow-hard-sm)]";
+
+const validateUsername = (val) => /^[a-z0-9]+$/.test(val);
+const validatePassword = (val) => /^(?=.*[A-Z])(?=.*\d).{8,}$/.test(val);
+const hasSpecialChar = (val) => /[^A-Za-z0-9]/.test(val);
+
+const getPasswordScore = (val) =>
+  [val.length >= 8, /[A-Z]/.test(val), /\d/.test(val), hasSpecialChar(val)].filter(Boolean).length;
+
+const FieldLabel = ({ htmlFor, children }) => (
+  <label htmlFor={htmlFor} className="mb-2 block text-sm font-bold text-[var(--color-ink)]">
+    {children}
+    <span className="ml-2 text-[var(--color-danger)]">*</span>
+  </label>
+);
+
+const PasswordInput = ({ id, value, onChange, autoComplete, placeholder }) => {
+  const [visible, setVisible] = useState(false);
+  const Icon = visible ? EyeOff : Eye;
+
+  return (
+    <div className="relative">
+      <input
+        id={id}
+        type={visible ? "text" : "password"}
+        value={value}
+        onChange={onChange}
+        required
+        autoComplete={autoComplete}
+        placeholder={placeholder}
+        className={`${inputClass} pr-12`}
+      />
+      <button
+        type="button"
+        onClick={() => setVisible((v) => !v)}
+        aria-label={visible ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+        className="absolute right-3 top-1/2 flex -translate-y-1/2 cursor-pointer border-0 bg-transparent p-1 text-[var(--color-ink)]"
+      >
+        <Icon aria-hidden="true" className="h-4 w-4" />
+      </button>
+    </div>
+  );
+};
 
 const RegisterForm = () => {
   const navigate = useNavigate();
+  const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const validateUsername = (val) => /^[a-z0-9]+$/.test(val);
-  const validatePassword = (val) => /^(?=.*[A-Z])(?=.*\d).{8,}$/.test(val);
+  const passwordScore = getPasswordScore(password);
+  const strength = STRENGTH_LEVELS[passwordScore];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
+    if (!displayName.trim()) {
+      setError("Vui lòng nhập họ và tên.");
+      return;
+    }
     if (!validateUsername(username)) {
       setError("Username chỉ được chứa chữ thường và số, không có khoảng trắng hay ký tự đặc biệt.");
       return;
@@ -25,37 +92,79 @@ const RegisterForm = () => {
       setError("Mật khẩu tối thiểu 8 ký tự, ít nhất 1 chữ hoa và 1 chữ số.");
       return;
     }
+    if (password !== confirmPassword) {
+      setError("Mật khẩu xác nhận không khớp.");
+      return;
+    }
 
     setLoading(true);
     try {
-      await registerUser({ username, email, password });
+      await registerUser({ displayName: displayName.trim(), username, email, password });
       navigate("/login");
     } catch (err) {
-      setError(err?.message || "Đăng ký thất bại. Vui lòng thử lại.");
+      setError(err?.error?.message || "Đăng ký thất bại. Vui lòng thử lại.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} noValidate>
-      {error && <p role="alert">{error}</p>}
-
+    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
       <div>
-        <label htmlFor="register-username">Username</label>
-        <input
-          id="register-username"
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
-          autoComplete="username"
-          placeholder="chỉ chữ thường và số"
-        />
+        <h2 className="m-0 text-[30px] font-extrabold text-[var(--color-ink)]">Tạo tài khoản</h2>
+        <p className="mt-2 text-sm font-medium text-[var(--color-neutral-600)]">
+          Chỉ mất 1 phút để bắt đầu luyện tập.
+        </p>
+      </div>
+
+      {error && (
+        <p
+          role="alert"
+          className="m-0 border-2 border-[var(--color-danger)] bg-[var(--color-danger-wash)] px-4 py-3 text-sm font-semibold text-[var(--color-danger-strong)]"
+        >
+          {error}
+        </p>
+      )}
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <FieldLabel htmlFor="register-display-name">Họ và tên</FieldLabel>
+          <input
+            id="register-display-name"
+            type="text"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            required
+            autoComplete="name"
+            placeholder="Nguyễn Văn A"
+            className={inputClass}
+          />
+        </div>
+        <div>
+          <FieldLabel htmlFor="register-username">Tên người dùng</FieldLabel>
+          <div className="relative">
+            <input
+              id="register-username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              autoComplete="username"
+              placeholder="chỉ chữ thường và số"
+              className={`${inputClass} pr-12`}
+            />
+            {validateUsername(username) && (
+              <SquareCheck
+                aria-hidden="true"
+                className="absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-success)]"
+              />
+            )}
+          </div>
+        </div>
       </div>
 
       <div>
-        <label htmlFor="register-email">Email</label>
+        <FieldLabel htmlFor="register-email">Email</FieldLabel>
         <input
           id="register-email"
           type="email"
@@ -64,28 +173,64 @@ const RegisterForm = () => {
           required
           autoComplete="email"
           placeholder="email@example.com"
+          className={inputClass}
         />
       </div>
 
       <div>
-        <label htmlFor="register-password">Mật khẩu</label>
-        <input
+        <FieldLabel htmlFor="register-password">Mật khẩu</FieldLabel>
+        <PasswordInput
           id="register-password"
-          type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          required
           autoComplete="new-password"
           placeholder="Tối thiểu 8 ký tự, 1 chữ hoa, 1 chữ số"
         />
+        {password && (
+          <>
+            <div className="mt-3 grid grid-cols-4 gap-2">
+              {STRENGTH_BAR_COLORS.map((color, i) => (
+                <span
+                  key={color}
+                  className={`h-[6px] border border-[var(--color-ink)] ${
+                    i < passwordScore ? color : "bg-[var(--color-line-handle)]"
+                  }`}
+                />
+              ))}
+            </div>
+            <p className={`mb-0 mt-2 text-xs font-medium ${strength.textClass}`}>
+              Độ mạnh: {strength.label}
+              {passwordScore === 3 && !hasSpecialChar(password) && " - thêm ký tự đặc biệt để an toàn hơn"}
+            </p>
+          </>
+        )}
       </div>
 
-      <button type="submit" disabled={loading}>
-        {loading ? "Đang đăng ký..." : "Đăng ký"}
+      <div>
+        <FieldLabel htmlFor="register-confirm-password">Xác nhận mật khẩu</FieldLabel>
+        <PasswordInput
+          id="register-confirm-password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          autoComplete="new-password"
+          placeholder="Nhập lại mật khẩu"
+        />
+      </div>
+
+      <button
+        type="submit"
+        disabled={loading}
+        className="flex h-12 cursor-pointer items-center justify-center gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-brand)] font-[inherit] text-sm font-bold text-[var(--color-neutral-white)] shadow-[var(--shadow-hard)] disabled:cursor-not-allowed disabled:bg-[var(--color-brand-light)]"
+      >
+        <UserPlus aria-hidden="true" className="h-4 w-4" />
+        {loading ? "Đang đăng ký..." : "Tạo tài khoản"}
       </button>
 
-      <p>
-        Đã có tài khoản? <Link to="/login">Đăng nhập</Link>
+      <p className="m-0 text-center text-sm font-medium text-[var(--color-neutral-600)]">
+        Đã có tài khoản?{" "}
+        <Link to="/login" className="ml-2 font-bold text-[var(--color-brand-strong)] no-underline">
+          Đăng nhập
+        </Link>
       </p>
     </form>
   );
