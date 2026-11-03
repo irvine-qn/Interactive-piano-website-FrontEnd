@@ -12,14 +12,14 @@ const NAV_ITEMS = [
   { to: ROUTES.LIBRARY, label: "Sheet library" },
   { to: ROUTES.WORKSPACE, label: "Practice" },
   { to: ROUTES.UPLOAD, label: "Upload", authOnly: true },
-  { to: ROUTES.LOGIN, label: "Đăng nhập", guestOnly: true },
-  { to: ROUTES.REGISTER, label: "Đăng ký", guestOnly: true },
+  { to: ROUTES.LOGIN, label: "Log in", guestOnly: true },
+  { to: ROUTES.REGISTER, label: "Sign up", guestOnly: true },
 ];
 
 const AUTH_PATHS = [ROUTES.LOGIN, ROUTES.REGISTER, ROUTES.FORGOT_PASSWORD];
 
 const navLinkClass = ({ isActive }) =>
-  `flex h-9 items-center border-2 border-[var(--color-ink)] px-[18px] text-[15px] font-bold no-underline shadow-[var(--shadow-hard-sm)] ${
+  `flex h-9 items-center border-2 border-[var(--color-ink)] px-[18px] text-[15px] font-bold no-underline ${
     isActive
       ? "bg-[var(--color-brand)] text-[var(--color-neutral-white)]"
       : "bg-[var(--color-surface-card)] text-[var(--color-ink)]"
@@ -61,7 +61,7 @@ const Navbar = () => {
     ));
 
   return (
-    <header className="relative z-20 border-b-4 border-[var(--color-ink)] bg-[linear-gradient(to_bottom,var(--color-sky-1)_0_16px,var(--color-sky-2)_16px_32px,var(--color-sky-3)_32px_48px,var(--color-sky-4)_48px_64px,var(--color-sky-5)_64px_80px,var(--color-sky-6)_80px)]">
+    <header className="relative z-20 border-b-4 border-[var(--color-ink)] bg-[var(--color-sky-3)]">
       <div className="relative mx-auto flex h-[92px] w-full max-w-[1600px] items-center gap-6 px-4">
         <NavLink
           to={ROUTES.HOME}
@@ -79,7 +79,7 @@ const Navbar = () => {
             className="ml-[120px] h-[46px] w-[95px]"
           />
         </NavLink>
-        <label className="ml-10 hidden h-10 w-[380px] shrink items-center border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-4 shadow-[var(--shadow-hard-sm)] md:flex">
+        <label className="ml-10 hidden h-10 w-[380px] shrink items-center border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-4 md:flex">
           <input
             type="search"
             placeholder="Find some music?"
@@ -102,8 +102,8 @@ const Navbar = () => {
           onClick={() => setMobileOpen((open) => !open)}
           aria-expanded={mobileOpen}
           aria-controls="mobile-navigation"
-          aria-label={mobileOpen ? "Đóng menu" : "Mở menu"}
-          className="ml-auto flex h-10 w-10 cursor-pointer items-center justify-center border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] text-[var(--color-ink)] shadow-[var(--shadow-hard-sm)] lg:hidden"
+          aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          className="ml-auto flex h-10 w-10 cursor-pointer items-center justify-center border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] text-[var(--color-ink)] lg:hidden"
         >
           {mobileOpen ? (
             <X aria-hidden="true" className="h-5 w-5" />
@@ -128,7 +128,7 @@ const Navbar = () => {
             <div className="invisible absolute right-0 top-full pt-3 opacity-0 transition-opacity group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
               <div
                 role="menu"
-                className="flex w-48 flex-col border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] shadow-[var(--shadow-hard)]"
+                className="flex w-48 flex-col border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)]"
               >
                 <p className="m-0 truncate border-b-2 border-[var(--color-line-dashed)] px-4 py-3 text-sm font-bold text-[var(--color-ink)]">
                   {user.displayName}
@@ -140,7 +140,7 @@ const Navbar = () => {
                   className="flex items-center gap-2 px-4 py-3 text-sm font-semibold text-[var(--color-ink)] no-underline hover:bg-[var(--color-brand-tint)]"
                 >
                   <User aria-hidden="true" className="h-4 w-4" />
-                  Trang cá nhân
+                  Profile
                 </NavLink>
                 <button
                   type="button"
@@ -149,7 +149,7 @@ const Navbar = () => {
                   className="flex cursor-pointer items-center gap-2 border-0 bg-transparent px-4 py-3 text-left font-[inherit] text-sm font-semibold text-[var(--color-danger)] hover:bg-[var(--color-danger-wash)]"
                 >
                   <LogOut aria-hidden="true" className="h-4 w-4" />
-                  Đăng xuất
+                  Log out
                 </button>
               </div>
             </div>

@@ -3,15 +3,15 @@ import { API_BASE_URL } from "../../../config/api";
 const BASE_URL = `${API_BASE_URL}/api/v1/auth`;
 
 const ERROR_MESSAGES = {
-  INVALID_CREDENTIALS: "Tên đăng nhập/email hoặc mật khẩu không đúng.",
-  USERNAME_TAKEN: "Tên người dùng đã tồn tại.",
-  EMAIL_TAKEN: "Email đã được sử dụng.",
-  VALIDATION_FAILED: "Thông tin chưa hợp lệ. Vui lòng kiểm tra lại.",
-  NOT_FOUND: "Tính năng này chưa sẵn sàng.",
-  NETWORK_ERROR: "Không thể kết nối tới máy chủ.",
+  INVALID_CREDENTIALS: "Incorrect username/email or password.",
+  USERNAME_TAKEN: "This username is already taken.",
+  EMAIL_TAKEN: "This email is already in use.",
+  VALIDATION_FAILED: "Some information is invalid. Please check and try again.",
+  NOT_FOUND: "This feature is not available yet.",
+  NETWORK_ERROR: "Unable to connect to the server.",
 };
 
-const DEFAULT_ERROR_MESSAGE = "Đã có lỗi xảy ra. Vui lòng thử lại.";
+const DEFAULT_ERROR_MESSAGE = "Something went wrong. Please try again.";
 
 const postJson = async (path, body) => {
   let res;
