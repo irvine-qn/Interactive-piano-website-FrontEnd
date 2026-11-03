@@ -1,9 +1,12 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { loginUser } from "../api/authApi";
+import { useAuthStore } from "../../../store/useAuthStore";
 
 const LoginForm = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const setAuth = useAuthStore((state) => state.setAuth);
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -14,10 +17,10 @@ const LoginForm = () => {
     setError("");
     setLoading(true);
     try {
-      await loginUser({ identifier, password });
-      navigate("/");
+      setAuth(await loginUser({ identifier, password }));
+      navigate(location.state?.from || "/", { replace: true });
     } catch (err) {
-      setError(err?.message || "Đăng nhập thất bại. Vui lòng thử lại.");
+      setError(err?.error?.message || "Đăng nhập thất bại. Vui lòng thử lại.");
     } finally {
       setLoading(false);
     }

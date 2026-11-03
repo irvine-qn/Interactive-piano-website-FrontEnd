@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, SquareCheck, UserPlus } from "lucide-react";
 import { registerUser } from "../api/authApi";
+import { useAuthStore } from "../../../store/useAuthStore";
 
 const STRENGTH_LEVELS = [
   { label: "Yếu", textClass: "text-[var(--color-danger)]" },
@@ -26,10 +27,18 @@ const validatePassword = (val) => /^(?=.*[A-Z])(?=.*\d).{8,}$/.test(val);
 const hasSpecialChar = (val) => /[^A-Za-z0-9]/.test(val);
 
 const getPasswordScore = (val) =>
-  [val.length >= 8, /[A-Z]/.test(val), /\d/.test(val), hasSpecialChar(val)].filter(Boolean).length;
+  [
+    val.length >= 8,
+    /[A-Z]/.test(val),
+    /\d/.test(val),
+    hasSpecialChar(val),
+  ].filter(Boolean).length;
 
 const FieldLabel = ({ htmlFor, children }) => (
-  <label htmlFor={htmlFor} className="mb-2 block text-sm font-bold text-[var(--color-ink)]">
+  <label
+    htmlFor={htmlFor}
+    className="mb-2 block text-sm font-bold text-[var(--color-ink)]"
+  >
     {children}
     <span className="ml-2 text-[var(--color-danger)]">*</span>
   </label>
@@ -65,6 +74,7 @@ const PasswordInput = ({ id, value, onChange, autoComplete, placeholder }) => {
 
 const RegisterForm = () => {
   const navigate = useNavigate();
+  const setAuth = useAuthStore((state) => state.setAuth);
   const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -85,7 +95,9 @@ const RegisterForm = () => {
       return;
     }
     if (!validateUsername(username)) {
-      setError("Username chỉ được chứa chữ thường và số, không có khoảng trắng hay ký tự đặc biệt.");
+      setError(
+        "Username chỉ được chứa chữ thường và số, không có khoảng trắng hay ký tự đặc biệt.",
+      );
       return;
     }
     if (!validatePassword(password)) {
@@ -99,8 +111,15 @@ const RegisterForm = () => {
 
     setLoading(true);
     try {
-      await registerUser({ displayName: displayName.trim(), username, email, password });
-      navigate("/login");
+      setAuth(
+        await registerUser({
+          displayName: displayName.trim(),
+          username,
+          email,
+          password,
+        }),
+      );
+      navigate("/profile", { replace: true });
     } catch (err) {
       setError(err?.error?.message || "Đăng ký thất bại. Vui lòng thử lại.");
     } finally {
@@ -111,7 +130,9 @@ const RegisterForm = () => {
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
       <div>
-        <h2 className="m-0 text-[30px] font-extrabold text-[var(--color-ink)]">Tạo tài khoản</h2>
+        <h2 className="m-0 text-[30px] font-extrabold text-[var(--color-ink)]">
+          Tạo tài khoản
+        </h2>
         <p className="mt-2 text-sm font-medium text-[var(--color-neutral-600)]">
           Chỉ mất 1 phút để bắt đầu luyện tập.
         </p>
@@ -198,16 +219,22 @@ const RegisterForm = () => {
                 />
               ))}
             </div>
-            <p className={`mb-0 mt-2 text-xs font-medium ${strength.textClass}`}>
+            <p
+              className={`mb-0 mt-2 text-xs font-medium ${strength.textClass}`}
+            >
               Độ mạnh: {strength.label}
-              {passwordScore === 3 && !hasSpecialChar(password) && " - thêm ký tự đặc biệt để an toàn hơn"}
+              {passwordScore === 3 &&
+                !hasSpecialChar(password) &&
+                " - thêm ký tự đặc biệt để an toàn hơn"}
             </p>
           </>
         )}
       </div>
 
       <div>
-        <FieldLabel htmlFor="register-confirm-password">Xác nhận mật khẩu</FieldLabel>
+        <FieldLabel htmlFor="register-confirm-password">
+          Xác nhận mật khẩu
+        </FieldLabel>
         <PasswordInput
           id="register-confirm-password"
           value={confirmPassword}
@@ -228,7 +255,10 @@ const RegisterForm = () => {
 
       <p className="m-0 text-center text-sm font-medium text-[var(--color-neutral-600)]">
         Đã có tài khoản?{" "}
-        <Link to="/login" className="ml-2 font-bold text-[var(--color-brand-strong)] no-underline">
+        <Link
+          to="/login"
+          className="ml-2 font-bold text-[var(--color-brand-strong)] no-underline"
+        >
           Đăng nhập
         </Link>
       </p>
