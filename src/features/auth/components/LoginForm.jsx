@@ -23,12 +23,18 @@ const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
+    if (!identifier.trim() || !password) {
+      setError("Vui lòng nhập tên đăng nhập/email và mật khẩu.");
+      return;
+    }
+
     setLoading(true);
     try {
-      setAuth(await loginUser({ identifier, password }));
+      setAuth(await loginUser({ identifier: identifier.trim(), password }));
       navigate(location.state?.from || ROUTES.HOME, { replace: true });
     } catch (err) {
-      setError(err?.error?.message || "Đăng nhập thất bại. Vui lòng thử lại.");
+      setError(err?.message || "Đăng nhập thất bại. Vui lòng thử lại.");
     } finally {
       setLoading(false);
     }
@@ -99,15 +105,18 @@ const LoginForm = () => {
 
       <button
         type="button"
-        className="h-12 cursor-pointer border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] font-[inherit] text-sm font-bold text-[var(--color-ink)] shadow-[var(--shadow-hard)]"
+        disabled
+        title="Sắp ra mắt"
+        className="h-12 cursor-not-allowed border-2 border-[var(--color-line-disabled)] bg-[var(--color-surface-disabled)] font-[inherit] text-sm font-bold text-[var(--color-neutral-400)]"
       >
-        Đăng nhập với Google
+        Đăng nhập với Google (sắp ra mắt)
       </button>
 
       <p className="m-0 text-center text-sm font-medium text-[var(--color-neutral-600)]">
         Chưa có tài khoản?{" "}
         <Link
           to={ROUTES.REGISTER}
+          state={location.state}
           className="ml-2 font-bold text-[var(--color-brand-strong)] no-underline"
         >
           Đăng ký ngay

@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { Mail } from "lucide-react";
 import { forgotPassword } from "../api/authApi";
 import { ROUTES } from "../../../config/routes";
+import { EMAIL_REGEX } from "../../../config/auth";
+import { FieldLabel, FormError, inputClass } from "./AuthFormFields";
+
+const linkClass = "font-bold text-[var(--color-brand-strong)] no-underline";
 
 const ForgotPasswordForm = () => {
   const [email, setEmail] = useState("");
@@ -12,9 +17,15 @@ const ForgotPasswordForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
+    if (!EMAIL_REGEX.test(email.trim())) {
+      setError("Email không hợp lệ.");
+      return;
+    }
+
     setLoading(true);
     try {
-      await forgotPassword({ email });
+      await forgotPassword({ email: email.trim() });
       setSuccess(true);
     } catch (err) {
       setError(err?.message || "Không thể gửi email. Vui lòng thử lại.");
@@ -25,21 +36,34 @@ const ForgotPasswordForm = () => {
 
   if (success) {
     return (
-      <div>
-        <p>Email đặt lại mật khẩu đã được gửi. Vui lòng kiểm tra hộp thư.</p>
-        <Link to={ROUTES.LOGIN}>Quay lại đăng nhập</Link>
+      <div className="flex flex-col gap-5">
+        <h2 className="m-0 text-[30px] font-extrabold text-[var(--color-ink)]">Kiểm tra hộp thư</h2>
+        <p
+          role="status"
+          className="m-0 border-2 border-[var(--color-success-border)] bg-[var(--color-success-banner)] px-4 py-3 text-sm font-semibold text-[var(--color-success-deep)]"
+        >
+          Email đặt lại mật khẩu đã được gửi. Vui lòng kiểm tra hộp thư.
+        </p>
+        <Link to={ROUTES.LOGIN} className={`text-center text-sm ${linkClass}`}>
+          Quay lại đăng nhập
+        </Link>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate>
-      <p>Nhập email tài khoản để nhận link đặt lại mật khẩu.</p>
+    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
+      <div>
+        <h2 className="m-0 text-[30px] font-extrabold text-[var(--color-ink)]">Quên mật khẩu</h2>
+        <p className="mt-2 text-sm font-medium text-[var(--color-neutral-600)]">
+          Nhập email tài khoản để nhận link đặt lại mật khẩu.
+        </p>
+      </div>
 
-      {error && <p role="alert">{error}</p>}
+      <FormError message={error} />
 
       <div>
-        <label htmlFor="forgot-email">Email</label>
+        <FieldLabel htmlFor="forgot-email">Email</FieldLabel>
         <input
           id="forgot-email"
           type="email"
@@ -48,15 +72,23 @@ const ForgotPasswordForm = () => {
           required
           autoComplete="email"
           placeholder="email@example.com"
+          className={inputClass}
         />
       </div>
 
-      <button type="submit" disabled={loading}>
+      <button
+        type="submit"
+        disabled={loading}
+        className="flex h-12 cursor-pointer items-center justify-center gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-brand)] font-[inherit] text-sm font-bold text-[var(--color-neutral-white)] shadow-[var(--shadow-hard)] disabled:cursor-not-allowed disabled:bg-[var(--color-brand-light)]"
+      >
+        <Mail aria-hidden="true" className="h-4 w-4" />
         {loading ? "Đang gửi..." : "Gửi link đặt lại mật khẩu"}
       </button>
 
-      <p>
-        <Link to={ROUTES.LOGIN}>Quay lại đăng nhập</Link>
+      <p className="m-0 text-center text-sm">
+        <Link to={ROUTES.LOGIN} className={linkClass}>
+          Quay lại đăng nhập
+        </Link>
       </p>
     </form>
   );
