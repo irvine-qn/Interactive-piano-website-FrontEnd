@@ -83,19 +83,19 @@ const Navbar = () => {
             </NavLink>
           ))}
         </nav>
-        <div className="group relative ml-auto shrink-0">
-          <button
-            type="button"
-            aria-haspopup={user ? "menu" : undefined}
-            className="avatar flex cursor-pointer border-0 bg-transparent p-0"
-          >
-            <img
-              src={defaultAvatar}
-              alt="User avatar"
-              className="avatar h-10 w-10 border-[2.5px] border-[var(--color-ink)] object-cover"
-            />
-          </button>
-          {user && (
+        {user && (
+          <div className="group relative ml-auto shrink-0">
+            <button
+              type="button"
+              aria-haspopup="menu"
+              className="avatar flex cursor-pointer border-0 bg-transparent p-0"
+            >
+              <img
+                src={defaultAvatar}
+                alt="User avatar"
+                className="avatar h-10 w-10 border-[2.5px] border-[var(--color-ink)] object-cover"
+              />
+            </button>
             <div className="invisible absolute right-0 top-full pt-3 opacity-0 transition-opacity group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
               <div
                 role="menu"
@@ -123,8 +123,8 @@ const Navbar = () => {
                 </button>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </header>
   );
