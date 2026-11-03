@@ -9,7 +9,9 @@ const NAV_ITEMS = [
   { to: "/library", label: "Library" },
   { to: "/workspace", label: "Practice_sample" },
   { to: "/upload", label: "Upload" },
-  { to: "/pro5", label: "Profile" },
+  { to: "/profile", label: "Profile" },
+  { to: "/login", label: "Login" },
+  { to: "/register", label: "Register" },
 ];
 
 const Navbar = () => (
