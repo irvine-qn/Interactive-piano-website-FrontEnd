@@ -24,17 +24,18 @@ const PIANO_KEYS_88 = generate88Keys();
 const WHITE_KEYS_88 = PIANO_KEYS_88.filter(k => !k.isBlack);
 
 const PianoKeyboard = () => {
-  const { pressedKeys, playbackKeys, pressKey, releaseKey, currentMode } = useWorkspaceStore(
+  const { pressedKeys, playbackKeys, pressKey, releaseKey, currentMode, octaveShift } = useWorkspaceStore(
     useShallow((state) => ({
       pressedKeys: state.pressedKeys,
       playbackKeys: state.playbackKeys,
       pressKey: state.pressKey,
       releaseKey: state.releaseKey,
       currentMode: state.currentMode,
+      octaveShift: state.octaveShift,
     })),
   );
 
-  const { noteByKey, keyByNote, status: mappingStatus, retry: retryMapping } = useKeyMapping();
+  const { noteByKey, keyByNote, status: mappingStatus, retry: retryMapping } = useKeyMapping(octaveShift);
 
   const isAutoPlay = currentMode === 'AUTO_PLAY';
   const displayedKeys = PIANO_KEYS_88;

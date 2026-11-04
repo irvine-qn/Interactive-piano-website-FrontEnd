@@ -8,6 +8,8 @@ export const useWorkspaceStore = create((set, get) => ({
   pressedSources: {},
   // Danh sách nốt đang được giữ (suy ra từ pressedSources) để vẽ bàn phím
   pressedKeys: [],
+  // Dịch bảng phím tắt theo quãng: 0 = C1-C6, +1 = C2-C7 (phạm vi lấy từ useKeyMapping().octaveRange)
+  octaveShift: 0,
   // Phím do bài nhạc bật sáng (Auto-play, sau này là gợi ý của Wait Mode): { [note]: { hand, count } }.
   // count: cùng một nốt có thể được đánh chồng (lần sau bắt đầu trước khi lần trước tắt) nên chỉ tắt khi về 0.
   playbackKeys: {},
@@ -48,6 +50,18 @@ export const useWorkspaceStore = create((set, get) => ({
     const stillHeld = Object.values(next).includes(note);
     if (!stillHeld) stopNote(note);
     set({ pressedSources: next, pressedKeys: [...new Set(Object.values(next))] });
+  },
+
+  // Đổi quãng thì phím máy tính đang giữ sẽ trỏ sang nốt khác -> nhả chúng trước (chuột giữ nguyên vì không đổi nốt)
+  setOctaveShift: (octaveShift) => {
+    const { pressedSources, octaveShift: current } = get();
+    if (octaveShift === current) return;
+    const next = Object.fromEntries(Object.entries(pressedSources).filter(([source]) => !source.startsWith('keyboard:')));
+    const stillHeld = new Set(Object.values(next));
+    new Set(Object.values(pressedSources)).forEach((note) => {
+      if (!stillHeld.has(note)) stopNote(note);
+    });
+    set({ octaveShift, pressedSources: next, pressedKeys: [...stillHeld] });
   },
 
   setPlaybackKey: (note, hand) => {

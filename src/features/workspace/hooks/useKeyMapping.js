@@ -2,20 +2,45 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 // Dùng chung bảng ánh xạ phím với HomePage (GET /api/v1/piano: "1" = C1 ... "m" = C6), không sửa file của Home
 import { getPianoConfig } from '../../home/api/pianoApi';
 
-// notes: [{ name, keyboardKey }] -> { noteByKey: { "t": "C3" }, keyByNote: { "C3": "t" } }
-const buildMapping = (notes) => {
-  const noteByKey = {};
-  const keyByNote = {};
-  (notes ?? []).forEach(({ name, keyboardKey }) => {
-    if (typeof keyboardKey !== 'string' || typeof name !== 'string') return;
-    noteByKey[keyboardKey] = name;
-    keyByNote[name] = keyboardKey;
-  });
-  return { noteByKey, keyByNote };
+const OCTAVE = 12;
+
+// Phạm vi dịch quãng như Home: phím tắt (C1-C6) còn nằm trong dải nốt của cấu hình (C1-C7) -> 0 .. +1
+const getOctaveRange = (notes) => {
+  const mapped = notes.filter((n) => typeof n.keyboardKey === 'string').map((n) => n.midi);
+  if (!notes.length || !mapped.length) return { min: 0, max: 0 };
+  return {
+    min: -Math.floor((Math.min(...mapped) - notes[0].midi) / OCTAVE),
+    max: Math.floor((notes[notes.length - 1].midi - Math.max(...mapped)) / OCTAVE),
+  };
 };
 
-// Trả bảng ánh xạ + trạng thái tải. Lỗi thì bàn phím máy tính tạm không dùng được (chuột vẫn chơi được).
-export const useKeyMapping = () => {
+// notes: [{ midi, name, keyboardKey }], octaveShift: số quãng dịch lên (+) / xuống (-)
+// -> { noteByKey: { "s": "C4" }, keyByNote: { "C4": "s" }, firstNote, lastNote, octaveRange }
+const buildMapping = (notes, octaveShift) => {
+  const noteByMidi = new Map(notes.map((n) => [n.midi, n.name]));
+  const noteByKey = {};
+  const keyByNote = {};
+  notes.forEach(({ midi, keyboardKey }) => {
+    if (typeof keyboardKey !== 'string') return;
+    const target = noteByMidi.get(midi + octaveShift * OCTAVE);
+    if (!target) return;
+    noteByKey[keyboardKey] = target;
+    keyByNote[target] = keyboardKey;
+  });
+  const mappedNotes = Object.values(noteByKey);
+  return {
+    noteByKey,
+    keyByNote,
+    // Dải phím tắt đang phủ, vd. "C1"-"C6" (dùng cho nhãn Octave Shift)
+    firstNote: mappedNotes[0] ?? null,
+    lastNote: mappedNotes[mappedNotes.length - 1] ?? null,
+    octaveRange: getOctaveRange(notes),
+  };
+};
+
+// Trả bảng ánh xạ (đã dịch theo octaveShift) + trạng thái tải.
+// Lỗi thì bàn phím máy tính tạm không dùng được (chuột vẫn chơi được).
+export const useKeyMapping = (octaveShift = 0) => {
   const [reloadKey, setReloadKey] = useState(0);
   // Kết quả gắn với lần tải (reloadKey) để suy ra "đang tải" mà không cần setState trong effect
   const [result, setResult] = useState({ key: null, notes: null, error: null });
@@ -34,7 +59,7 @@ export const useKeyMapping = () => {
     };
   }, [reloadKey]);
 
-  const mapping = useMemo(() => buildMapping(result.notes), [result.notes]);
+  const mapping = useMemo(() => buildMapping(result.notes ?? [], octaveShift), [result.notes, octaveShift]);
   const retry = useCallback(() => setReloadKey((k) => k + 1), [setReloadKey]);
 
   const isLoading = result.key !== reloadKey;

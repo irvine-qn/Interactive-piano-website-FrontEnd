@@ -12,6 +12,12 @@ const isTypingTarget = (target) =>
 export const useKeyboardInput = ({ noteByKey, pressKey, releaseKey }) => {
   // event.code -> source đang giữ (một phím vật lý giữ đúng một nốt)
   const heldRef = useRef(new Map());
+  // Bảng phím đổi (Octave Shift, tải xong cấu hình) không được làm nhả phím đang giữ, nên listener chỉ đăng ký
+  // một lần và đọc giá trị mới nhất qua ref; releaseAll chỉ chạy khi mất focus hoặc rời trang.
+  const latestRef = useRef({ noteByKey, pressKey, releaseKey });
+  useEffect(() => {
+    latestRef.current = { noteByKey, pressKey, releaseKey };
+  }, [noteByKey, pressKey, releaseKey]);
 
   useEffect(() => {
     const held = heldRef.current;
@@ -19,26 +25,27 @@ export const useKeyboardInput = ({ noteByKey, pressKey, releaseKey }) => {
     const handleKeyDown = (event) => {
       if (event.repeat || event.ctrlKey || event.metaKey || event.altKey || isTypingTarget(event.target)) return;
       if (held.has(event.code)) return;
-      const note = noteByKey[event.key];
+      const note = latestRef.current.noteByKey[event.key];
       if (!note) return;
       event.preventDefault();
       const source = `keyboard:${event.code}`;
       held.set(event.code, source);
-      pressKey(note, source);
+      latestRef.current.pressKey(note, source);
     };
 
     const handleKeyUp = (event) => {
       const source = held.get(event.code);
       if (!source) return;
       held.delete(event.code);
-      releaseKey(source);
+      latestRef.current.releaseKey(source);
     };
 
     const releaseAll = () => {
-      held.forEach((source) => releaseKey(source));
+      const { releaseKey: release } = latestRef.current;
+      held.forEach((source) => release(source));
       held.clear();
       // Đang giữ chuột trên phím mà cửa sổ mất focus thì mouseup không bao giờ tới
-      releaseKey('mouse');
+      release('mouse');
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -50,5 +57,5 @@ export const useKeyboardInput = ({ noteByKey, pressKey, releaseKey }) => {
       window.removeEventListener('blur', releaseAll);
       releaseAll();
     };
-  }, [noteByKey, pressKey, releaseKey]);
+  }, []);
 };
