@@ -42,7 +42,8 @@ const WorkspacePage = () => {
           </header>
 
           <div className="flex flex-col p-[14px]">
-            <div className="relative h-[440px] w-full overflow-hidden border-2 border-[var(--color-ink)] bg-[var(--color-surface-paper)]">
+            {/* Cao theo màn hình (tối đa 440px như thiết kế, tối thiểu 260px) để header + waterfall + piano nằm trọn một màn hình */}
+            <div className="relative h-[clamp(260px,calc(100dvh-360px),440px)] w-full overflow-hidden border-2 border-[var(--color-ink)] bg-[var(--color-surface-paper)]">
               <WaterfallCanvas />
               {sheetStatus === "loading" && (
                 <div className="absolute inset-0 flex items-center justify-center text-sm font-bold text-[var(--color-neutral-600)]">
