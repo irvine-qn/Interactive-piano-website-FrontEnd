@@ -1,6 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
 import * as Tone from 'tone';
+import { KEY_LAYOUT } from '../config/keyLayout';
 
 const WaterfallCanvas = () => {
   const canvasRef = useRef(null);
@@ -13,6 +14,8 @@ const WaterfallCanvas = () => {
     if (!canvas || !container) return;
 
     const ctx = canvas.getContext('2d');
+    // Bàn phím render cùng lượt với canvas (cùng trang) nên lúc effect chạy vùng phím đã có trong DOM
+    const keybed = document.querySelector('[data-keybed]');
     let animationFrameId;
     let keyMap = {}; 
     let canvasWidth = 0;
@@ -32,17 +35,16 @@ const WaterfallCanvas = () => {
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(dpr, dpr);
 
-      const keyElements = document.querySelectorAll('[data-note]');
-      keyMap = {}; 
-      
-      keyElements.forEach(el => {
-        const note = el.getAttribute('data-note');
-        const keyRect = el.getBoundingClientRect();
-        
-        keyMap[note] = {
-          x: keyRect.left - rect.left,
-          width: keyRect.width,
-          isBlack: note.includes('#')
+      // Toạ độ X lấy từ KEY_LAYOUT (cùng công thức với bàn phím), quy đổi theo vị trí vùng phím (data-keybed)
+      // so với canvas, nên viền/lề của khung bàn phím khác canvas vẫn rơi đúng phím.
+      const bed = keybed ? keybed.getBoundingClientRect() : rect;
+      const offset = bed.left - rect.left;
+      keyMap = {};
+      KEY_LAYOUT.forEach((key) => {
+        keyMap[key.note] = {
+          x: offset + (key.left / 100) * bed.width,
+          width: (key.width / 100) * bed.width,
+          isBlack: key.isBlack,
         };
       });
     };
@@ -100,19 +102,16 @@ const WaterfallCanvas = () => {
       animationFrameId = requestAnimationFrame(renderLoop);
     };
 
-    const timeoutId = setTimeout(() => {
-      updateLayout();
-    }, 50);
-
+    // Tính lại khi canvas hoặc vùng phím đổi kích thước (ResizeObserver gọi ngay lần đầu khi bắt đầu theo dõi)
     const resizeObserver = new ResizeObserver(() => {
       updateLayout();
     });
     resizeObserver.observe(container);
+    if (keybed) resizeObserver.observe(keybed);
 
     renderLoop();
 
     return () => {
-      clearTimeout(timeoutId);
       resizeObserver.disconnect();
       cancelAnimationFrame(animationFrameId);
     };
