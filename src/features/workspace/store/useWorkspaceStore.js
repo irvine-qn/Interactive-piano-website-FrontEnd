@@ -28,6 +28,11 @@ export const useWorkspaceStore = create((set, get) => ({
   setSheetLoading: () => set({ sheet: null, sheetStatus: 'loading', sheetError: null }),
   setSheet: (sheet) => set({ sheet, sheetStatus: 'ready', sheetError: null }),
   setSheetError: (error) => set({ sheet: null, sheetStatus: 'error', sheetError: error }),
+  // Cập nhật lượt xem sau khi BE đếm (bỏ qua nếu đã chuyển sang bài khác)
+  setSheetViews: (id, views) => {
+    const { sheet } = get();
+    if (sheet?.id === id) set({ sheet: { ...sheet, views } });
+  },
 
   // source: 'mouse' hoặc 'keyboard:<event.code>' (xem useKeyboardInput)
   pressKey: (note, source = 'mouse') => {
