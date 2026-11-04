@@ -23,9 +23,10 @@ const PIANO_KEYS_88 = generate88Keys();
 const WHITE_KEYS_88 = PIANO_KEYS_88.filter(k => !k.isBlack);
 
 const PianoKeyboard = () => {
-  const { activeKeys, pressKey, releaseKey, currentMode } = useWorkspaceStore(
+  const { pressedKeys, playbackKeys, pressKey, releaseKey, currentMode } = useWorkspaceStore(
     useShallow((state) => ({
-      activeKeys: state.activeKeys,
+      pressedKeys: state.pressedKeys,
+      playbackKeys: state.playbackKeys,
       pressKey: state.pressKey,
       releaseKey: state.releaseKey,
       currentMode: state.currentMode,
@@ -72,7 +73,8 @@ const PianoKeyboard = () => {
                  hint={NOTE_TO_KEYBOARD_MAP[whiteKey.note]}
                  showHint={!isAutoPlay}
                  isBlack={false}
-                 isActive={activeKeys.includes(whiteKey.note)}
+                 isPressed={pressedKeys.includes(whiteKey.note)}
+                 playbackHand={playbackKeys[whiteKey.note]?.hand ?? null}
                  onMouseDown={pressKey}
                  onMouseUp={releaseKey}
                />
@@ -87,7 +89,8 @@ const PianoKeyboard = () => {
                      hint={NOTE_TO_KEYBOARD_MAP[nextKey.note]}
                      showHint={!isAutoPlay}
                      isBlack={true}
-                     isActive={activeKeys.includes(nextKey.note)}
+                     isPressed={pressedKeys.includes(nextKey.note)}
+                     playbackHand={playbackKeys[nextKey.note]?.hand ?? null}
                      onMouseDown={pressKey}
                      onMouseUp={releaseKey}
                    />

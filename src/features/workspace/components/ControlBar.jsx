@@ -12,15 +12,15 @@ const MODES = [
 ];
 
 const ControlBar = () => {
-  // Chỉ đăng ký các field cần dùng: Control Bar không render lại mỗi khi một phím sáng/tắt (activeKeys)
-  const { currentMode, setMode, isPlaying, setIsPlaying, duration, clearActiveKeys } = useWorkspaceStore(
+  // Chỉ đăng ký các field cần dùng: Control Bar không render lại mỗi khi một phím sáng/tắt (pressedKeys, playbackKeys)
+  const { currentMode, setMode, isPlaying, setIsPlaying, duration, resetKeys } = useWorkspaceStore(
     useShallow((state) => ({
       currentMode: state.currentMode,
       setMode: state.setMode,
       isPlaying: state.isPlaying,
       setIsPlaying: state.setIsPlaying,
       duration: state.duration,
-      clearActiveKeys: state.clearActiveKeys,
+      resetKeys: state.resetKeys,
     })),
   );
   const progressBarRef = useRef(null);
@@ -61,7 +61,7 @@ const ControlBar = () => {
     const handleHalt = () => {
       setIsPlaying(false);
       stopAllNotes();
-      clearActiveKeys();
+      resetKeys();
     };
 
     Tone.Transport.on('start', handleStart);
@@ -76,7 +76,7 @@ const ControlBar = () => {
       Tone.Transport.off('pause', handleHalt);
       Tone.Transport.off('stop', handleHalt);
     };
-  }, [setIsPlaying, clearActiveKeys, duration]);
+  }, [setIsPlaying, resetKeys, duration]);
 
   const handlePlay = async () => {
     if (Tone.context.state !== 'running') await Tone.start();
@@ -93,7 +93,7 @@ const ControlBar = () => {
     
     // Tua thì phải ngắt các nốt đang ngân và tắt highlight
     stopAllNotes();
-    clearActiveKeys();
+    resetKeys();
     
     if (currentTimeRef.current) {
       currentTimeRef.current.innerText = formatTime(newTime);

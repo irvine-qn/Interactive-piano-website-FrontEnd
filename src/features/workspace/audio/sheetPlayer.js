@@ -35,11 +35,11 @@ export const loadSheet = (notes) => {
         pianoSampler.triggerAttackRelease(n.name, n.duration, time, n.velocity);
       }
       Tone.Draw.schedule(
-        () => useWorkspaceStore.getState().highlightKey(n.name),
+        () => useWorkspaceStore.getState().setPlaybackKey(n.name, n.hand),
         time,
       );
       Tone.Draw.schedule(
-        () => useWorkspaceStore.getState().unhighlightKey(n.name),
+        () => useWorkspaceStore.getState().clearPlaybackKey(n.name),
         time + n.duration,
       );
     },

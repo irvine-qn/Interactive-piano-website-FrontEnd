@@ -1,6 +1,9 @@
 import { memo } from 'react';
 
-const Key = ({ note, hint, showHint = true, isBlack, isActive, onMouseDown, onMouseUp }) => {
+// isPressed: người dùng đang nhấn; playbackHand: 'left' | 'right' | null khi bài nhạc bật sáng phím.
+// Hiện 2 trạng thái dùng chung một kiểu sáng; màu theo tay sẽ làm khi restyle bàn phím (T-07E).
+const Key = ({ note, hint, showHint = true, isBlack, isPressed, playbackHand, onMouseDown, onMouseUp }) => {
+  const isActive = isPressed || playbackHand !== null;
   return (
     <div
       data-note={note}
