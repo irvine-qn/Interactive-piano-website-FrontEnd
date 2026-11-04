@@ -1,8 +1,15 @@
 import { useEffect, useRef } from 'react';
 
-// Phím đang gõ chữ (ô search trên Navbar, form...) thì không phải phím đàn
-const isTypingTarget = (target) =>
-  target instanceof HTMLElement && target.closest('input, textarea, select, [contenteditable=true]');
+// Phím đang gõ chữ (ô search trên Navbar, form...) thì không phải phím đàn.
+// Thanh trượt / checkbox / nút không gõ chữ (range chỉ dùng mũi tên, Home/End, PageUp/Down - không phải phím đàn)
+// nên vẫn chơi được: kéo timeline hay âm lượng xong gõ phím đàn ngay, không phải click ra chỗ khác.
+const NON_TEXT_INPUTS = ['range', 'checkbox', 'radio', 'button', 'submit', 'reset', 'color', 'file'];
+const isTypingTarget = (target) => {
+  if (!(target instanceof HTMLElement)) return false;
+  const field = target.closest('input, textarea, select, [contenteditable=true]');
+  if (!field) return false;
+  return !(field instanceof HTMLInputElement && NON_TEXT_INPUTS.includes(field.type));
+};
 
 // Chơi đàn bằng bàn phím máy tính, theo cách HomePage đang làm:
 // - Tìm nốt theo event.key lúc nhấn, nhưng nhả theo event.code (vị trí phím): nhả Shift trước rồi mới nhả "T"

@@ -7,7 +7,7 @@ import { useKeyboardInput } from '../hooks/useKeyboardInput';
 import { KEY_LAYOUT } from '../config/keyLayout';
 
 const PianoKeyboard = () => {
-  const { pressedKeys, playbackKeys, pressKey, releaseKey, currentMode, octaveShift } = useWorkspaceStore(
+  const { pressedKeys, playbackKeys, pressKey, releaseKey, currentMode, octaveShift, keyLabels } = useWorkspaceStore(
     useShallow((state) => ({
       pressedKeys: state.pressedKeys,
       playbackKeys: state.playbackKeys,
@@ -15,12 +15,15 @@ const PianoKeyboard = () => {
       releaseKey: state.releaseKey,
       currentMode: state.currentMode,
       octaveShift: state.octaveShift,
+      keyLabels: state.keyLabels,
     })),
   );
 
   const { noteByKey, keyByNote, status: mappingStatus, retry: retryMapping } = useKeyMapping(octaveShift);
 
   const isAutoPlay = currentMode === 'AUTO_PLAY';
+  // Nhãn phím tắt theo lựa chọn của người dùng (KeyLabelSelect). AUTO_PLAY không nhận phím máy tính nên luôn ẩn
+  const showHints = !isAutoPlay && keyLabels === 'shortcuts';
 
   useKeyboardInput({ noteByKey, pressKey, releaseKey });
 
@@ -64,7 +67,7 @@ const PianoKeyboard = () => {
             width={key.width}
             isBlack={key.isBlack}
             hint={keyByNote[key.note]}
-            showHint={!isAutoPlay}
+            showHint={showHints}
             interactive={!isAutoPlay}
             isPressed={pressedKeys.includes(key.note)}
             playbackHand={playbackKeys[key.note]?.hand ?? null}

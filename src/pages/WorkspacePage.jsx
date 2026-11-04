@@ -5,6 +5,7 @@ import PianoKeyboard from "../features/workspace/components/PianoKeyboard";
 import ControlBar from "../features/workspace/components/ControlBar";
 import SheetInfoPanel from "../features/workspace/components/SheetInfoPanel";
 import OctaveShiftControl from "../features/workspace/components/OctaveShiftControl";
+import KeyLabelSelect from "../features/workspace/components/KeyLabelSelect";
 import WaterfallCanvas from "../features/workspace/canvas/practiceWaterfall";
 import { useSheetLoader } from "../features/workspace/hooks/useSheetLoader";
 import Footer from "../components/common/footer";
@@ -41,7 +42,8 @@ const WorkspacePage = () => {
             <span aria-hidden="true" className="h-3 w-3 border-2 border-[var(--color-ink)] bg-[var(--color-brand)]" />
             <h2 className="m-0 text-sm font-bold uppercase tracking-wide text-[var(--color-ink)]">Waterfall</h2>
             {/* Dải phím tắt đặt bên phải header như thiết kế (ngay trên bàn phím mà nó điều khiển) */}
-            <div className="ml-auto">
+            <div className="ml-auto flex flex-wrap items-center gap-x-6 gap-y-2">
+              <KeyLabelSelect />
               <OctaveShiftControl />
             </div>
           </header>
