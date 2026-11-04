@@ -1,8 +1,9 @@
-import { useEffect } from 'react';
+import { useCallback } from 'react';
 import Key from './Key';
 import { useShallow } from 'zustand/react/shallow';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
 import { useKeyMapping } from '../hooks/useKeyMapping';
+import { useKeyboardInput } from '../hooks/useKeyboardInput';
 
 const NOTES_IN_OCTAVE = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
@@ -39,26 +40,11 @@ const PianoKeyboard = () => {
   const displayedKeys = PIANO_KEYS_88;
   const whiteKeys = WHITE_KEYS_88;
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.ctrlKey || e.metaKey || e.altKey) return;
-      const note = noteByKey[e.key];
-      if (note && !e.repeat) pressKey(note);
-    };
+  useKeyboardInput({ noteByKey, pressKey, releaseKey });
 
-    const handleKeyUp = (e) => {
-      const note = noteByKey[e.key];
-      if (note) releaseKey(note);
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
-  }, [noteByKey, pressKey, releaseKey]);
+  // Chuột là một nguồn riêng ('mouse'); callback ổn định để memo của Key còn tác dụng
+  const pressWithMouse = useCallback((note) => pressKey(note, 'mouse'), [pressKey]);
+  const releaseMouse = useCallback(() => releaseKey('mouse'), [releaseKey]);
 
   return (
     <>
@@ -91,8 +77,8 @@ const PianoKeyboard = () => {
                  isBlack={false}
                  isPressed={pressedKeys.includes(whiteKey.note)}
                  playbackHand={playbackKeys[whiteKey.note]?.hand ?? null}
-                 onMouseDown={pressKey}
-                 onMouseUp={releaseKey}
+                 onMouseDown={pressWithMouse}
+                 onMouseUp={releaseMouse}
                />
                
                {hasBlackKeyAfter && (
@@ -108,8 +94,8 @@ const PianoKeyboard = () => {
                      isBlack={true}
                      isPressed={pressedKeys.includes(nextKey.note)}
                      playbackHand={playbackKeys[nextKey.note]?.hand ?? null}
-                     onMouseDown={pressKey}
-                     onMouseUp={releaseKey}
+                     onMouseDown={pressWithMouse}
+                     onMouseUp={releaseMouse}
                    />
                  </div>
                )}
