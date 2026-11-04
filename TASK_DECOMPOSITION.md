@@ -10,7 +10,9 @@
 > - Mỗi sub-task chỉ đụng vài file, có thể review/commit độc lập. Cột Contract ghi rõ file bị ảnh hưởng và task phụ thuộc (`Phụ thuộc:`).
 > - Không sửa code của Feature HomePage (`pages/HomePage.jsx`, `features/home/*`). Code dùng chung với Home (`features/piano/audio/toneEngine.js`, `components/common/*`, `index.css`, BE `/piano`, `/frequencies`) chỉ được sửa nếu không đổi hành vi của Home.
 > - Task `[BE]` có thêm/đổi API thì cập nhật luôn mục *Available API* trong README của BE.
-> - Thứ tự thực hiện phiên này: **Hạ tầng chung → Sheet Library (BE → FE) → Piano Workspace**. Feature User: pending.
+> - **Ngôn ngữ giao diện: tiếng Anh** (thống nhất với team từ 2026-11). Comment trong code và WBS vẫn viết tiếng Việt.
+> - DB: chỉ dùng **Prisma** (schema + migration) cho mọi bảng, không tạo bảng bằng SQL lúc server khởi động.
+> - Thứ tự thực hiện: ~~Hạ tầng chung → Sheet Library (BE → FE)~~ (xong) → **C-06 (merge `develop`) → C-07 (Auth sang Prisma) → C-08 (Library sang tiếng Anh) → Piano Workspace → C-04, C-05, E-02**. Feature User: pending.
 
 ## Hạ tầng chung (Common)
 
@@ -19,8 +21,30 @@
 | **C-01** `[BE]` | API prefix `/api/v1` | Đổi mount point trong `src/app.js` từ `/api` sang `/api/v1` cho `workspace.routes` và `sheets.routes`. Cập nhật toàn bộ ví dụ trong README. Phải merge cùng lúc với C-02. | Done |
 | **C-02** `[FE]` | axios baseURL `/api/v1` | Sửa `src/lib/axios.js`: `baseURL = ${API_BASE_URL}/api/v1`. Không sửa `features/home/api/pianoApi.js` (đường dẫn tương đối `/piano` vẫn đúng). Kiểm tra Home vẫn tải được cấu hình piano/metronome. Phụ thuộc: C-01. | Done |
 | **C-03** `[FE]` | Chuẩn hoá thư mục `pages/` | Chuyển `pages/sheet/WorkspacePage.jsx` thành `pages/WorkspacePage.jsx`, xoá thư mục `pages/sheet/`, sửa import trong `routes/AppRoutes.jsx`. Trang sau này đặt phẳng trong `pages/` (`LibraryPage`, `NotFoundPage`, ...). | Done |
-| **C-04** `[FE]` | Navbar: chữ thương hiệu mới | Trong `components/common/navbar.jsx`, thay ảnh `fiano-logo.png` bằng chữ `FIANO` + dấu chấm màu `--color-brand` (giống tầng 1 hiện tại của WorkspacePage), dùng design token. **Giữ nguyên con cáo mascot** và vị trí. Không đổi menu và ô search. | To Do |
+| **C-04** `[FE]` | Navbar: chữ thương hiệu mới | Làm trên **Navbar mới của team** (sau C-06B): trong `components/common/navbar.jsx`, thay ảnh `fiano-logo.png` bằng chữ `FIANO` + dấu chấm màu `--color-brand` (giống tầng 1 hiện tại của WorkspacePage), dùng design token. **Giữ nguyên con cáo mascot**, menu, ô search, phần đăng nhập/đăng xuất và menu mobile của team. Phụ thuộc: C-06B. | To Do |
 | **C-05** `[FE]` | Tách bundle theo route | Dùng `React.lazy` + `Suspense` trong `routes/AppRoutes.jsx` cho các page để Tone.js không nằm trong bundle chính. So sánh kích thước `dist/assets/*.js` trước và sau. Làm cuối phiên. | To Do |
+
+### Đồng bộ với `develop` (sau khi Feature Auth của team được merge)
+
+| Sub-Task | Component | Contract & Constraints | Status |
+| :--- | :--- | :--- | :--- |
+| **C-06A** `[BE]` | Merge `develop` vào `sheet-library` | Bạn chạy `git merge origin/develop`, Claude sửa xung đột, bạn `git add .` + commit. `package.json`: gộp dependency 2 bên (Prisma + `bcryptjs`, `jsonwebtoken`, `pg`), chạy `npm install` để sinh lại `package-lock.json`. `app.js`: mọi route dưới `/api/v1` (workspace, sheets, auth). `env.js`: gộp `DATABASE_URL`, `JWT_SECRET`, `JWT_EXPIRES_IN`. `server.js`: tạm giữ `createUsersTable()` của team + graceful shutdown của mình (bỏ ở C-07C). `.env.example` thêm `JWT_SECRET`, `JWT_EXPIRES_IN`. Kiểm tra: server chạy, `/sheets`, `/piano`, `/auth/register`, `/auth/login` đều hoạt động. | To Do |
+| **C-06B** `[FE]` | Merge `develop` vào `sheet-library` | Như C-06A. `AppRoutes.jsx`: giữ toàn bộ route của team (Login/Register/Forgot, Profile, Upload, `*` NotFound, `GuestRoute`/`ProtectedRoute`, `ROUTES`) + thêm `ROUTES.LIBRARY` → `LibraryPage`, import `pages/WorkspacePage` (vị trí mới từ C-03). Kiểm tra bản sửa tiếng Anh của team trong `WorkspacePage` đã vào đúng file mới. Chạy lint + build, mở thử Home, Library, Workspace, Login, trang 404. | To Do |
+
+### Chuyển Feature Auth từ `pg` thuần sang Prisma (đã thống nhất với team)
+
+| Sub-Task | Component | Contract & Constraints | Status |
+| :--- | :--- | :--- | :--- |
+| **C-07A** `[BE]` | Model `User` + migration `add_users` | Thêm `model User` (`@@map("users")`) khớp **từng cột** bảng hiện tại của team: `id` (autoincrement), `username`, `email` (unique, `VarChar` theo `auth.constants.js`), `passwordHash` → `password_hash`, `displayName` → `display_name`, `role` (mặc định `user`), `isVerified` → `is_verified`, `createdAt` → `created_at` (`Timestamptz`). Sinh migration rồi sửa SQL thành `CREATE TABLE IF NOT EXISTS` / `CREATE UNIQUE INDEX IF NOT EXISTS`. **Thử trên DB tạm** (không đụng DB `fiano`): (1) DB mới tinh; (2) DB đã có bảng `users` kèm dữ liệu (giống máy teammate) → `db:migrate` không đòi reset, dữ liệu còn nguyên. Ghi cách xử lý nếu vẫn báo drift (`prisma migrate resolve --applied`). Phụ thuộc: C-06A. | To Do |
+| **C-07B** `[BE]` | Bộ test hồi quy Auth (chụp bản gốc) | Viết script test `POST /api/v1/auth/register` và `/login`: đăng ký thành công, trùng username, trùng email, thiếu/sai định dạng từng trường, đăng nhập đúng (bằng username và bằng email), sai mật khẩu, tài khoản không tồn tại. Chạy trên code `pg` hiện tại, lưu response (status + body, bỏ phần token/thời gian thay đổi mỗi lần) làm bản gốc. Phụ thuộc: C-06A. | To Do |
+| **C-07C** `[BE]` | `users.repository.js` dùng Prisma | Viết lại bằng `prisma.user.*`, **giữ nguyên tên hàm, tham số và dạng dữ liệu trả về** để `auth.service.js` không phải sửa. Xoá `createUsersTable()` (trong repository và `server.js`) và `src/config/database.js`. Giữ package `pg` (Prisma adapter cần). Phụ thuộc: C-07A, C-07B. | To Do |
+| **C-07D** `[BE]` | So sánh hồi quy + tài liệu | Chạy lại bộ test C-07B trên code Prisma: mọi response phải **giống bản gốc**. Thử thêm: mật khẩu vẫn được hash (không lưu plaintext), tài khoản tạo từ bản `pg` vẫn đăng nhập được sau khi đổi. README BE: mục Auth API (register/login, `Authorization: Bearer`), biến `JWT_SECRET`/`JWT_EXPIRES_IN`, cập nhật cây thư mục và checklist. Phụ thuộc: C-07C. | To Do |
+
+### Chuyển giao diện Sheet Library sang tiếng Anh
+
+| Sub-Task | Component | Contract & Constraints | Status |
+| :--- | :--- | :--- | :--- |
+| **C-08** `[FE]` | Library sang tiếng Anh | Dịch mọi chữ hiển thị và `aria-label` trong `features/library/*` + `pages/LibraryPage.jsx`: toolbar (placeholder, *Showing x / N sheets*, *Sort by*, nhãn sắp xếp), bộ lọc (*Difficulty*, *Genre*, *All*), nhãn độ khó (*Easy/Medium/Hard/Expert* trong `config/difficulty.js`), card (*Practice*, aria số lượt xem/thích/thời lượng), trạng thái rỗng/lỗi/thử lại, phân trang (*Page x of y*, *Previous/Next page*). Cập nhật mục Sheet Library trong README FE. Không đổi logic. Phụ thuộc: C-06B. | To Do |
 
 ## Feature: Piano Workspace 
 
@@ -47,7 +71,7 @@
 | Sub-Task | Component | Contract & Constraints | Status |
 | :--- | :--- | :--- | :--- |
 | **T-05A** `[FE]` | Bỏ chế độ FREE_PLAY | `useWorkspaceStore.js`: `currentMode` mặc định `'AUTO_PLAY'`, chỉ còn `'PRACTICE' \| 'AUTO_PLAY'`. Xoá mode Free trong `ControlBar.jsx`, xoá `PIANO_KEYS_61` (luôn dùng 88 phím) trong `PianoKeyboard.jsx`, bỏ nhánh `FREE_PLAY` trong `practiceWaterfall.jsx`. | To Do |
-| **T-05B** `[FE]` | Redirect `/workspace` không có id | `routes/AppRoutes.jsx`: `/workspace` dùng `<Navigate to="/" replace />`, `/workspace/:sheetId` vào WorkspacePage. Xoá `config/sheet.js` (`DEFAULT_SHEET_ID`) và phần fallback trong WorkspacePage. Phụ thuộc: C-03. | To Do |
+| **T-05B** `[FE]` | Redirect `/workspace` không có id | `routes/AppRoutes.jsx`: `/workspace` dùng `<Navigate to={ROUTES.LIBRARY} replace />` (nút *Practice* trên Navbar trỏ tới `/workspace` → người dùng được đưa sang Library để chọn bài), `/workspace/:sheetId` vào WorkspacePage. Xoá `config/sheet.js` (`DEFAULT_SHEET_ID`) và phần fallback trong WorkspacePage. Phụ thuộc: C-06B. | To Do |
 | **T-05C** `[FE]` | Tối ưu re-render (selector) | Thay mọi chỗ `const {...} = useWorkspaceStore()` bằng selector theo từng field hoặc `useShallow` (zustand/react/shallow) trong `WorkspacePage`, `ControlBar`, `PianoKeyboard`, `practiceWaterfall`, `useSheetLoader`. Không đổi hành vi. Kiểm tra bằng React DevTools Profiler: khi Auto-play, ControlBar và Canvas không render lại theo từng nốt. | To Do |
 | **T-05D** `[FE]` | Tách state phím | Tách `activeKeys` thành `pressedKeys` (người dùng nhấn) và `playbackKeys` (Auto-play / gợi ý Practice, lưu kèm `hand`). Đổi `highlightKey`/`unhighlightKey` thành `setPlaybackKey`/`clearPlaybackKey`. `sheetPlayer.js` và `ControlBar.jsx` dùng API mới. `Key` nhận 2 trạng thái riêng. Phụ thuộc: T-05C. | To Do |
 | **T-05E** `[FE]` | Khoá thao tác ở AUTO_PLAY | Ở `AUTO_PLAY` bỏ qua chuột và phím máy tính (không phát tiếng, không đổi `pressedKeys`), con trỏ chuột về mặc định. Đổi mode thì nhả hết phím đang giữ. Phụ thuộc: T-05D. | To Do |
@@ -76,7 +100,7 @@
 
 | Sub-Task | Component | Contract & Constraints | Status |
 | :--- | :--- | :--- | :--- |
-| **T-08A** `[FE]` | Restyle Control Bar | `ControlBar.jsx` theo phong cách cartoon (token, viền ink, bóng cứng, góc vuông). Mode selector dạng segmented: *Tự động phát* / *Wait Mode*. Timeline dùng ref thay cho `document.getElementById('progress-thumb')`. Đổi định dạng thời gian thống nhất `m:ss`. | To Do |
+| **T-08A** `[FE]` | Restyle Control Bar | `ControlBar.jsx` theo phong cách cartoon (token, viền ink, bóng cứng, góc vuông). Mode selector dạng segmented: *Auto Play* / *Wait Mode*. Timeline dùng ref thay cho `document.getElementById('progress-thumb')`. Đổi định dạng thời gian thống nhất `m:ss`. | To Do |
 | **T-08B** `[FE]` | Nút Tua về đầu | Thêm nút Restart: `Transport.stop()` + về 0:00, nhả nốt, xoá playbackKeys. | To Do |
 | **T-08C** `[FE]` | Volume thật | Slider âm lượng chỉ cho Workspace: chỉnh `pianoSampler.volume`, lưu giá trị gốc lúc mount và **khôi phục khi unmount** để không ảnh hưởng Home. | To Do |
 | **T-08D** `[FE]` | Tốc độ phát: chuyển sang thời gian nhạc | `sheetPlayer.js`: lên lịch nốt theo ticks (dựa vào BPM bài) thay cho giây tuyệt đối, để đổi `Transport.bpm` thì cả âm thanh lẫn waterfall đều co giãn. Thêm helper `getSongTime()` dùng chung cho Canvas và Timeline. Chưa có UI. | To Do |
@@ -92,7 +116,7 @@
 | **T-09B** `[FE]` | Dừng chờ tại mỗi bước | Ở PRACTICE: Transport chạy, đến thời điểm của bước thì `pause()` và đặt `playbackKeys` = các nốt cần nhấn (gợi ý). Không phát âm tự động. Phụ thuộc: T-09A, T-05D, T-08D. | To Do |
 | **T-09C** `[FE]` | Kiểm tra phím người dùng | Người dùng nhấn phím thì có tiếng. Đánh dấu nốt đúng của bước hiện tại. Đủ **tất cả** nốt (nhấn sau khi bước bắt đầu chờ) thì `start()` tiếp. Phím sai vẫn kêu nhưng không tính. Phụ thuộc: T-09B, T-06B. | To Do |
 | **T-09D** `[FE]` | Đồng bộ seek/restart | Tua, Restart, đổi mode thì tính lại bước hiện tại theo thời gian mới, xoá gợi ý và các nốt đã đánh dấu. Phụ thuộc: T-09C. | To Do |
-| **T-09E** `[FE]` | Phản hồi trực quan | Phím gợi ý có màu theo tay, nốt đã nhấn đúng đổi trạng thái, Control Bar hiện badge *Đang chờ*. Phụ thuộc: T-09C, T-07E. | To Do |
+| **T-09E** `[FE]` | Phản hồi trực quan | Phím gợi ý có màu theo tay, nốt đã nhấn đúng đổi trạng thái, Control Bar hiện badge *Waiting for you*. Phụ thuộc: T-09C, T-07E. | To Do |
 | **T-10** `[FE]` | Review Workspace | Chạy `npm run lint` + `npm run build`, test thủ công (Auto/Practice, seek, đổi bài, rời trang không còn âm hay listener), cập nhật README FE. | To Do |
 
 ## Feature: Sheet Library 
@@ -175,15 +199,17 @@
 
 | Sub-Task | Component | Contract & Constraints | Status |
 | :--- | :--- | :--- | :--- |
-| **E-01** `[FE]` | Trang 404 | `pages/NotFoundPage.jsx` + route `*` trong `AppRoutes.jsx`. Phong cách cartoon (con cáo, chữ 404, nút *Về trang chủ* và *Đến Sheet Library*), dùng design token, có Footer. Phụ thuộc: C-03. | To Do |
-| **E-02** `[FE]` | Bài nhạc không tồn tại | WorkspacePage khi API trả `404 SHEET_NOT_FOUND` thì hiện thông báo riêng + nút về Library (không hiện nút *Thử lại* vô ích). Phụ thuộc: T-07A. | To Do |
+| **E-02** `[FE]` | Bài nhạc không tồn tại | WorkspacePage khi API trả `404 SHEET_NOT_FOUND` thì hiện thông báo riêng (tiếng Anh) + nút về Library (không hiện nút *Try again* vô ích). Phụ thuộc: T-07A. | To Do |
+
+> E-01 (trang 404) đã bỏ: team đã làm `pages/NotFoundPage.jsx` + route `*` trong Feature Auth.
 
 ---
 
 ## Ghi chú thảo luận với teammate (chưa thực hiện)
 
 - **Navbar – ô search:** gõ + Enter thì chuyển sang `/library?q=...`.
-- **Navbar – menu:** thiết kế dùng `Piano | Sheet library | Metronome`. Code hiện tại là `Piano, Library, Practice_sample, Upload, Profile`. Đề xuất: `Piano`, `Sheet library`, `Profile` (ẩn cho tới khi có User). Cần chốt mục *Metronome* trỏ tới đâu.
-- **Pages:** `HomePage`, `WorkspacePage`, `LibraryPage`, `UserProfilePage`, `UploadPage`, `LoginPage`, `RegisterPage`, `ForgotPasswordPage`, `NotFoundPage`. Đề xuất tách Login/Register/Forgot thành 3 page riêng (3 thiết kế riêng, URL riêng để link reset mật khẩu trong email trỏ thẳng tới).
-- **Database:** PostgreSQL + Prisma, migration theo feature. Bảng `users` (Auth) khi có sẽ thêm migration gắn `sheets.uploaderId`. File MIDI/ảnh avatar lưu trên cloud (làm cùng Feature User).
+- ~~**Navbar – menu**~~ và ~~**Pages** (tách Login/Register/Forgot)~~: team đã làm trong Feature Auth.
+- **Database:** PostgreSQL + Prisma, migration theo feature. Bảng `users` đưa vào Prisma ở C-07; Feature User sẽ thêm migration gắn `sheets.uploaderId` → `users.id`. File MIDI/ảnh avatar lưu trên cloud (làm cùng Feature User).
+- `index.html` chưa có favicon (trình duyệt báo 404 `/favicon.ico` ở mọi trang).
+- HomePage hiện lỗi đỏ "Unable to access MIDI devices…" khi người dùng không cấp quyền Web MIDI; nên ẩn hoặc diễn đạt nhẹ hơn.
 - **Upload:** chỉ nhận file MIDI. Engine xử lý sẽ dựa trên `convertMidi.mjs` + logic chọn track/chia tay trong `scripts/midi-to-sheet.mjs`.
