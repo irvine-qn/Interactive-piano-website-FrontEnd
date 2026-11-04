@@ -94,13 +94,13 @@
 | **T-07D** `[FE]` | Bố trí phím dùng chung | Tạo `features/workspace/config/keyLayout.js` tính `left/width` (%) cho 88 phím theo công thức của Home (`BLACK_KEY_RATIO`). Bàn phím và Canvas cùng dùng layout này, thay cho việc đọc DOM `[data-note]` bằng `setTimeout 50ms`. | Done |
 | **T-07E** `[FE]` | Giao diện Piano giống Home | Viết lại phần render của `PianoKeyboard.jsx`/`Key.jsx` theo style Home: khung gỗ, dải nỉ đỏ, phím trắng/đen dùng token, nhãn phím tắt (`kbd`) + tên nốt, vạch đáy phím. Phím người dùng nhấn: màu brand như Home. Phím Auto-play: tay phải cam, tay trái xanh dương. Phụ thuộc: T-07D, T-05D. | Done |
 | **T-07F** `[FE]` | Giao diện Waterfall giống Home | `practiceWaterfall.jsx`: nền giấy, lưới ngang, vạch phân quãng tám, vạch hit-line, khối nốt có gradient + viền ink + bóng cứng, đọc màu từ CSS variables. Tay phải = gradient cam (`--color-note-orange-*`), tay trái = gradient xanh (`--color-note-blue-*`). Hiện tên nốt trên khối nếu đủ chỗ. Chiều cao vùng waterfall co giãn theo chiều cao màn hình (tối đa 440px như thiết kế, tối thiểu ~260px) để bàn phím luôn nằm trọn trong màn hình 16:9 (đã thống nhất ở T-07A, có thể chỉnh sau). **Giữ nguyên cơ chế rơi theo `Tone.Transport`.** Phụ thuộc: T-07D. | Done |
-| **T-07G** `[FE]` | Kiểm tra màu 2 tay | Sau khi dữ liệu được convert lại (L-BE-05), kiểm tra Merry Christmas: âm trầm màu xanh (trái), âm cao màu cam (phải). Phụ thuộc: L-BE-05/L-BE-06. | To Do |
+| **T-07G** `[FE]` | Kiểm tra màu 2 tay | Sau khi dữ liệu được convert lại (L-BE-05), kiểm tra Merry Christmas: âm trầm màu xanh (trái), âm cao màu cam (phải). Phụ thuộc: L-BE-05/L-BE-06. | Done |
 
 ### Giai đoạn 5: Control Bar
 
 | Sub-Task | Component | Contract & Constraints | Status |
 | :--- | :--- | :--- | :--- |
-| **T-08A** `[FE]` | Restyle Control Bar | `ControlBar.jsx` theo phong cách cartoon (token, viền ink, bóng cứng, góc vuông). Mode selector dạng segmented: *Auto Play* / *Wait Mode*. Timeline dùng ref thay cho `document.getElementById('progress-thumb')`. Đổi định dạng thời gian thống nhất `m:ss`. | To Do |
+| **T-08A** `[FE]` | Restyle Control Bar | `ControlBar.jsx` theo phong cách cartoon (token, viền ink, bóng cứng, góc vuông). Mode selector dạng segmented: *Auto Play* / *Wait Mode*. Timeline dùng ref thay cho `document.getElementById('progress-thumb')`. Đổi định dạng thời gian thống nhất `m:ss`. | Done |
 | **T-08B** `[FE]` | Nút Tua về đầu | Thêm nút Restart: `Transport.stop()` + về 0:00, nhả nốt, xoá playbackKeys. | To Do |
 | **T-08C** `[FE]` | Volume thật | Slider âm lượng chỉ cho Workspace: chỉnh `pianoSampler.volume`, lưu giá trị gốc lúc mount và **khôi phục khi unmount** để không ảnh hưởng Home. | To Do |
 | **T-08D** `[FE]` | Tốc độ phát: chuyển sang thời gian nhạc | `sheetPlayer.js`: lên lịch nốt theo ticks (dựa vào BPM bài) thay cho giây tuyệt đối, để đổi `Transport.bpm` thì cả âm thanh lẫn waterfall đều co giãn. Thêm helper `getSongTime()` dùng chung cho Canvas và Timeline. Chưa có UI. | To Do |
