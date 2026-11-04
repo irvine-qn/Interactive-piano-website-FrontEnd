@@ -3,7 +3,8 @@ import * as Tone from 'tone';
 import { useShallow } from 'zustand/react/shallow';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
 import { stopAllNotes, resetPlayback } from '../../piano/audio/toneEngine';
-import { Hourglass, PlaySquare, Play, Pause, RotateCcw, Volume2 } from 'lucide-react';
+import { Hourglass, PlaySquare, Play, Pause, RotateCcw, Volume1, Volume2, VolumeX } from 'lucide-react';
+import { useWorkspaceVolume } from '../hooks/useWorkspaceVolume';
 
 // AUTO_PLAY là chế độ mặc định nên đứng đầu. PRACTICE hiển thị là "Wait Mode" (đợi người chơi nhấn đúng, T-09)
 const MODES = [
@@ -44,8 +45,10 @@ const SLIDER_CLASS =
 
 const ControlBar = () => {
   // Chỉ đăng ký các field cần dùng: Control Bar không render lại mỗi khi một phím sáng/tắt (pressedKeys, playbackKeys)
-  const { currentMode, setMode, isPlaying, setIsPlaying, duration, resetKeys } = useWorkspaceStore(
+  const { currentMode, setMode, isPlaying, setIsPlaying, duration, resetKeys, volume, setVolume } = useWorkspaceStore(
     useShallow((state) => ({
+      volume: state.volume,
+      setVolume: state.setVolume,
       currentMode: state.currentMode,
       setMode: state.setMode,
       isPlaying: state.isPlaying,
@@ -54,6 +57,7 @@ const ControlBar = () => {
       resetKeys: state.resetKeys,
     })),
   );
+  useWorkspaceVolume(volume);
   const timelineRef = useRef(null);
   const currentTimeRef = useRef(null);
   const requestRef = useRef();
@@ -114,6 +118,7 @@ const ControlBar = () => {
   };
 
   const PlayIcon = isPlaying ? Pause : Play;
+  const VolumeIcon = volume === 0 ? VolumeX : volume < 50 ? Volume1 : Volume2;
 
   return (
     <div className="flex w-full flex-wrap items-center gap-x-6 gap-y-3 px-5 py-4">
@@ -190,18 +195,19 @@ const ControlBar = () => {
           <PlayIcon aria-hidden="true" className="h-5 w-5 fill-current" />
         </button>
 
-        {/* Âm lượng thật làm ở T-08C, tạm thời khoá để không gây hiểu nhầm */}
+        {/* Âm lượng chỉ của Workspace (rời trang thì trả lại mức gốc cho Home, xem useWorkspaceVolume) */}
         <div className="flex h-11 items-center gap-2 border-2 border-solid border-[var(--color-ink)] bg-[var(--color-surface-soft)] px-3">
-          <Volume2 aria-hidden="true" className="h-5 w-5 text-[var(--color-brand-strong)]" />
+          <VolumeIcon aria-hidden="true" className="h-5 w-5 shrink-0 text-[var(--color-brand-strong)]" />
           <input
             type="range"
             aria-label="Volume"
-            title="Volume control coming soon"
+            aria-valuetext={`${volume}%`}
             min="0"
             max="100"
-            defaultValue="75"
-            disabled
-            style={{ '--fill': '75%' }}
+            step="1"
+            value={volume}
+            onChange={(e) => setVolume(Number(e.target.value))}
+            style={{ '--fill': `${volume}%` }}
             className={`${SLIDER_CLASS} w-24`}
           />
         </div>

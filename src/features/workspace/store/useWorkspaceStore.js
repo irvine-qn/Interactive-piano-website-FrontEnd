@@ -14,6 +14,8 @@ export const useWorkspaceStore = create((set, get) => ({
   // count: cùng một nốt có thể được đánh chồng (lần sau bắt đầu trước khi lần trước tắt) nên chỉ tắt khi về 0.
   playbackKeys: {},
   isPlaying: false,
+  // Âm lượng của Workspace (0-100%, 100 = mức gốc của sampler). Giữ trong store để đổi bài vẫn nhớ
+  volume: 100,
   duration: 250,
   sheet: null, // { id, title, composer, notes, ... } lấy từ API
   sheetStatus: 'idle', // 'idle' | 'loading' | 'ready' | 'error'
@@ -24,6 +26,7 @@ export const useWorkspaceStore = create((set, get) => ({
     set({ currentMode: mode, pressedSources: {}, pressedKeys: [], playbackKeys: {} });
   },
   setIsPlaying: (status) => set({ isPlaying: status }),
+  setVolume: (volume) => set({ volume: Math.min(100, Math.max(0, volume)) }),
   setDuration: (time) => set({ duration: time }),
   setSheetLoading: () => set({ sheet: null, sheetStatus: 'loading', sheetError: null }),
   setSheet: (sheet) => set({ sheet, sheetStatus: 'ready', sheetError: null }),
