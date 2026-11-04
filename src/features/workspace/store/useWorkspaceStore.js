@@ -25,7 +25,9 @@ export const useWorkspaceStore = create((set, get) => ({
   setSheetError: (error) => set({ sheet: null, sheetStatus: 'error', sheetError: error }),
 
   pressKey: (note) => {
-    const { pressedKeys } = get();
+    const { pressedKeys, currentMode } = get();
+    // AUTO_PLAY: bài tự phát, người dùng chỉ xem. Chuột và bàn phím đều đi qua đây nên chặn một chỗ là đủ.
+    if (currentMode === 'AUTO_PLAY') return;
     if (!pressedKeys.includes(note)) {
       playNote(note);
       set({ pressedKeys: [...pressedKeys, note] });

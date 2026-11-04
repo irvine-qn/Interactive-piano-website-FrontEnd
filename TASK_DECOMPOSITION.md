@@ -74,7 +74,7 @@
 | **T-05B** `[FE]` | Redirect `/workspace` không có id | `routes/AppRoutes.jsx`: `/workspace` dùng `<Navigate to={ROUTES.LIBRARY} replace />` (nút *Practice* trên Navbar trỏ tới `/workspace` → người dùng được đưa sang Library để chọn bài), `/workspace/:sheetId` vào WorkspacePage. Xoá `config/sheet.js` (`DEFAULT_SHEET_ID`) và phần fallback trong WorkspacePage. Phụ thuộc: C-06B. | Done |
 | **T-05C** `[FE]` | Tối ưu re-render (selector) | Thay mọi chỗ `const {...} = useWorkspaceStore()` bằng selector theo từng field hoặc `useShallow` (zustand/react/shallow) trong `WorkspacePage`, `ControlBar`, `PianoKeyboard`, `practiceWaterfall`, `useSheetLoader`. Không đổi hành vi. Kiểm tra bằng React DevTools Profiler: khi Auto-play, ControlBar và Canvas không render lại theo từng nốt. | Done |
 | **T-05D** `[FE]` | Tách state phím | Tách `activeKeys` thành `pressedKeys` (người dùng nhấn) và `playbackKeys` (Auto-play / gợi ý Practice, lưu kèm `hand`). Đổi `highlightKey`/`unhighlightKey` thành `setPlaybackKey`/`clearPlaybackKey`. `sheetPlayer.js` và `ControlBar.jsx` dùng API mới. `Key` nhận 2 trạng thái riêng. Phụ thuộc: T-05C. | Done |
-| **T-05E** `[FE]` | Khoá thao tác ở AUTO_PLAY | Ở `AUTO_PLAY` bỏ qua chuột và phím máy tính (không phát tiếng, không đổi `pressedKeys`), con trỏ chuột về mặc định. Đổi mode thì nhả hết phím đang giữ. Phụ thuộc: T-05D. | To Do |
+| **T-05E** `[FE]` | Khoá thao tác ở AUTO_PLAY | Ở `AUTO_PLAY` bỏ qua chuột và phím máy tính (không phát tiếng, không đổi `pressedKeys`), con trỏ chuột về mặc định. Đổi mode thì nhả hết phím đang giữ. Phụ thuộc: T-05D. | Done |
 
 ### Giai đoạn 3: Nhập liệu bàn phím
 
@@ -113,7 +113,7 @@
 | Sub-Task | Component | Contract & Constraints | Status |
 | :--- | :--- | :--- | :--- |
 | **T-09A** `[FE]` | Gom nốt thành bước | Hàm thuần `features/workspace/practice/buildSteps.js`: gom nốt có `time` lệch nhau ≤ 50ms thành 1 bước `{ time, notes: Set<name>, hands }`, sắp theo thời gian. Có vài test case viết tay trong comment hoặc file test. | To Do |
-| **T-09B** `[FE]` | Dừng chờ tại mỗi bước | Ở PRACTICE: Transport chạy, đến thời điểm của bước thì `pause()` và đặt `playbackKeys` = các nốt cần nhấn (gợi ý). Không phát âm tự động. Phụ thuộc: T-09A, T-05D, T-08D. | To Do |
+| **T-09B** `[FE]` | Dừng chờ tại mỗi bước | Ở PRACTICE: Transport chạy, đến thời điểm của bước thì `pause()` và đặt `playbackKeys` = các nốt cần nhấn (gợi ý). Không phát âm tự động. **Lưu ý (phát hiện ở T-05E):** `ControlBar` đang nghe sự kiện `pause`/`stop` của `Tone.Transport` để gọi `stopAllNotes()` + `resetKeys()`, và Tone phát sự kiện này trễ vài chục ms → nếu Wait Mode `pause()` để chờ thì sẽ **tắt tiếng và xoá phím người chơi đang giữ**. Phải tách "dừng do người dùng bấm Pause/Stop/tua" khỏi "dừng chờ của Wait Mode", và chỉ tắt âm/phím của bài nhạc (`playbackKeys`), không đụng `pressedKeys`. Phụ thuộc: T-09A, T-05D, T-08D. | To Do |
 | **T-09C** `[FE]` | Kiểm tra phím người dùng | Người dùng nhấn phím thì có tiếng. Đánh dấu nốt đúng của bước hiện tại. Đủ **tất cả** nốt (nhấn sau khi bước bắt đầu chờ) thì `start()` tiếp. Phím sai vẫn kêu nhưng không tính. Phụ thuộc: T-09B, T-06B. | To Do |
 | **T-09D** `[FE]` | Đồng bộ seek/restart | Tua, Restart, đổi mode thì tính lại bước hiện tại theo thời gian mới, xoá gợi ý và các nốt đã đánh dấu. Phụ thuộc: T-09C. | To Do |
 | **T-09E** `[FE]` | Phản hồi trực quan | Phím gợi ý có màu theo tay, nốt đã nhấn đúng đổi trạng thái, Control Bar hiện badge *Waiting for you*. Phụ thuộc: T-09C, T-07E. | To Do |

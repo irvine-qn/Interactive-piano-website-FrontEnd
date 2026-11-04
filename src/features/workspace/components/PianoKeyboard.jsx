@@ -72,6 +72,7 @@ const PianoKeyboard = () => {
                  note={whiteKey.note}
                  hint={NOTE_TO_KEYBOARD_MAP[whiteKey.note]}
                  showHint={!isAutoPlay}
+                 interactive={!isAutoPlay}
                  isBlack={false}
                  isPressed={pressedKeys.includes(whiteKey.note)}
                  playbackHand={playbackKeys[whiteKey.note]?.hand ?? null}
@@ -88,6 +89,7 @@ const PianoKeyboard = () => {
                      note={nextKey.note}
                      hint={NOTE_TO_KEYBOARD_MAP[nextKey.note]}
                      showHint={!isAutoPlay}
+                     interactive={!isAutoPlay}
                      isBlack={true}
                      isPressed={pressedKeys.includes(nextKey.note)}
                      playbackHand={playbackKeys[nextKey.note]?.hand ?? null}

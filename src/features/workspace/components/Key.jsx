@@ -2,7 +2,8 @@ import { memo } from 'react';
 
 // isPressed: người dùng đang nhấn; playbackHand: 'left' | 'right' | null khi bài nhạc bật sáng phím.
 // Hiện 2 trạng thái dùng chung một kiểu sáng; màu theo tay sẽ làm khi restyle bàn phím (T-07E).
-const Key = ({ note, hint, showHint = true, isBlack, isPressed, playbackHand, onMouseDown, onMouseUp }) => {
+// interactive = false (AUTO_PLAY): phím chỉ để xem, con trỏ thường thay vì bàn tay
+const Key = ({ note, hint, showHint = true, isBlack, isPressed, playbackHand, interactive = true, onMouseDown, onMouseUp }) => {
   const isActive = isPressed || playbackHand !== null;
   return (
     <div
@@ -12,7 +13,7 @@ const Key = ({ note, hint, showHint = true, isBlack, isPressed, playbackHand, on
       onMouseLeave={() => onMouseUp(note)}
       // Thêm overflow-hidden và min-w-0 để phím có thể co lại nhỏ hơn cả nội dung text
       className={`
-        flex flex-col justify-end items-center pb-1 md:pb-2 cursor-pointer select-none border border-gray-400
+        flex flex-col justify-end items-center pb-1 md:pb-2 ${interactive ? 'cursor-pointer' : 'cursor-default'} select-none border border-gray-400
         transition-all duration-75 ease-in-out w-full h-full overflow-hidden min-w-0
         ${isBlack 
           ? 'bg-black text-white rounded-b-xs' 
