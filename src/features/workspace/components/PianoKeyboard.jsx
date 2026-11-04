@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import Key from './Key';
 import { useShallow } from 'zustand/react/shallow';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
-import { KEYBOARD_TO_NOTE_MAP, NOTE_TO_KEYBOARD_MAP } from '../config/keyMapping';
+import { useKeyMapping } from '../hooks/useKeyMapping';
 
 const NOTES_IN_OCTAVE = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
@@ -33,6 +33,8 @@ const PianoKeyboard = () => {
     })),
   );
 
+  const { noteByKey, keyByNote, status: mappingStatus, retry: retryMapping } = useKeyMapping();
+
   const isAutoPlay = currentMode === 'AUTO_PLAY';
   const displayedKeys = PIANO_KEYS_88;
   const whiteKeys = WHITE_KEYS_88;
@@ -40,12 +42,12 @@ const PianoKeyboard = () => {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.ctrlKey || e.metaKey || e.altKey) return;
-      const note = KEYBOARD_TO_NOTE_MAP[e.key];
+      const note = noteByKey[e.key];
       if (note && !e.repeat) pressKey(note);
     };
 
     const handleKeyUp = (e) => {
-      const note = KEYBOARD_TO_NOTE_MAP[e.key];
+      const note = noteByKey[e.key];
       if (note) releaseKey(note);
     };
 
@@ -56,9 +58,22 @@ const PianoKeyboard = () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [pressKey, releaseKey]);
+  }, [noteByKey, pressKey, releaseKey]);
 
   return (
+    <>
+    {mappingStatus === 'error' && (
+      <p role="alert" className="m-0 mb-2 flex items-center gap-3 text-sm font-semibold text-[var(--color-danger)]">
+        Keyboard shortcuts are unavailable (could not load the key map). You can still play with the mouse.
+        <button
+          type="button"
+          onClick={retryMapping}
+          className="cursor-pointer border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-3 py-1 font-[inherit] text-xs font-bold text-[var(--color-ink)]"
+        >
+          Retry
+        </button>
+      </p>
+    )}
     <div className="flex w-full p-2 sm:p-4 bg-gray-900 rounded-b-lg h-[120px] sm:h-[180px]">
       <div className="flex w-full h-full relative">
         {whiteKeys.map((whiteKey) => {
@@ -70,7 +85,7 @@ const PianoKeyboard = () => {
             <div key={whiteKey.note} className="flex-1 relative h-full min-w-0">
                <Key
                  note={whiteKey.note}
-                 hint={NOTE_TO_KEYBOARD_MAP[whiteKey.note]}
+                 hint={keyByNote[whiteKey.note]}
                  showHint={!isAutoPlay}
                  interactive={!isAutoPlay}
                  isBlack={false}
@@ -87,7 +102,7 @@ const PianoKeyboard = () => {
                  >
                    <Key
                      note={nextKey.note}
-                     hint={NOTE_TO_KEYBOARD_MAP[nextKey.note]}
+                     hint={keyByNote[nextKey.note]}
                      showHint={!isAutoPlay}
                      interactive={!isAutoPlay}
                      isBlack={true}
@@ -103,6 +118,7 @@ const PianoKeyboard = () => {
         })}
       </div>
     </div>
+    </>
   );
 };
 
