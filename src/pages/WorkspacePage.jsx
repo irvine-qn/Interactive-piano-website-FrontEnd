@@ -3,6 +3,7 @@ import { useShallow } from "zustand/react/shallow";
 import { useWorkspaceStore } from "../features/workspace/store/useWorkspaceStore";
 import PianoKeyboard from "../features/workspace/components/PianoKeyboard";
 import ControlBar from "../features/workspace/components/ControlBar";
+import SheetInfoPanel from "../features/workspace/components/SheetInfoPanel";
 import WaterfallCanvas from "../features/workspace/canvas/practiceWaterfall";
 import { useSheetLoader } from "../features/workspace/hooks/useSheetLoader";
 import Footer from "../components/common/footer";
@@ -24,12 +25,9 @@ const WorkspacePage = () => {
   return (
     <div className="flex flex-1 flex-col">
       <main className="mx-auto flex w-full max-w-[1600px] flex-1 flex-col gap-6 px-4 pb-14 pt-10">
-        {/* Tầng 1: thông tin bài (SheetInfoPanel ở T-07B) + Control Bar */}
+        {/* Tầng 1: thông tin bài + Control Bar */}
         <section aria-label="Sheet information" className={`${CARD_CLASS} px-5 py-4`}>
-          <h1 className="m-0 text-[26px] font-bold leading-tight text-[var(--color-ink)]">
-            {sheet?.title ?? (sheetStatus === "error" ? "Sheet unavailable" : "Loading…")}
-          </h1>
-          {sheet && <p className="m-0 mt-1 text-base font-semibold text-[var(--color-neutral-450)]">{sheet.composer}</p>}
+          <SheetInfoPanel sheet={sheet} status={sheetStatus} />
         </section>
 
         <section aria-label="Playback controls" className={CARD_CLASS}>
