@@ -39,6 +39,7 @@ export const loadSheet = (notes, bpm) => {
   setSongTempo(bpm);
 
   const store = useWorkspaceStore.getState();
+  store.setPlaybackRate(1); // bài mới phát ở tốc độ gốc
   const songEnd = notes.reduce(
     (max, n) => Math.max(max, n.time + n.duration),
     0,

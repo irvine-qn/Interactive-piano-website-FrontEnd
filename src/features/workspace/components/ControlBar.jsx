@@ -7,6 +7,7 @@ import { Hourglass, PlaySquare, Play, Pause, RotateCcw, Volume1, Volume2, Volume
 import { useWorkspaceVolume } from '../hooks/useWorkspaceVolume';
 import { getSongTime, setSongTime } from '../audio/songClock';
 import { silencePlayback } from '../audio/sheetPlayer';
+import SpeedControl from './SpeedControl';
 
 // AUTO_PLAY là chế độ mặc định nên đứng đầu. PRACTICE hiển thị là "Wait Mode" (đợi người chơi nhấn đúng, T-09)
 const MODES = [
@@ -177,8 +178,9 @@ const ControlBar = () => {
         </span>
       </div>
 
-      {/* Restart + Play/Pause + âm lượng */}
-      <div className="flex shrink-0 items-center gap-4">
+      {/* Tốc độ + Restart + Play/Pause + âm lượng */}
+      <div className="flex shrink-0 flex-wrap items-center gap-4">
+        <SpeedControl />
         <button
           type="button"
           onClick={handleRestart}

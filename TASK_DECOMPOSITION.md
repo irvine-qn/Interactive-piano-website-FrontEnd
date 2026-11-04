@@ -104,7 +104,7 @@
 | **T-08B** `[FE]` | Nút Tua về đầu | Thêm nút Restart: `Transport.stop()` + về 0:00, nhả nốt, xoá playbackKeys. | Done |
 | **T-08C** `[FE]` | Volume thật | Slider âm lượng chỉ cho Workspace: chỉnh `pianoSampler.volume`, lưu giá trị gốc lúc mount và **khôi phục khi unmount** để không ảnh hưởng Home. | Done |
 | **T-08D** `[FE]` | Tốc độ phát: chuyển sang thời gian nhạc | `sheetPlayer.js`: lên lịch nốt theo ticks (dựa vào BPM bài) thay cho giây tuyệt đối, để đổi `Transport.bpm` thì cả âm thanh lẫn waterfall đều co giãn. Thêm helper `getSongTime()` dùng chung cho Canvas và Timeline. Chưa có UI. | Done |
-| **T-08E** `[FE]` | Tốc độ phát: UI | Bộ chọn 0.5x / 0.75x / 1x / 1.25x / 1.5x kèm hiển thị BPM thực tế (dạng `− 92 BPM +` như thiết kế). Phụ thuộc: T-08D. **Lưu ý (từ T-08D):** nốt tự nhả sau độ dài đã quy ra giây thật lúc bắt đầu, nên đổi tốc độ đúng lúc nốt đang ngân thì nốt đó vẫn ngân theo tốc độ cũ; nếu muốn chính xác, khi đổi tốc độ lúc đang phát thì tua lại tại chỗ (`setSongTime(getSongTime())`). | To Do |
+| **T-08E** `[FE]` | Tốc độ phát: UI | Bộ chọn 0.5x / 0.75x / 1x / 1.25x / 1.5x kèm hiển thị BPM thực tế (dạng `− 92 BPM +` như thiết kế). Phụ thuộc: T-08D. **Lưu ý (từ T-08D):** nốt tự nhả sau độ dài đã quy ra giây thật lúc bắt đầu, nên đổi tốc độ đúng lúc nốt đang ngân thì nốt đó vẫn ngân theo tốc độ cũ; nếu muốn chính xác, khi đổi tốc độ lúc đang phát thì tua lại tại chỗ (`setSongTime(getSongTime())`). | Done |
 | **T-08F** `[FE]` | Octave Shift (UI) | Cụm `-1 [C1-C6 (0)] +1` giống Home trong Control Bar, disable ở 2 đầu phạm vi và khi AUTO_PLAY. Phụ thuộc: T-06C. | To Do |
 | **T-08G** `[FE]` | Bật/tắt nhãn phím | Select *Phím tắt + Tên nốt* / *Tên nốt* như Home, thay cho logic ẩn nhãn cứng theo mode. Phụ thuộc: T-07E. | To Do |
 

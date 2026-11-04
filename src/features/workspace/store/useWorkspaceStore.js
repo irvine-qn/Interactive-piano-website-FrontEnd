@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { playNote, stopNote, resetPlayback } from '../../piano/audio/toneEngine'; // Import động cơ âm thanh
+import { setPlaybackRate as applyPlaybackRate } from '../audio/songClock';
 
 export const useWorkspaceStore = create((set, get) => ({
   currentMode: 'AUTO_PLAY', // 'AUTO_PLAY' | 'PRACTICE'
@@ -16,6 +17,8 @@ export const useWorkspaceStore = create((set, get) => ({
   isPlaying: false,
   // Âm lượng của Workspace (0-100%, 100 = mức gốc của sampler). Giữ trong store để đổi bài vẫn nhớ
   volume: 100,
+  // Tốc độ phát so với bản gốc (0.5 - 1.5). Nạp bài mới thì về 1 (xem loadSheet)
+  playbackRate: 1,
   duration: 250,
   sheet: null, // { id, title, composer, notes, ... } lấy từ API
   sheetStatus: 'idle', // 'idle' | 'loading' | 'ready' | 'error'
@@ -27,6 +30,11 @@ export const useWorkspaceStore = create((set, get) => ({
   },
   setIsPlaying: (status) => set({ isPlaying: status }),
   setVolume: (volume) => set({ volume: Math.min(100, Math.max(0, volume)) }),
+  // Đổi Transport.bpm (cả âm thanh, waterfall, timeline cùng co giãn) và lưu lại để UI hiển thị
+  setPlaybackRate: (rate) => {
+    applyPlaybackRate(rate);
+    set({ playbackRate: rate });
+  },
   setDuration: (time) => set({ duration: time }),
   setSheetLoading: () => set({ sheet: null, sheetStatus: 'loading', sheetError: null }),
   setSheet: (sheet) => set({ sheet, sheetStatus: 'ready', sheetError: null }),
