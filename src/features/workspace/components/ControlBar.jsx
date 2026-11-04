@@ -2,8 +2,8 @@ import { useEffect, useRef } from 'react';
 import * as Tone from 'tone';
 import { useShallow } from 'zustand/react/shallow';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
-import { stopAllNotes } from '../../piano/audio/toneEngine';
-import { Hourglass, PlaySquare, Play, Pause, Volume2 } from 'lucide-react';
+import { stopAllNotes, resetPlayback } from '../../piano/audio/toneEngine';
+import { Hourglass, PlaySquare, Play, Pause, RotateCcw, Volume2 } from 'lucide-react';
 
 // AUTO_PLAY là chế độ mặc định nên đứng đầu. PRACTICE hiển thị là "Wait Mode" (đợi người chơi nhấn đúng, T-09)
 const MODES = [
@@ -23,10 +23,19 @@ const formatTime = (seconds) => {
 const paintTimeline = (input, label, seconds, duration) => {
   if (input) {
     input.value = seconds;
-    const percentage = duration > 0 ? Math.min((seconds / duration) * 100, 100) : 0;
+    // Làm tròn: sau stop() Transport đôi khi trả về số cực nhỏ (vd 4e-16) thay vì đúng 0
+    const percentage = duration > 0 ? Math.round(Math.min((seconds / duration) * 100, 100) * 1000) / 1000 : 0;
     input.style.setProperty('--fill', `${percentage}%`);
   }
   if (label) label.textContent = formatTime(seconds);
+};
+
+// Tắt âm và phím sáng ngay. Phải huỷ cả các lệnh Tone.Draw đã xếp lịch (Part được gọi sớm ~0.1s để kịp
+// lên lịch âm thanh), nếu không phím vừa xoá sẽ bị bật sáng lại sau đó
+const silenceNow = (resetKeys) => {
+  Tone.Draw.cancel(0);
+  stopAllNotes();
+  resetKeys();
 };
 
 // Thanh trượt kiểu Home (slider BPM): viền ink, phần đã qua tô cam theo biến CSS, thumb vuông
@@ -60,8 +69,7 @@ const ControlBar = () => {
     // Pause/Stop: tắt âm đang ngân và tắt highlight các phím Auto-play
     const handleHalt = () => {
       setIsPlaying(false);
-      stopAllNotes();
-      resetKeys();
+      silenceNow(resetKeys);
     };
 
     Tone.Transport.on('start', handleStart);
@@ -87,13 +95,21 @@ const ControlBar = () => {
     Tone.Transport.pause();
   };
 
+  // Tua về đầu: dừng Transport, về 0:00, tắt âm đang ngân và xoá phím sáng ngay
+  // (sự kiện stop của Tone đến trễ vài chục ms nên không chờ nó mới xoá phím)
+  const handleRestart = () => {
+    resetPlayback();
+    Tone.Transport.seconds = 0;
+    silenceNow(resetKeys);
+    paintTimeline(timelineRef.current, currentTimeRef.current, 0, duration);
+  };
+
   const handleSeek = (e) => {
     const newTime = parseFloat(e.target.value);
     Tone.Transport.seconds = newTime;
 
     // Tua thì phải ngắt các nốt đang ngân và tắt highlight
-    stopAllNotes();
-    resetKeys();
+    silenceNow(resetKeys);
     paintTimeline(timelineRef.current, currentTimeRef.current, newTime, duration);
   };
 
@@ -154,8 +170,17 @@ const ControlBar = () => {
         </span>
       </div>
 
-      {/* Play/Pause + âm lượng */}
+      {/* Restart + Play/Pause + âm lượng */}
       <div className="flex shrink-0 items-center gap-4">
+        <button
+          type="button"
+          onClick={handleRestart}
+          aria-label="Restart"
+          title="Restart from the beginning"
+          className="flex h-11 w-11 cursor-pointer items-center justify-center border-2 border-solid border-[var(--color-ink)] bg-[var(--color-surface-card)] p-0 text-[var(--color-ink)] shadow-[var(--shadow-hard-sm)] hover:bg-[var(--color-brand-tint)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+        >
+          <RotateCcw aria-hidden="true" className="h-5 w-5" />
+        </button>
         <button
           type="button"
           onClick={isPlaying ? handlePause : handlePlay}
