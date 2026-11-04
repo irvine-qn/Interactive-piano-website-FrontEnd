@@ -6,13 +6,15 @@
 | :--- | :--- | :--- | :--- |
 
 > **Quy ước chung**
+> - **Phân công:** các task trong file này (Hạ tầng chung, Piano Workspace, Sheet Library, **User upload sheet (MIDI)**, Handle Error page) là của **Bình** (Nguyễn Thanh Bình). **Quỳnh** (Nguyễn Thị Ngọc Quỳnh) phụ trách Feature **HomePage**, **Auth**, **User profile** và **User edit profile** (các mục đó để trống ở đây, Quỳnh tự quản lý). Ai đọc file này để làm việc thì chỉ làm task của người đang được giao.
 > - Mã task có tiền tố repo: `[BE]` = `Interactive-piano-website-Backend`, `[FE]` = `Interactive-piano-website-FrontEnd`. File WBS duy nhất nằm ở repo FE.
 > - Mỗi sub-task chỉ đụng vài file, có thể review/commit độc lập. Cột Contract ghi rõ file bị ảnh hưởng và task phụ thuộc (`Phụ thuộc:`).
 > - Không sửa code của Feature HomePage (`pages/HomePage.jsx`, `features/home/*`). Code dùng chung với Home (`features/piano/audio/toneEngine.js`, `components/common/*`, `index.css`, BE `/piano`, `/frequencies`) chỉ được sửa nếu không đổi hành vi của Home.
 > - Task `[BE]` có thêm/đổi API thì cập nhật luôn mục *Available API* trong README của BE.
-> - **Ngôn ngữ giao diện: tiếng Anh** (thống nhất với team từ 2026-11). Comment trong code và WBS vẫn viết tiếng Việt.
+> - **Ngôn ngữ giao diện: tiếng Anh** (thống nhất với Quỳnh từ 2026-11). Comment trong code và WBS vẫn viết tiếng Việt.
 > - DB: chỉ dùng **Prisma** (schema + migration) cho mọi bảng, không tạo bảng bằng SQL lúc server khởi động.
-> - Thứ tự thực hiện: ~~Hạ tầng chung → Sheet Library (BE → FE)~~ (xong) → **C-06 (merge `develop`) → C-07 (Auth sang Prisma) → C-08 (Library sang tiếng Anh) → Piano Workspace → C-04, C-05, E-02**. Feature User: pending.
+> - Thứ tự thực hiện: ~~Hạ tầng chung → Sheet Library (BE → FE) → C-06 → C-07 → C-08 → Piano Workspace (T-05 → T-08)~~ (xong) → **C-04, C-05, E-02** → **User upload sheet (MIDI)**. User profile / edit profile: Quỳnh làm. Wait Mode (T-09) và T-10: **pending**, làm sau Feature Upload MIDI.
+> - Ghi chú kỹ thuật và nhật ký thay đổi: `docs/NOTES.md`, `docs/CHANGELOG.md` (có ở cả 2 repo).
 
 ## Hạ tầng chung (Common)
 
@@ -21,21 +23,21 @@
 | **C-01** `[BE]` | API prefix `/api/v1` | Đổi mount point trong `src/app.js` từ `/api` sang `/api/v1` cho `workspace.routes` và `sheets.routes`. Cập nhật toàn bộ ví dụ trong README. Phải merge cùng lúc với C-02. | Done |
 | **C-02** `[FE]` | axios baseURL `/api/v1` | Sửa `src/lib/axios.js`: `baseURL = ${API_BASE_URL}/api/v1`. Không sửa `features/home/api/pianoApi.js` (đường dẫn tương đối `/piano` vẫn đúng). Kiểm tra Home vẫn tải được cấu hình piano/metronome. Phụ thuộc: C-01. | Done |
 | **C-03** `[FE]` | Chuẩn hoá thư mục `pages/` | Chuyển `pages/sheet/WorkspacePage.jsx` thành `pages/WorkspacePage.jsx`, xoá thư mục `pages/sheet/`, sửa import trong `routes/AppRoutes.jsx`. Trang sau này đặt phẳng trong `pages/` (`LibraryPage`, `NotFoundPage`, ...). | Done |
-| **C-04** `[FE]` | Navbar: chữ thương hiệu mới | Làm trên **Navbar mới của team** (sau C-06B): trong `components/common/navbar.jsx`, thay ảnh `fiano-logo.png` bằng chữ `FIANO` + dấu chấm màu `--color-brand` (giống tầng 1 hiện tại của WorkspacePage), dùng design token. **Giữ nguyên con cáo mascot**, menu, ô search, phần đăng nhập/đăng xuất và menu mobile của team. Phụ thuộc: C-06B. | To Do |
+| **C-04** `[FE]` | Navbar: chữ thương hiệu mới | Làm trên **Navbar mới của Quỳnh** (sau C-06B): trong `components/common/navbar.jsx`, thay ảnh `fiano-logo.png` bằng chữ `FIANO` + dấu chấm màu `--color-brand` (giống tầng 1 hiện tại của WorkspacePage), dùng design token. **Giữ nguyên con cáo mascot**, menu, ô search, phần đăng nhập/đăng xuất và menu mobile của Quỳnh. Phụ thuộc: C-06B. | To Do |
 | **C-05** `[FE]` | Tách bundle theo route | Dùng `React.lazy` + `Suspense` trong `routes/AppRoutes.jsx` cho các page để Tone.js không nằm trong bundle chính. So sánh kích thước `dist/assets/*.js` trước và sau. Làm cuối phiên. | To Do |
 
-### Đồng bộ với `develop` (sau khi Feature Auth của team được merge)
+### Đồng bộ với `develop` (sau khi Feature Auth của Quỳnh được merge)
 
 | Sub-Task | Component | Contract & Constraints | Status |
 | :--- | :--- | :--- | :--- |
-| **C-06A** `[BE]` | Merge `develop` vào `sheet-library` | Bạn chạy `git merge origin/develop`, Claude sửa xung đột, bạn `git add .` + commit. `package.json`: gộp dependency 2 bên (Prisma + `bcryptjs`, `jsonwebtoken`, `pg`), chạy `npm install` để sinh lại `package-lock.json`. `app.js`: mọi route dưới `/api/v1` (workspace, sheets, auth). `env.js`: gộp `DATABASE_URL`, `JWT_SECRET`, `JWT_EXPIRES_IN`. `server.js`: tạm giữ `createUsersTable()` của team + graceful shutdown của mình (bỏ ở C-07C). `.env.example` thêm `JWT_SECRET`, `JWT_EXPIRES_IN`. Kiểm tra: server chạy, `/sheets`, `/piano`, `/auth/register`, `/auth/login` đều hoạt động. | Done |
-| **C-06B** `[FE]` | Merge `develop` vào `sheet-library` | Như C-06A. `AppRoutes.jsx`: giữ toàn bộ route của team (Login/Register/Forgot, Profile, Upload, `*` NotFound, `GuestRoute`/`ProtectedRoute`, `ROUTES`) + thêm `ROUTES.LIBRARY` → `LibraryPage`, import `pages/WorkspacePage` (vị trí mới từ C-03). Kiểm tra bản sửa tiếng Anh của team trong `WorkspacePage` đã vào đúng file mới. Chạy lint + build, mở thử Home, Library, Workspace, Login, trang 404. | Done |
+| **C-06A** `[BE]` | Merge `develop` vào `sheet-library` | Bạn chạy `git merge origin/develop`, Claude sửa xung đột, bạn `git add .` + commit. `package.json`: gộp dependency 2 bên (Prisma + `bcryptjs`, `jsonwebtoken`, `pg`), chạy `npm install` để sinh lại `package-lock.json`. `app.js`: mọi route dưới `/api/v1` (workspace, sheets, auth). `env.js`: gộp `DATABASE_URL`, `JWT_SECRET`, `JWT_EXPIRES_IN`. `server.js`: tạm giữ `createUsersTable()` của Quỳnh + graceful shutdown của mình (bỏ ở C-07C). `.env.example` thêm `JWT_SECRET`, `JWT_EXPIRES_IN`. Kiểm tra: server chạy, `/sheets`, `/piano`, `/auth/register`, `/auth/login` đều hoạt động. | Done |
+| **C-06B** `[FE]` | Merge `develop` vào `sheet-library` | Như C-06A. `AppRoutes.jsx`: giữ toàn bộ route của Quỳnh (Login/Register/Forgot, Profile, Upload, `*` NotFound, `GuestRoute`/`ProtectedRoute`, `ROUTES`) + thêm `ROUTES.LIBRARY` → `LibraryPage`, import `pages/WorkspacePage` (vị trí mới từ C-03). Kiểm tra bản sửa tiếng Anh của Quỳnh trong `WorkspacePage` đã vào đúng file mới. Chạy lint + build, mở thử Home, Library, Workspace, Login, trang 404. | Done |
 
-### Chuyển Feature Auth từ `pg` thuần sang Prisma (đã thống nhất với team)
+### Chuyển Feature Auth từ `pg` thuần sang Prisma (đã thống nhất với Quỳnh)
 
 | Sub-Task | Component | Contract & Constraints | Status |
 | :--- | :--- | :--- | :--- |
-| **C-07A** `[BE]` | Model `User` + migration `add_users` | Thêm `model User` (`@@map("users")`) khớp **từng cột** bảng hiện tại của team: `id` (autoincrement), `username`, `email` (unique, `VarChar` theo `auth.constants.js`), `passwordHash` → `password_hash`, `displayName` → `display_name`, `role` (mặc định `user`), `isVerified` → `is_verified`, `createdAt` → `created_at` (`Timestamptz`). Sinh migration rồi sửa SQL thành `CREATE TABLE IF NOT EXISTS` / `CREATE UNIQUE INDEX IF NOT EXISTS`. **Thử trên DB tạm** (không đụng DB `fiano`): (1) DB mới tinh; (2) DB đã có bảng `users` kèm dữ liệu (giống máy teammate) → `db:migrate` không đòi reset, dữ liệu còn nguyên. Ghi cách xử lý nếu vẫn báo drift (`prisma migrate resolve --applied`). Phụ thuộc: C-06A. **Kết quả:** migration `20261104095754_add_users`; thêm script `db:deploy`. Máy mới: `db:migrate` chạy bình thường. Máy đã có `sheets` + `users`: `db:migrate` báo drift đòi reset → phải chạy `db:deploy` một lần. Máy chỉ có `users` (chưa có Prisma): `deploy` báo P3005 → `prisma migrate resolve --applied 20261104095754_add_users` rồi `db:deploy`. Cả 3 trường hợp đã thử, dữ liệu `users` còn nguyên. DB `fiano` thật đã `db:deploy` (có backup trước). | Done |
+| **C-07A** `[BE]` | Model `User` + migration `add_users` | Thêm `model User` (`@@map("users")`) khớp **từng cột** bảng hiện tại của Quỳnh: `id` (autoincrement), `username`, `email` (unique, `VarChar` theo `auth.constants.js`), `passwordHash` → `password_hash`, `displayName` → `display_name`, `role` (mặc định `user`), `isVerified` → `is_verified`, `createdAt` → `created_at` (`Timestamptz`). Sinh migration rồi sửa SQL thành `CREATE TABLE IF NOT EXISTS` / `CREATE UNIQUE INDEX IF NOT EXISTS`. **Thử trên DB tạm** (không đụng DB `fiano`): (1) DB mới tinh; (2) DB đã có bảng `users` kèm dữ liệu (giống máy Quỳnh) → `db:migrate` không đòi reset, dữ liệu còn nguyên. Ghi cách xử lý nếu vẫn báo drift (`prisma migrate resolve --applied`). Phụ thuộc: C-06A. **Kết quả:** migration `20261104095754_add_users`; thêm script `db:deploy`. Máy mới: `db:migrate` chạy bình thường. Máy đã có `sheets` + `users`: `db:migrate` báo drift đòi reset → phải chạy `db:deploy` một lần. Máy chỉ có `users` (chưa có Prisma): `deploy` báo P3005 → `prisma migrate resolve --applied 20261104095754_add_users` rồi `db:deploy`. Cả 3 trường hợp đã thử, dữ liệu `users` còn nguyên. DB `fiano` thật đã `db:deploy` (có backup trước). | Done |
 | **C-07B** `[BE]` | Bộ test hồi quy Auth (chụp bản gốc) | Viết script test `POST /api/v1/auth/register` và `/login`: đăng ký thành công, trùng username, trùng email, thiếu/sai định dạng từng trường, đăng nhập đúng (bằng username và bằng email), sai mật khẩu, tài khoản không tồn tại. Chạy trên code `pg` hiện tại, lưu response (status + body, bỏ phần token/thời gian thay đổi mỗi lần) làm bản gốc. Phụ thuộc: C-06A. | Done |
 | **C-07C** `[BE]` | `users.repository.js` dùng Prisma | Viết lại bằng `prisma.user.*`, **giữ nguyên tên hàm, tham số và dạng dữ liệu trả về** để `auth.service.js` không phải sửa. Xoá `createUsersTable()` (trong repository và `server.js`) và `src/config/database.js`. Giữ package `pg` (Prisma adapter cần). Phụ thuộc: C-07A, C-07B. | Done |
 | **C-07D** `[BE]` | So sánh hồi quy + tài liệu | Chạy lại bộ test C-07B trên code Prisma: mọi response phải **giống bản gốc**. Thử thêm: mật khẩu vẫn được hash (không lưu plaintext), tài khoản tạo từ bản `pg` vẫn đăng nhập được sau khi đổi. README BE: mục Auth API (register/login, `Authorization: Bearer`), biến `JWT_SECRET`/`JWT_EXPIRES_IN`, cập nhật cây thư mục và checklist. **Mục "Cập nhật DB cũ sau khi pull"**: hướng dẫn đúng lệnh cho 3 trường hợp ở C-07A (kèm cảnh báo **không gõ `y`** khi `db:migrate` đòi reset), lệnh `db:deploy`. Phụ thuộc: C-07C. | Done |
@@ -108,7 +110,9 @@
 | **T-08F** `[FE]` | Octave Shift (UI) | Cụm `-1 [C1-C6 (0)] +1` giống Home trong Control Bar, disable ở 2 đầu phạm vi và khi AUTO_PLAY. Phụ thuộc: T-06C. | Done |
 | **T-08G** `[FE]` | Bật/tắt nhãn phím | Select *Phím tắt + Tên nốt* / *Tên nốt* như Home, thay cho logic ẩn nhãn cứng theo mode. Phụ thuộc: T-07E. | Done |
 
-### Giai đoạn 6: Chế độ PRACTICE (Wait Mode)
+### Giai đoạn 6: Chế độ PRACTICE (Wait Mode) — Pending
+
+> **Pending (2026-11-05):** tạm dừng Wait Mode, làm tiếp sau khi hoàn thiện Feature Upload MIDI (để thử với bài do người dùng tải lên). Trong lúc chờ, nút *Wait Mode* chỉ đổi sang chế độ người dùng tự chơi (có nhãn phím tắt, Octave Shift), chưa dừng chờ theo bài.
 
 | Sub-Task | Component | Contract & Constraints | Status |
 | :--- | :--- | :--- | :--- |
@@ -164,17 +168,20 @@
 | **L-FE-10** `[FE]` | Review Library | `lint` + `build`, test thủ công (tìm kiếm, lọc, sắp xếp, phân trang, F5 giữ URL, BE tắt thì hiện lỗi), cập nhật README FE. | Done |
 
 ## Feature: User
-### Sub feature: User profile
+
+> **Phân công (2026-11-05):** *User profile* (trang profile) và *User edit profile* (trang chỉnh sửa profile, gồm ảnh avatar) là của **Quỳnh**. *User upload sheet* (upload file MIDI) là của **Bình**. *Bài đã lưu của người dùng*: chưa phân công. Trang profile có thể cần danh sách bài người dùng đã upload: thống nhất API trước khi làm.
+
+### Sub feature: User profile (Quỳnh)
 
 | Sub-Task | Component | Contract & Constraints | Status |
 | :--- | :--- | :--- | :--- |
 
-### Sub feature: User edit profile
+### Sub feature: User edit profile (Quỳnh)
 
 | Sub-Task | Component | Contract & Constraints | Status |
 | :--- | :--- | :--- | :--- |
 
-### Sub feature: User upload sheet
+### Sub feature: User upload sheet (Bình)
 
 | Sub-Task | Component | Contract & Constraints | Status |
 | :--- | :--- | :--- | :--- |
@@ -201,15 +208,15 @@
 | :--- | :--- | :--- | :--- |
 | **E-02** `[FE]` | Bài nhạc không tồn tại | WorkspacePage khi API trả `404 SHEET_NOT_FOUND` thì hiện thông báo riêng (tiếng Anh) + nút về Library (không hiện nút *Try again* vô ích). Phụ thuộc: T-07A. | To Do |
 
-> E-01 (trang 404) đã bỏ: team đã làm `pages/NotFoundPage.jsx` + route `*` trong Feature Auth.
+> E-01 (trang 404) đã bỏ: Quỳnh đã làm `pages/NotFoundPage.jsx` + route `*` trong Feature Auth.
 
 ---
 
-## Ghi chú thảo luận với teammate (chưa thực hiện)
+## Ghi chú thảo luận với Quỳnh (chưa thực hiện)
 
 - **Navbar – ô search:** gõ + Enter thì chuyển sang `/library?q=...`.
-- ~~**Navbar – menu**~~ và ~~**Pages** (tách Login/Register/Forgot)~~: team đã làm trong Feature Auth.
-- **Database:** PostgreSQL + Prisma, migration theo feature. Bảng `users` đưa vào Prisma ở C-07; Feature User sẽ thêm migration gắn `sheets.uploaderId` → `users.id`. File MIDI/ảnh avatar lưu trên cloud (làm cùng Feature User).
+- ~~**Navbar – menu**~~ và ~~**Pages** (tách Login/Register/Forgot)~~: Quỳnh đã làm trong Feature Auth.
+- **Database:** PostgreSQL + Prisma, migration theo feature. Bảng `users` đưa vào Prisma ở C-07; Feature User sẽ thêm migration gắn `sheets.uploaderId` → `users.id`. File MIDI (Bình, upload sheet) và ảnh avatar (Quỳnh, edit profile) lưu trên cloud: nên dùng chung một dịch vụ lưu trữ, thống nhất trước khi làm.
 - `index.html` chưa có favicon (trình duyệt báo 404 `/favicon.ico` ở mọi trang).
 - HomePage hiện lỗi đỏ "Unable to access MIDI devices…" khi người dùng không cấp quyền Web MIDI; nên ẩn hoặc diễn đạt nhẹ hơn.
 - **Upload:** chỉ nhận file MIDI. Engine xử lý sẽ dựa trên `convertMidi.mjs` + logic chọn track/chia tay trong `scripts/midi-to-sheet.mjs`.

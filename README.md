@@ -142,17 +142,23 @@ frontend/
 │   │       ├── hooks/         # useLibraryQuery (bộ lọc theo URL), useTags
 │   │       └── utils/         # pagination (dãy số trang)
 │   ├── lib/axios.js           # apiClient: baseURL `${VITE_API_URL}/api/v1`, chuẩn hoá lỗi
-│   ├── pages/                 # HomePage, LibraryPage, WorkspacePage
+│   ├── pages/                 # HomePage, LibraryPage, WorkspacePage, NotFoundPage, auth/, profile/
 │   ├── routes/AppRoutes.jsx
 │   ├── utils/format.js        # formatCount (45.2K), formatDuration (03:45)
 │   ├── App.jsx
 │   ├── index.css              # Design tokens (--color-*, --shadow-hard...)
 │   └── main.jsx
+├── docs/
+│   ├── NOTES.md               # Ghi chú kỹ thuật cho team (thay đổi lớn, lưu ý khi sửa Workspace, lỗi đã biết)
+│   └── CHANGELOG.md           # Nhật ký thay đổi quan trọng theo ngày
 ├── .env.example
 ├── index.html
 ├── package.json
+├── TASK_DECOMPOSITION.md      # WBS: danh sách task và trạng thái
 └── vite.config.js
 ```
+
+> Trước khi sửa code dùng chung hoặc Workspace, đọc [`docs/NOTES.md`](docs/NOTES.md). Thay đổi nào ảnh hưởng tới cả team thì ghi thêm vào [`docs/CHANGELOG.md`](docs/CHANGELOG.md).
 
 ### Routes
 
@@ -430,6 +436,8 @@ Sau đó cài thêm dependencies nếu `package.json` đã thay đổi:
 ```bash
 npm install
 ```
+
+Xem mục **Cần làm sau khi pull** trong [`docs/CHANGELOG.md`](docs/CHANGELOG.md) của cả 2 repo (Backend có thể cần cập nhật database).
 
 Chạy
 
