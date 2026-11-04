@@ -1,15 +1,27 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff, SquareCheck, UserPlus } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { SquareCheck, UserPlus } from "lucide-react";
 import { registerUser } from "../api/authApi";
 import { useAuthStore } from "../../../store/useAuthStore";
+import { ROUTES } from "../../../config/routes";
+import {
+  DIGIT_REGEX,
+  EMAIL_REGEX,
+  DISPLAY_NAME_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
+  SPECIAL_CHAR_REGEX,
+  UPPERCASE_REGEX,
+  USERNAME_MAX_LENGTH,
+  USERNAME_REGEX,
+} from "../../../config/auth";
+import { FieldLabel, FormError, PasswordInput, inputClass } from "./AuthFormFields";
 
 const STRENGTH_LEVELS = [
-  { label: "Yếu", textClass: "text-[var(--color-danger)]" },
-  { label: "Yếu", textClass: "text-[var(--color-danger)]" },
-  { label: "Trung bình", textClass: "text-[var(--color-warning)]" },
-  { label: "Khá tốt", textClass: "text-[var(--color-success)]" },
-  { label: "Mạnh", textClass: "text-[var(--color-success)]" },
+  { label: "Weak", textClass: "text-[var(--color-danger)]" },
+  { label: "Weak", textClass: "text-[var(--color-danger)]" },
+  { label: "Fair", textClass: "text-[var(--color-warning)]" },
+  { label: "Good", textClass: "text-[var(--color-success)]" },
+  { label: "Strong", textClass: "text-[var(--color-success)]" },
 ];
 
 const STRENGTH_BAR_COLORS = [
@@ -19,61 +31,23 @@ const STRENGTH_BAR_COLORS = [
   "bg-[var(--color-success)]",
 ];
 
-const inputClass =
-  "h-12 w-full border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-4 font-[inherit] text-sm text-[var(--color-ink)] outline-none placeholder:text-[var(--color-neutral-300)] focus:border-[var(--color-brand)] focus:shadow-[var(--shadow-hard-sm)]";
+const validateUsername = (val) =>
+  val.length <= USERNAME_MAX_LENGTH && USERNAME_REGEX.test(val);
 
-const validateUsername = (val) => /^[a-z0-9]+$/.test(val);
-const validatePassword = (val) => /^(?=.*[A-Z])(?=.*\d).{8,}$/.test(val);
-const hasSpecialChar = (val) => /[^A-Za-z0-9]/.test(val);
+const hasMinLength = (val) => val.length >= PASSWORD_MIN_LENGTH;
+const hasUppercase = (val) => UPPERCASE_REGEX.test(val);
+const hasDigit = (val) => DIGIT_REGEX.test(val);
+const hasSpecialChar = (val) => SPECIAL_CHAR_REGEX.test(val);
+
+const validatePassword = (val) =>
+  hasMinLength(val) && hasUppercase(val) && hasDigit(val);
 
 const getPasswordScore = (val) =>
-  [
-    val.length >= 8,
-    /[A-Z]/.test(val),
-    /\d/.test(val),
-    hasSpecialChar(val),
-  ].filter(Boolean).length;
-
-const FieldLabel = ({ htmlFor, children }) => (
-  <label
-    htmlFor={htmlFor}
-    className="mb-2 block text-sm font-bold text-[var(--color-ink)]"
-  >
-    {children}
-    <span className="ml-2 text-[var(--color-danger)]">*</span>
-  </label>
-);
-
-const PasswordInput = ({ id, value, onChange, autoComplete, placeholder }) => {
-  const [visible, setVisible] = useState(false);
-  const Icon = visible ? EyeOff : Eye;
-
-  return (
-    <div className="relative">
-      <input
-        id={id}
-        type={visible ? "text" : "password"}
-        value={value}
-        onChange={onChange}
-        required
-        autoComplete={autoComplete}
-        placeholder={placeholder}
-        className={`${inputClass} pr-12`}
-      />
-      <button
-        type="button"
-        onClick={() => setVisible((v) => !v)}
-        aria-label={visible ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
-        className="absolute right-3 top-1/2 flex -translate-y-1/2 cursor-pointer border-0 bg-transparent p-1 text-[var(--color-ink)]"
-      >
-        <Icon aria-hidden="true" className="h-4 w-4" />
-      </button>
-    </div>
-  );
-};
+  [hasMinLength(val), hasUppercase(val), hasDigit(val), hasSpecialChar(val)].filter(Boolean).length;
 
 const RegisterForm = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const setAuth = useAuthStore((state) => state.setAuth);
   const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState("");
@@ -91,21 +65,25 @@ const RegisterForm = () => {
     setError("");
 
     if (!displayName.trim()) {
-      setError("Vui lòng nhập họ và tên.");
+      setError("Please enter your full name.");
       return;
     }
     if (!validateUsername(username)) {
       setError(
-        "Username chỉ được chứa chữ thường và số, không có khoảng trắng hay ký tự đặc biệt.",
+        "Username can only contain lowercase letters and numbers, with no spaces or special characters.",
       );
       return;
     }
+    if (!EMAIL_REGEX.test(email.trim())) {
+      setError("Please enter a valid email address.");
+      return;
+    }
     if (!validatePassword(password)) {
-      setError("Mật khẩu tối thiểu 8 ký tự, ít nhất 1 chữ hoa và 1 chữ số.");
+      setError("Password must be at least 8 characters with 1 uppercase letter and 1 number.");
       return;
     }
     if (password !== confirmPassword) {
-      setError("Mật khẩu xác nhận không khớp.");
+      setError("Passwords do not match.");
       return;
     }
 
@@ -115,13 +93,13 @@ const RegisterForm = () => {
         await registerUser({
           displayName: displayName.trim(),
           username,
-          email,
+          email: email.trim(),
           password,
         }),
       );
-      navigate("/profile", { replace: true });
+      navigate(ROUTES.PROFILE, { replace: true, state: { welcome: true } });
     } catch (err) {
-      setError(err?.error?.message || "Đăng ký thất bại. Vui lòng thử lại.");
+      setError(err?.message || "Sign up failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -131,25 +109,18 @@ const RegisterForm = () => {
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
       <div>
         <h2 className="m-0 text-[30px] font-extrabold text-[var(--color-ink)]">
-          Tạo tài khoản
+          Create account
         </h2>
         <p className="mt-2 text-sm font-medium text-[var(--color-neutral-600)]">
-          Chỉ mất 1 phút để bắt đầu luyện tập.
+          It only takes a minute to start practicing.
         </p>
       </div>
 
-      {error && (
-        <p
-          role="alert"
-          className="m-0 border-2 border-[var(--color-danger)] bg-[var(--color-danger-wash)] px-4 py-3 text-sm font-semibold text-[var(--color-danger-strong)]"
-        >
-          {error}
-        </p>
-      )}
+      <FormError message={error} />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <FieldLabel htmlFor="register-display-name">Họ và tên</FieldLabel>
+          <FieldLabel htmlFor="register-display-name">Full name</FieldLabel>
           <input
             id="register-display-name"
             type="text"
@@ -157,12 +128,13 @@ const RegisterForm = () => {
             onChange={(e) => setDisplayName(e.target.value)}
             required
             autoComplete="name"
-            placeholder="Nguyễn Văn A"
+            maxLength={DISPLAY_NAME_MAX_LENGTH}
+            placeholder="John Smith"
             className={inputClass}
           />
         </div>
         <div>
-          <FieldLabel htmlFor="register-username">Tên người dùng</FieldLabel>
+          <FieldLabel htmlFor="register-username">Username</FieldLabel>
           <div className="relative">
             <input
               id="register-username"
@@ -171,7 +143,8 @@ const RegisterForm = () => {
               onChange={(e) => setUsername(e.target.value)}
               required
               autoComplete="username"
-              placeholder="chỉ chữ thường và số"
+              maxLength={USERNAME_MAX_LENGTH}
+              placeholder="lowercase letters and numbers only"
               className={`${inputClass} pr-12`}
             />
             {validateUsername(username) && (
@@ -199,13 +172,13 @@ const RegisterForm = () => {
       </div>
 
       <div>
-        <FieldLabel htmlFor="register-password">Mật khẩu</FieldLabel>
+        <FieldLabel htmlFor="register-password">Password</FieldLabel>
         <PasswordInput
           id="register-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           autoComplete="new-password"
-          placeholder="Tối thiểu 8 ký tự, 1 chữ hoa, 1 chữ số"
+          placeholder="At least 8 characters, 1 uppercase, 1 number"
         />
         {password && (
           <>
@@ -222,10 +195,10 @@ const RegisterForm = () => {
             <p
               className={`mb-0 mt-2 text-xs font-medium ${strength.textClass}`}
             >
-              Độ mạnh: {strength.label}
+              Strength: {strength.label}
               {passwordScore === 3 &&
                 !hasSpecialChar(password) &&
-                " - thêm ký tự đặc biệt để an toàn hơn"}
+                " - add a special character to make it stronger"}
             </p>
           </>
         )}
@@ -233,33 +206,34 @@ const RegisterForm = () => {
 
       <div>
         <FieldLabel htmlFor="register-confirm-password">
-          Xác nhận mật khẩu
+          Confirm password
         </FieldLabel>
         <PasswordInput
           id="register-confirm-password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           autoComplete="new-password"
-          placeholder="Nhập lại mật khẩu"
+          placeholder="Re-enter your password"
         />
       </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="flex h-12 cursor-pointer items-center justify-center gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-brand)] font-[inherit] text-sm font-bold text-[var(--color-neutral-white)] shadow-[var(--shadow-hard)] disabled:cursor-not-allowed disabled:bg-[var(--color-brand-light)]"
+        className="flex h-12 cursor-pointer items-center justify-center gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-brand)] font-[inherit] text-sm font-bold text-[var(--color-neutral-white)] disabled:cursor-not-allowed disabled:bg-[var(--color-brand-light)]"
       >
         <UserPlus aria-hidden="true" className="h-4 w-4" />
-        {loading ? "Đang đăng ký..." : "Tạo tài khoản"}
+        {loading ? "Creating account..." : "Create account"}
       </button>
 
       <p className="m-0 text-center text-sm font-medium text-[var(--color-neutral-600)]">
-        Đã có tài khoản?{" "}
+        Already have an account?{" "}
         <Link
-          to="/login"
+          to={ROUTES.LOGIN}
+          state={location.state}
           className="ml-2 font-bold text-[var(--color-brand-strong)] no-underline"
         >
-          Đăng nhập
+          Log in
         </Link>
       </p>
     </form>

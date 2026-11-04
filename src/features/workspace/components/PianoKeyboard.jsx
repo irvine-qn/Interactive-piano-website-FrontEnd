@@ -56,7 +56,7 @@ const PianoKeyboard = () => {
   }, [pressKey, releaseKey]);
 
   return (
-    <div className="flex w-full p-2 sm:p-4 bg-gray-900 rounded-b-lg shadow-2xl h-[120px] sm:h-[180px]">
+    <div className="flex w-full p-2 sm:p-4 bg-gray-900 rounded-b-lg h-[120px] sm:h-[180px]">
       <div className="flex w-full h-full relative">
         {whiteKeys.map((whiteKey) => {
           const originalIdx = displayedKeys.findIndex(k => k.note === whiteKey.note);
