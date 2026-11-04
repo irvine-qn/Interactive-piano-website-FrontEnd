@@ -1,4 +1,5 @@
 import { useParams } from "react-router-dom";
+import { useShallow } from "zustand/react/shallow";
 import { useWorkspaceStore } from "../features/workspace/store/useWorkspaceStore";
 import PianoKeyboard from "../features/workspace/components/PianoKeyboard";
 import ControlBar from "../features/workspace/components/ControlBar";
@@ -7,7 +8,9 @@ import { useSheetLoader } from "../features/workspace/hooks/useSheetLoader";
 import Footer from "../components/common/footer";
 
 const WorkspacePage = () => {
-  const { sheet, sheetStatus, sheetError } = useWorkspaceStore();
+  const { sheet, sheetStatus, sheetError } = useWorkspaceStore(
+    useShallow((state) => ({ sheet: state.sheet, sheetStatus: state.sheetStatus, sheetError: state.sheetError })),
+  );
   const { sheetId } = useParams();
   const reloadSheet = useSheetLoader(sheetId);
 

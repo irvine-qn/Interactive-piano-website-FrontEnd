@@ -1,3 +1,5 @@
+import { memo } from 'react';
+
 const Key = ({ note, hint, showHint = true, isBlack, isActive, onMouseDown, onMouseUp }) => {
   return (
     <div
@@ -28,4 +30,5 @@ const Key = ({ note, hint, showHint = true, isBlack, isActive, onMouseDown, onMo
   );
 };
 
-export default Key;
+// memo: bàn phím render lại mỗi khi một phím sáng/tắt, nhưng chỉ phím đổi trạng thái mới phải render lại
+export default memo(Key);

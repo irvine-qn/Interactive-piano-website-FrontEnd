@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import * as Tone from 'tone';
+import { useShallow } from 'zustand/react/shallow';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
 import { stopAllNotes } from '../../piano/audio/toneEngine';
 import { BookOpen, PlaySquare, Play, Pause, Volume2 } from 'lucide-react';
@@ -11,7 +12,17 @@ const MODES = [
 ];
 
 const ControlBar = () => {
-  const { currentMode, setMode, isPlaying, setIsPlaying, duration, clearActiveKeys } = useWorkspaceStore();
+  // Chỉ đăng ký các field cần dùng: Control Bar không render lại mỗi khi một phím sáng/tắt (activeKeys)
+  const { currentMode, setMode, isPlaying, setIsPlaying, duration, clearActiveKeys } = useWorkspaceStore(
+    useShallow((state) => ({
+      currentMode: state.currentMode,
+      setMode: state.setMode,
+      isPlaying: state.isPlaying,
+      setIsPlaying: state.setIsPlaying,
+      duration: state.duration,
+      clearActiveKeys: state.clearActiveKeys,
+    })),
+  );
   const progressBarRef = useRef(null);
   const currentTimeRef = useRef(null);
   const progressFillRef = useRef(null);

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import Key from './Key';
+import { useShallow } from 'zustand/react/shallow';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
 import { KEYBOARD_TO_NOTE_MAP, NOTE_TO_KEYBOARD_MAP } from '../config/keyMapping';
 
@@ -22,7 +23,14 @@ const PIANO_KEYS_88 = generate88Keys();
 const WHITE_KEYS_88 = PIANO_KEYS_88.filter(k => !k.isBlack);
 
 const PianoKeyboard = () => {
-  const { activeKeys, pressKey, releaseKey, currentMode } = useWorkspaceStore();
+  const { activeKeys, pressKey, releaseKey, currentMode } = useWorkspaceStore(
+    useShallow((state) => ({
+      activeKeys: state.activeKeys,
+      pressKey: state.pressKey,
+      releaseKey: state.releaseKey,
+      currentMode: state.currentMode,
+    })),
+  );
 
   const isAutoPlay = currentMode === 'AUTO_PLAY';
   const displayedKeys = PIANO_KEYS_88;
