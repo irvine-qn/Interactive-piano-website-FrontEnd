@@ -102,7 +102,7 @@ const ControlBar = () => {
                 onClick={() => setMode(mode.id)}
                 className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 ${
                   isActive 
-                    ? 'bg-white text-[#ff7a1a] shadow-xs'
+                    ? 'bg-white text-[#ff7a1a]'
                     : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200'
                 }`}
               >
