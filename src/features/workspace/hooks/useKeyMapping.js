@@ -20,20 +20,25 @@ const buildMapping = (notes, octaveShift) => {
   const noteByMidi = new Map(notes.map((n) => [n.midi, n.name]));
   const noteByKey = {};
   const keyByNote = {};
+  let lowest = null;
+  let highest = null;
   notes.forEach(({ midi, keyboardKey }) => {
     if (typeof keyboardKey !== 'string') return;
-    const target = noteByMidi.get(midi + octaveShift * OCTAVE);
+    const targetMidi = midi + octaveShift * OCTAVE;
+    const target = noteByMidi.get(targetMidi);
     if (!target) return;
     noteByKey[keyboardKey] = target;
     keyByNote[target] = keyboardKey;
+    if (lowest === null || targetMidi < lowest.midi) lowest = { midi: targetMidi, name: target };
+    if (highest === null || targetMidi > highest.midi) highest = { midi: targetMidi, name: target };
   });
-  const mappedNotes = Object.values(noteByKey);
   return {
     noteByKey,
     keyByNote,
-    // Dải phím tắt đang phủ, vd. "C1"-"C6" (dùng cho nhãn Octave Shift)
-    firstNote: mappedNotes[0] ?? null,
-    lastNote: mappedNotes[mappedNotes.length - 1] ?? null,
+    // Dải phím tắt đang phủ, vd. "C1"-"C6" (nhãn Octave Shift). Lấy theo số MIDI thấp/cao nhất, không theo thứ tự
+    // khoá của object: JS luôn xếp khoá dạng số ("0"-"9") lên trước nên phím "0" (E2) sẽ đứng đầu thay cho "1" (C1)
+    firstNote: lowest?.name ?? null,
+    lastNote: highest?.name ?? null,
     octaveRange: getOctaveRange(notes),
   };
 };

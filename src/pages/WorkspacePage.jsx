@@ -4,6 +4,7 @@ import { useWorkspaceStore } from "../features/workspace/store/useWorkspaceStore
 import PianoKeyboard from "../features/workspace/components/PianoKeyboard";
 import ControlBar from "../features/workspace/components/ControlBar";
 import SheetInfoPanel from "../features/workspace/components/SheetInfoPanel";
+import OctaveShiftControl from "../features/workspace/components/OctaveShiftControl";
 import WaterfallCanvas from "../features/workspace/canvas/practiceWaterfall";
 import { useSheetLoader } from "../features/workspace/hooks/useSheetLoader";
 import Footer from "../components/common/footer";
@@ -36,9 +37,13 @@ const WorkspacePage = () => {
 
         {/* Tầng 2 + 3: Waterfall và Piano */}
         <section aria-label="Waterfall and piano" className={CARD_CLASS}>
-          <header className="flex items-center gap-3 border-0 border-b-2 border-solid border-[var(--color-ink)] bg-[var(--color-surface-soft)] px-5 py-3">
+          <header className="flex flex-wrap items-center gap-3 border-0 border-b-2 border-solid border-[var(--color-ink)] bg-[var(--color-surface-soft)] px-5 py-2">
             <span aria-hidden="true" className="h-3 w-3 border-2 border-[var(--color-ink)] bg-[var(--color-brand)]" />
             <h2 className="m-0 text-sm font-bold uppercase tracking-wide text-[var(--color-ink)]">Waterfall</h2>
+            {/* Dải phím tắt đặt bên phải header như thiết kế (ngay trên bàn phím mà nó điều khiển) */}
+            <div className="ml-auto">
+              <OctaveShiftControl />
+            </div>
           </header>
 
           <div className="flex flex-col p-[14px]">
