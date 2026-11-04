@@ -88,7 +88,7 @@
 
 | Sub-Task | Component | Contract & Constraints | Status |
 | :--- | :--- | :--- | :--- |
-| **T-07A** `[FE]` | Bố cục 3 tầng | `WorkspacePage.jsx` còn 3 tầng: (1) Thông tin bài + Control Bar, (2) Waterfall, (3) Piano. Xoá header `FIANO.` cũ. Khung theo design token (viền `--color-ink`, `--shadow-hard`, góc vuông), bỏ màu hex và `rounded-*`. Loading/lỗi/Thử lại giữ nguyên. | To Do |
+| **T-07A** `[FE]` | Bố cục 3 tầng | `WorkspacePage.jsx` còn 3 tầng: (1) Thông tin bài + Control Bar, (2) Waterfall, (3) Piano. Xoá header `FIANO.` cũ. Khung theo design token (viền `--color-ink`, `--shadow-hard`, góc vuông), bỏ màu hex và `rounded-*`. Loading/lỗi/Thử lại giữ nguyên. | Done |
 | **T-07B** `[FE]` | Card thông tin bài | Tạo `features/workspace/components/SheetInfoPanel.jsx`: tiêu đề, tác giả, độ khó, tags, lượt xem, lượt thích (chỉ hiển thị). Theo thiết kế `Sheet_Practice_Studio_Waterfall`, chưa có nút Like/Share/Export. Phụ thuộc: T-07A, L-BE-08. | To Do |
 | **T-07C** `[FE]` | Tăng lượt xem | Khi tải bài thành công thì gọi `POST /sheets/:id/view` một lần (`sheetsApi.js` + `useSheetLoader.js`). Chặn StrictMode gọi 2 lần trong dev. Phụ thuộc: L-BE-10. | To Do |
 | **T-07D** `[FE]` | Bố trí phím dùng chung | Tạo `features/workspace/config/keyLayout.js` tính `left/width` (%) cho 88 phím theo công thức của Home (`BLACK_KEY_RATIO`). Bàn phím và Canvas cùng dùng layout này, thay cho việc đọc DOM `[data-note]` bằng `setTimeout 50ms`. | To Do |
