@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
-import * as Tone from 'tone';
 import { KEY_LAYOUT } from '../config/keyLayout';
+import { getSongTime } from '../audio/songClock';
 
 // --- THÔNG SỐ VẼ (giống waterfall HomePage) ---
 const PIXELS_PER_SECOND = 150; // Tốc độ rơi: 1 giây nốt đi được 150 pixel
@@ -162,8 +162,9 @@ const WaterfallCanvas = () => {
 
       // Chưa tải xong bài thì chỉ vẽ nền
       if (notes) {
-        // Thời gian bài hát lấy từ Tone.Transport -> đồng bộ với Play/Pause/Seek và âm thanh
-        const currentTime = Tone.Transport.seconds;
+        // Thời gian bài (giây ở tốc độ gốc) suy từ ticks của Transport -> đồng bộ với Play/Pause/Seek/tốc độ và âm thanh.
+        // Khoảng cách rơi tính theo thời gian bài nên chơi chậm thì nốt rơi chậm theo
+        const currentTime = getSongTime();
 
         // Chỉ vẽ những nốt đang nằm trong khung hình
         const visible = [];

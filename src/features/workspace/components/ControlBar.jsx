@@ -2,9 +2,11 @@ import { useEffect, useRef } from 'react';
 import * as Tone from 'tone';
 import { useShallow } from 'zustand/react/shallow';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
-import { stopAllNotes, resetPlayback } from '../../piano/audio/toneEngine';
+import { resetPlayback } from '../../piano/audio/toneEngine';
 import { Hourglass, PlaySquare, Play, Pause, RotateCcw, Volume1, Volume2, VolumeX } from 'lucide-react';
 import { useWorkspaceVolume } from '../hooks/useWorkspaceVolume';
+import { getSongTime, setSongTime } from '../audio/songClock';
+import { silencePlayback } from '../audio/sheetPlayer';
 
 // AUTO_PLAY là chế độ mặc định nên đứng đầu. PRACTICE hiển thị là "Wait Mode" (đợi người chơi nhấn đúng, T-09)
 const MODES = [
@@ -12,9 +14,10 @@ const MODES = [
   { id: 'PRACTICE', label: 'Wait Mode', Icon: Hourglass },
 ];
 
-// Định dạng thời gian thống nhất m:ss (0:05, 3:35)
+// Định dạng thời gian thống nhất m:ss (0:05, 3:35).
+// Cộng 10ms trước khi làm tròn xuống: tua tới 0:30 thực ra đặt ở 29.997s (lùi 1 tick, xem setSongTime) -> vẫn hiện 0:30
 const formatTime = (seconds) => {
-  const safe = Number.isFinite(seconds) && seconds > 0 ? seconds : 0;
+  const safe = Number.isFinite(seconds) && seconds > 0 ? seconds + 0.01 : 0;
   const m = Math.floor(safe / 60);
   const s = Math.floor(safe % 60).toString().padStart(2, '0');
   return `${m}:${s}`;
@@ -31,12 +34,12 @@ const paintTimeline = (input, label, seconds, duration) => {
   if (label) label.textContent = formatTime(seconds);
 };
 
-// Tắt âm và phím sáng ngay. Phải huỷ cả các lệnh Tone.Draw đã xếp lịch (Part được gọi sớm ~0.1s để kịp
-// lên lịch âm thanh), nếu không phím vừa xoá sẽ bị bật sáng lại sau đó
+// Người dùng bấm Restart / tua: xoá phím sáng ngay để giao diện phản hồi tức thì (huỷ mọi lệnh Tone.Draw đang chờ,
+// nếu không phím vừa xoá sẽ sáng lại), rồi tắt âm và bỏ các sự kiện tồn đọng (silencePlayback)
 const silenceNow = (resetKeys) => {
   Tone.Draw.cancel(0);
-  stopAllNotes();
   resetKeys();
+  silencePlayback();
 };
 
 // Thanh trượt kiểu Home (slider BPM): viền ink, phần đã qua tô cam theo biến CSS, thumb vuông
@@ -65,15 +68,15 @@ const ControlBar = () => {
 
   useEffect(() => {
     function updateProgress() {
-      if (!isDragging.current) paintTimeline(timelineRef.current, currentTimeRef.current, Tone.Transport.seconds, duration);
+      if (!isDragging.current) paintTimeline(timelineRef.current, currentTimeRef.current, getSongTime(), duration);
       requestRef.current = requestAnimationFrame(updateProgress);
     }
 
     const handleStart = () => setIsPlaying(true);
-    // Pause/Stop: tắt âm đang ngân và tắt highlight các phím Auto-play
-    const handleHalt = () => {
+    // Pause/Stop (kể cả hết bài, đổi chế độ, Restart, tua khi đang phát): nhả nốt và xoá phím đúng lúc dừng
+    const handleHalt = (time) => {
       setIsPlaying(false);
-      silenceNow(resetKeys);
+      silencePlayback(time);
     };
 
     Tone.Transport.on('start', handleStart);
@@ -99,21 +102,20 @@ const ControlBar = () => {
     Tone.Transport.pause();
   };
 
-  // Tua về đầu: dừng Transport, về 0:00, tắt âm đang ngân và xoá phím sáng ngay
-  // (sự kiện stop của Tone đến trễ vài chục ms nên không chờ nó mới xoá phím)
+  // Restart / tua: tắt âm và xoá phím TRƯỚC rồi mới đổi vị trí. silenceNow ghi mốc "bỏ sự kiện tồn đọng" = Tone.now();
+  // nếu đổi vị trí trước, đồng hồ âm thanh có thể nhích lên giữa 2 lệnh -> mốc đó lớn hơn thời điểm của nốt nằm
+  // đúng điểm tua và nốt đó bị bỏ nhầm.
   const handleRestart = () => {
-    resetPlayback();
-    Tone.Transport.seconds = 0;
     silenceNow(resetKeys);
+    resetPlayback();
+    setSongTime(0);
     paintTimeline(timelineRef.current, currentTimeRef.current, 0, duration);
   };
 
   const handleSeek = (e) => {
     const newTime = parseFloat(e.target.value);
-    Tone.Transport.seconds = newTime;
-
-    // Tua thì phải ngắt các nốt đang ngân và tắt highlight
     silenceNow(resetKeys);
+    setSongTime(newTime);
     paintTimeline(timelineRef.current, currentTimeRef.current, newTime, duration);
   };
 
