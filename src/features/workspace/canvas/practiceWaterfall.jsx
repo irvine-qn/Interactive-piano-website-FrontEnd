@@ -5,7 +5,6 @@ import * as Tone from 'tone';
 const WaterfallCanvas = () => {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
-  const { currentMode } = useWorkspaceStore();
   const notes = useWorkspaceStore((state) => state.sheet?.notes);
 
   useEffect(() => {
@@ -54,8 +53,8 @@ const WaterfallCanvas = () => {
     const renderLoop = () => {
       ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-      // Chế độ Tự Do không có sheet nhạc nên không vẽ thác nốt
-      if (currentMode === 'FREE_PLAY' || !notes) {
+      // Chưa tải xong bài thì chưa có nốt để vẽ
+      if (!notes) {
         animationFrameId = requestAnimationFrame(renderLoop);
         return;
       }
@@ -117,7 +116,7 @@ const WaterfallCanvas = () => {
       resizeObserver.disconnect();
       cancelAnimationFrame(animationFrameId);
     };
-  }, [currentMode, notes]);
+  }, [notes]);
 
   return (
     <div ref={containerRef} className="absolute inset-0 w-full h-full bg-[#111]/10">

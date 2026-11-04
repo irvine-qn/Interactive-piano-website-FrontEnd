@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { playNote, stopNote, resetPlayback } from '../../piano/audio/toneEngine'; // Import động cơ âm thanh
 
 export const useWorkspaceStore = create((set, get) => ({
-  currentMode: 'FREE_PLAY', // 'FREE_PLAY' | 'PRACTICE' | 'AUTO_PLAY'
+  currentMode: 'AUTO_PLAY', // 'AUTO_PLAY' | 'PRACTICE'
   activeKeys: [],
   isPlaying: false,
   duration: 250,

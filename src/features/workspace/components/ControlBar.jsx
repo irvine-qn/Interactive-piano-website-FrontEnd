@@ -2,12 +2,12 @@ import { useEffect, useRef } from 'react';
 import * as Tone from 'tone';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
 import { stopAllNotes } from '../../piano/audio/toneEngine';
-import { Music, BookOpen, PlaySquare, Play, Pause, Volume2 } from 'lucide-react';
+import { BookOpen, PlaySquare, Play, Pause, Volume2 } from 'lucide-react';
 
+// AUTO_PLAY là chế độ mặc định nên đứng đầu (tên hiển thị sẽ đổi khi restyle Control Bar ở T-08A)
 const MODES = [
-  { id: 'FREE_PLAY', label: 'Free', icon: <Music className="w-4 h-4" /> },
-  { id: 'PRACTICE', label: 'Practice', icon: <BookOpen className="w-4 h-4" /> },
   { id: 'AUTO_PLAY', label: 'Auto', icon: <PlaySquare className="w-4 h-4" /> },
+  { id: 'PRACTICE', label: 'Practice', icon: <BookOpen className="w-4 h-4" /> },
 ];
 
 const ControlBar = () => {
@@ -114,7 +114,7 @@ const ControlBar = () => {
         </div>
 
         {/* Timeline Slider */}
-        <div className={`flex-1 w-full flex items-center gap-3 px-4 transition-opacity duration-300 ${currentMode === 'FREE_PLAY' ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
+        <div className="flex-1 w-full flex items-center gap-3 px-4">
           <span ref={currentTimeRef} className="text-xs font-bold text-gray-500 w-10 text-right">00:00</span>
           
           <div className="relative flex-1 h-2 flex items-center group cursor-pointer">
@@ -154,7 +154,7 @@ const ControlBar = () => {
         </div>
 
         {/* Trình phát & Âm lượng */}
-        <div className={`flex items-center gap-3 shrink-0 transition-opacity duration-300 ${currentMode === 'FREE_PLAY' ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
+        <div className="flex items-center gap-3 shrink-0">
           {!isPlaying ? (
             <button onClick={handlePlay} className="cursor-pointer p-3 rounded-full bg-[#ffe8d1] text-[#e8630a] hover:bg-[#ffd9b8] transition-colors">
               <Play className="w-5 h-5 fill-current" />

@@ -17,22 +17,16 @@ const generate88Keys = () => {
   return keys;
 };
 
+// Workspace luôn hiển thị đủ 88 phím (A0 - C8)
 const PIANO_KEYS_88 = generate88Keys();
-
-// ĐẢM BẢO ĐOẠN NÀY KHÔNG BỊ XÓA (Fix lỗi PIANO_KEYS_61 is not defined)
-const PIANO_KEYS_61 = PIANO_KEYS_88.filter(keyObj => {
-  const octave = parseInt(keyObj.note.slice(-1));
-  if (octave >= 2 && octave <= 6) return true;
-  if (keyObj.note === 'C7') return true;
-  return false;
-});
+const WHITE_KEYS_88 = PIANO_KEYS_88.filter(k => !k.isBlack);
 
 const PianoKeyboard = () => {
   const { activeKeys, pressKey, releaseKey, currentMode } = useWorkspaceStore();
 
   const isAutoPlay = currentMode === 'AUTO_PLAY';
-  const displayedKeys = currentMode === 'FREE_PLAY' ? PIANO_KEYS_61 : PIANO_KEYS_88;
-  const whiteKeys = displayedKeys.filter(k => !k.isBlack);
+  const displayedKeys = PIANO_KEYS_88;
+  const whiteKeys = WHITE_KEYS_88;
 
   useEffect(() => {
     const handleKeyDown = (e) => {
