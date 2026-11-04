@@ -4,10 +4,10 @@ import { ChevronDown, ListFilter, Search, X } from 'lucide-react';
 const SEARCH_DELAY_MS = 300;
 
 const SORT_LABELS = {
-  popular: 'Phổ biến nhất',
-  likes: 'Lượt thích',
-  newest: 'Mới nhất',
-  title: 'Tên (A–Z)',
+  popular: 'Most popular',
+  likes: 'Most liked',
+  newest: 'Newest',
+  title: 'Title (A–Z)',
 };
 
 // Ô tìm kiếm: gõ xong 300ms mới cập nhật URL, Enter thì tìm ngay.
@@ -48,7 +48,7 @@ const SearchBox = ({ value, onSearch }) => {
     >
       <label htmlFor={inputId} className="flex shrink-0">
         <Search aria-hidden="true" className="h-5 w-5 text-[var(--color-brand)]" />
-        <span className="sr-only">Tìm bản nhạc</span>
+        <span className="sr-only">Search sheets</span>
       </label>
       <input
         id={inputId}
@@ -56,7 +56,7 @@ const SearchBox = ({ value, onSearch }) => {
         type="search"
         value={text}
         onChange={(event) => setDraft(event.target.value)}
-        placeholder="Tìm theo tên bài hoặc tác giả..."
+        placeholder="Search by title or composer..."
         autoComplete="off"
         className="h-full min-w-0 flex-1 appearance-none border-0 bg-transparent p-0 font-[inherit] text-[15px] text-[var(--color-ink)] outline-none placeholder:text-[var(--color-neutral-350)] [&::-webkit-search-cancel-button]:appearance-none"
       />
@@ -64,7 +64,7 @@ const SearchBox = ({ value, onSearch }) => {
         <button
           type="button"
           onClick={handleClear}
-          aria-label="Xoá từ khoá"
+          aria-label="Clear search"
           className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center border-0 bg-transparent p-0 text-[var(--color-neutral-500)] hover:text-[var(--color-ink)]"
         >
           <X aria-hidden="true" className="h-4 w-4" />
@@ -80,7 +80,7 @@ const SortSelect = ({ value, onChange }) => {
     <div className="flex items-center gap-2.5">
       <ListFilter aria-hidden="true" className="h-5 w-5 text-[var(--color-ink)]" />
       <label htmlFor={selectId} className="text-sm font-bold text-[var(--color-ink)]">
-        Sắp xếp:
+        Sort by:
       </label>
       <span className="relative flex">
         <select
@@ -107,7 +107,7 @@ const SortSelect = ({ value, onChange }) => {
 // Thanh công cụ của Library: tìm kiếm, số bài đang hiển thị, sắp xếp; `children` là hàng bộ lọc bên dưới
 const LibraryToolbar = ({ query, meta, shownCount, onSearch, onSortChange, children }) => (
   <section
-    aria-label="Tìm kiếm, sắp xếp và lọc"
+    aria-label="Search, sort and filter"
     className="flex flex-col border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-4 py-3.5 shadow-[var(--shadow-hard)]"
   >
     <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
@@ -115,7 +115,7 @@ const LibraryToolbar = ({ query, meta, shownCount, onSearch, onSortChange, child
       <div className="ml-auto flex flex-wrap items-center gap-x-6 gap-y-3">
         {meta && (
           <p aria-live="polite" className="m-0 text-sm text-[var(--color-neutral-500)]">
-            Hiển thị {shownCount} / {meta.total.toLocaleString('en')} bản
+            Showing {shownCount} of {meta.total.toLocaleString('en')} {meta.total === 1 ? 'sheet' : 'sheets'}
           </p>
         )}
         <SortSelect value={query.sort} onChange={onSortChange} />

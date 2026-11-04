@@ -7,17 +7,17 @@ const IDLE_CLASS = 'bg-[var(--color-surface-soft)] text-[var(--color-ink)] enabl
 
 const Pagination = ({ page, totalPages, onChange }) => (
   <nav
-    aria-label="Phân trang"
+    aria-label="Pagination"
     className="flex flex-wrap items-center justify-between gap-3 border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-4 py-3 shadow-[var(--shadow-hard)]"
   >
     <p className="m-0 text-sm text-[var(--color-neutral-600)]">
-      Trang {page} trên {totalPages}
+      Page {page} of {totalPages}
     </p>
     <ul className="m-0 flex list-none items-center gap-2 p-0">
       <li>
         <button
           type="button"
-          aria-label="Trang trước"
+          aria-label="Previous page"
           disabled={page <= 1}
           onClick={() => onChange(page - 1)}
           className={`${BUTTON_CLASS} ${IDLE_CLASS}`}
@@ -35,7 +35,7 @@ const Pagination = ({ page, totalPages, onChange }) => (
           <li key={item}>
             <button
               type="button"
-              aria-label={`Trang ${item}`}
+              aria-label={`Page ${item}`}
               aria-current={item === page ? 'page' : undefined}
               onClick={() => item !== page && onChange(item)}
               className={`${BUTTON_CLASS} ${
@@ -52,7 +52,7 @@ const Pagination = ({ page, totalPages, onChange }) => (
       <li>
         <button
           type="button"
-          aria-label="Trang sau"
+          aria-label="Next page"
           disabled={page >= totalPages}
           onClick={() => onChange(page + 1)}
           className={`${BUTTON_CLASS} ${IDLE_CLASS}`}

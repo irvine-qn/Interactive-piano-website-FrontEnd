@@ -30,9 +30,9 @@ const LibraryFilters = ({ difficulty, tag, tags, onChange }) => {
 
   return (
     <div className="flex flex-col gap-2.5">
-      <FilterRow label="Độ khó">
+      <FilterRow label="Difficulty">
         <ChipButton active={!difficulty} onClick={() => onChange({ difficulty: '' })}>
-          Tất cả
+          All
         </ChipButton>
         {DIFFICULTIES.map((level) => (
           <ChipButton key={level} active={difficulty === level} onClick={() => onChange({ difficulty: level })}>
@@ -43,9 +43,9 @@ const LibraryFilters = ({ difficulty, tag, tags, onChange }) => {
       </FilterRow>
 
       {tagOptions.length > 0 && (
-        <FilterRow label="Thể loại">
+        <FilterRow label="Genre">
           <ChipButton active={!tag} onClick={() => onChange({ tag: '' })}>
-            Tất cả
+            All
           </ChipButton>
           {tagOptions.map((t) => (
             <ChipButton key={t.name} active={tag === t.name} onClick={() => onChange({ tag: t.name })}>

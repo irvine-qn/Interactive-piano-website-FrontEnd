@@ -36,8 +36,8 @@ const SheetGrid = ({ sheets, status, error, onRetry, skeletonCount }) => {
       <StatePanel
         role="alert"
         icon={<CircleAlert aria-hidden="true" className="h-10 w-10 text-[var(--color-danger)]" />}
-        title="Không tải được thư viện"
-        description={error?.message ?? 'Đã có lỗi xảy ra.'}
+        title="Could not load the library"
+        description={error?.message ?? 'Something went wrong.'}
       >
         <button
           type="button"
@@ -45,7 +45,7 @@ const SheetGrid = ({ sheets, status, error, onRetry, skeletonCount }) => {
           className="mt-2 flex h-10 cursor-pointer items-center gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-brand)] px-5 font-[inherit] text-sm font-bold text-[var(--color-neutral-white)] shadow-[var(--shadow-hard-sm)] hover:bg-[var(--color-brand-strong)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
         >
           <RotateCcw aria-hidden="true" className="h-4 w-4" />
-          Thử lại
+          Try again
         </button>
       </StatePanel>
     );
@@ -54,7 +54,7 @@ const SheetGrid = ({ sheets, status, error, onRetry, skeletonCount }) => {
   // Lần tải đầu (chưa có dữ liệu cũ để giữ) thì hiện khung xương
   if (status === 'loading' && sheets.length === 0) {
     return (
-      <div className={GRID_CLASS} aria-busy="true" aria-label="Đang tải bản nhạc">
+      <div className={GRID_CLASS} aria-busy="true" aria-label="Loading sheets">
         {Array.from({ length: skeletonCount }, (_, i) => (
           <SkeletonCard key={i} />
         ))}
@@ -66,8 +66,8 @@ const SheetGrid = ({ sheets, status, error, onRetry, skeletonCount }) => {
     return (
       <StatePanel
         icon={<SearchX aria-hidden="true" className="h-10 w-10 text-[var(--color-neutral-400)]" />}
-        title="Không tìm thấy bản nhạc"
-        description="Thử từ khoá khác hoặc bỏ bớt bộ lọc."
+        title="No sheets found"
+        description="Try another keyword or remove some filters."
       />
     );
   }

@@ -161,6 +161,11 @@ frontend/
 | `/` | `HomePage` | Virtual piano + metronome |
 | `/library` | `LibraryPage` | Thư viện bản nhạc. Bộ lọc nằm trên URL: `?q=&difficulty=&tag=&sort=&page=` |
 | `/workspace/:sheetId` | `WorkspacePage` | Luyện tập một bài, ví dụ `/workspace/canon-in-d` |
+| `/login`, `/register`, `/forgot-password` | `pages/auth/*` | Chỉ dành cho khách (`GuestRoute`), đã đăng nhập thì chuyển đi |
+| `/profile`, `/upload` | `pages/profile/*`, … | Cần đăng nhập (`ProtectedRoute`), chưa đăng nhập thì về `/login` |
+| `*` | `NotFoundPage` | Trang 404 |
+
+Đường dẫn được khai báo tập trung trong `src/config/routes.js` (`ROUTES`). Chữ hiển thị trên giao diện dùng **tiếng Anh**.
 
 ---
 
@@ -169,18 +174,18 @@ frontend/
 Trang `/library` hiển thị danh sách bản nhạc từ `GET /api/v1/sheets`.
 
 * **Tìm kiếm** theo tên bài / tác giả: gõ xong 300ms mới tìm (Enter để tìm ngay, ✕ để xoá).
-* **Sắp xếp**: Phổ biến nhất (mặc định), Lượt thích, Mới nhất, Tên (A–Z).
-* **Lọc** theo độ khó (Dễ / Trung bình / Khó / Chuyên gia) và thể loại (lấy từ `GET /api/v1/sheets/tags`).
-* **Phân trang** 8 bài / trang.
-* Card **"Luyện tập"** mở `/workspace/:id`.
+* **Sắp xếp** (*Sort by*): Most popular (mặc định), Most liked, Newest, Title (A–Z).
+* **Lọc** theo độ khó (*Easy / Medium / Hard / Expert*) và thể loại (*Genre*, lấy từ `GET /api/v1/sheets/tags`).
+* **Phân trang** 8 bài / trang (*Page x of y*).
+* Card **"Practice"** mở `/workspace/:id`.
 
 URL là nguồn sự thật của bộ lọc (hook `useLibraryQuery`): F5, nút Back và chia sẻ link đều giữ nguyên kết quả. Giá trị mặc định không ghi lên URL, giá trị sai trên URL (vd. `?sort=abc`) tự quay về mặc định, `?page` vượt quá số trang tự chuyển về trang cuối.
 
-Các trạng thái: khung xương khi tải lần đầu, giữ lưới cũ (làm mờ) khi đổi bộ lọc, "Không tìm thấy bản nhạc" khi rỗng, thông báo lỗi + nút "Thử lại" khi không gọi được Backend.
+Các trạng thái: khung xương khi tải lần đầu, giữ lưới cũ (làm mờ) khi đổi bộ lọc, "No sheets found" khi rỗng, thông báo "Could not load the library" + nút "Try again" khi không gọi được Backend.
 
 Ảnh bìa (`SheetCover`) vẽ bằng CSS/SVG, không dùng file ảnh: màu nền theo `coverColor` của bài, nốt nhạc và góc nghiêng sinh cố định theo `id` (mỗi bài một bìa, tải lại không đổi).
 
-Nút Thích / Thêm vào bộ sưu tập sẽ được thêm khi có Feature User.
+Nút Like / Add to collection sẽ được thêm khi có Feature User.
 
 ---
 

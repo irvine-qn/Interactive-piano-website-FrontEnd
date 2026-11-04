@@ -32,15 +32,15 @@ const SheetCard = ({ sheet }) => {
         </p>
 
         <ul className="m-0 mt-3 flex list-none items-center gap-5 p-0 text-sm font-bold">
-          <li className="flex items-center gap-1.5 text-[var(--color-neutral-600)]" aria-label={`${sheet.views} lượt xem`}>
+          <li className="flex items-center gap-1.5 text-[var(--color-neutral-600)]" aria-label={`${sheet.views} views`}>
             <Eye aria-hidden="true" className="h-4 w-4" />
             {formatCount(sheet.views)}
           </li>
-          <li className="flex items-center gap-1.5 text-[var(--color-danger)]" aria-label={`${sheet.likes} lượt thích`}>
+          <li className="flex items-center gap-1.5 text-[var(--color-danger)]" aria-label={`${sheet.likes} likes`}>
             <Heart aria-hidden="true" className="h-4 w-4 fill-[var(--color-danger-bright)] text-[var(--color-danger-bright)]" />
             {formatCount(sheet.likes)}
           </li>
-          <li className="flex items-center gap-1.5 text-[var(--color-neutral-600)]" aria-label={`Thời lượng ${formatDuration(sheet.durationSec)}`}>
+          <li className="flex items-center gap-1.5 text-[var(--color-neutral-600)]" aria-label={`Duration ${formatDuration(sheet.durationSec)}`}>
             <Clock aria-hidden="true" className="h-4 w-4" />
             {formatDuration(sheet.durationSec)}
           </li>
@@ -53,7 +53,7 @@ const SheetCard = ({ sheet }) => {
             className="flex h-10 items-center justify-center gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-brand)] text-[15px] font-bold text-[var(--color-neutral-white)] no-underline shadow-[var(--shadow-hard-sm)] transition-colors hover:bg-[var(--color-brand-strong)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-ink)]"
           >
             <PianoKeysIcon />
-            Luyện tập
+            Practice
           </Link>
         </div>
       </div>
