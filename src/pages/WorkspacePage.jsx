@@ -4,12 +4,11 @@ import PianoKeyboard from "../features/workspace/components/PianoKeyboard";
 import ControlBar from "../features/workspace/components/ControlBar";
 import WaterfallCanvas from "../features/workspace/canvas/practiceWaterfall";
 import { useSheetLoader } from "../features/workspace/hooks/useSheetLoader";
-import { DEFAULT_SHEET_ID } from "../features/workspace/config/sheet";
 import Footer from "../components/common/footer";
 
 const WorkspacePage = () => {
   const { sheet, sheetStatus, sheetError } = useWorkspaceStore();
-  const { sheetId = DEFAULT_SHEET_ID } = useParams();
+  const { sheetId } = useParams();
   const reloadSheet = useSheetLoader(sheetId);
 
   return (

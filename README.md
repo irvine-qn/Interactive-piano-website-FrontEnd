@@ -161,6 +161,7 @@ frontend/
 | `/` | `HomePage` | Virtual piano + metronome |
 | `/library` | `LibraryPage` | Thư viện bản nhạc. Bộ lọc nằm trên URL: `?q=&difficulty=&tag=&sort=&page=` |
 | `/workspace/:sheetId` | `WorkspacePage` | Luyện tập một bài, ví dụ `/workspace/canon-in-d` |
+| `/workspace` | → `/library` | Chưa chọn bài (vd. nút *Practice* trên Navbar) thì chuyển sang Library để chọn |
 | `/login`, `/register`, `/forgot-password` | `pages/auth/*` | Chỉ dành cho khách (`GuestRoute`), đã đăng nhập thì chuyển đi |
 | `/profile`, `/upload` | `pages/profile/*`, … | Cần đăng nhập (`ProtectedRoute`), chưa đăng nhập thì về `/login` |
 | `*` | `NotFoundPage` | Trang 404 |

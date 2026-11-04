@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import HomePage from "../pages/HomePage";
 import LibraryPage from "../pages/LibraryPage";
 import WorkspacePage from "../pages/WorkspacePage";
@@ -14,7 +14,9 @@ const AppRoutes = () => (
   <Routes>
     <Route path={ROUTES.HOME} element={<HomePage />} />
     <Route path={ROUTES.LIBRARY} element={<LibraryPage />} />
-    <Route path={`${ROUTES.WORKSPACE}/:sheetId?`} element={<WorkspacePage />} />
+    {/* Chưa chọn bài (vd. nút "Practice" trên Navbar) thì sang Library để chọn */}
+    <Route path={ROUTES.WORKSPACE} element={<Navigate to={ROUTES.LIBRARY} replace />} />
+    <Route path={`${ROUTES.WORKSPACE}/:sheetId`} element={<WorkspacePage />} />
     <Route element={<GuestRoute />}>
       <Route path={ROUTES.LOGIN} element={<LoginPage />} />
       <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
