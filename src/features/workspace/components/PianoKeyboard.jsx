@@ -42,27 +42,35 @@ const PianoKeyboard = () => {
         </button>
       </p>
     )}
-    <div className="flex w-full p-2 sm:p-4 bg-gray-900 rounded-b-lg h-[120px] sm:h-[180px]">
+    {/* Khung gỗ + dải nỉ đỏ như bàn phím HomePage */}
+    <div className="relative border-2 border-[var(--color-ink)] bg-[var(--color-piano-wood)] p-[14px]">
+      <span
+        aria-hidden="true"
+        className="absolute inset-x-[6px] top-[3px] h-[2px] bg-[repeating-linear-gradient(90deg,var(--color-piano-wood-grain)_0_8px,transparent_8px_16px)]"
+      />
+      <div className="h-[10px] border-2 border-[var(--color-ink)] bg-[var(--color-piano-felt)]" />
       {/* data-keybed: vùng chứa phím, Waterfall đo vị trí vùng này để đặt nốt theo cùng KEY_LAYOUT */}
-      <div data-keybed className="relative h-full w-full">
+      <div
+        data-keybed
+        role="group"
+        aria-label="Piano keyboard"
+        className="relative h-[200px] select-none border-l-[1.5px] border-[var(--color-ink)] bg-[var(--color-key-white)]"
+      >
         {KEY_LAYOUT.map((key) => (
-          <div
+          <Key
             key={key.note}
-            className={`absolute top-0 ${key.isBlack ? 'z-10 h-[65%]' : 'h-full'}`}
-            style={{ left: `${key.left}%`, width: `${key.width}%` }}
-          >
-            <Key
-              note={key.note}
-              hint={keyByNote[key.note]}
-              showHint={!isAutoPlay}
-              interactive={!isAutoPlay}
-              isBlack={key.isBlack}
-              isPressed={pressedKeys.includes(key.note)}
-              playbackHand={playbackKeys[key.note]?.hand ?? null}
-              onMouseDown={pressWithMouse}
-              onMouseUp={releaseMouse}
-            />
-          </div>
+            note={key.note}
+            left={key.left}
+            width={key.width}
+            isBlack={key.isBlack}
+            hint={keyByNote[key.note]}
+            showHint={!isAutoPlay}
+            interactive={!isAutoPlay}
+            isPressed={pressedKeys.includes(key.note)}
+            playbackHand={playbackKeys[key.note]?.hand ?? null}
+            onMouseDown={pressWithMouse}
+            onMouseUp={releaseMouse}
+          />
         ))}
       </div>
     </div>

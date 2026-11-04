@@ -37,13 +37,18 @@ const WaterfallCanvas = () => {
 
       // Toạ độ X lấy từ KEY_LAYOUT (cùng công thức với bàn phím), quy đổi theo vị trí vùng phím (data-keybed)
       // so với canvas, nên viền/lề của khung bàn phím khác canvas vẫn rơi đúng phím.
+      // Phím đặt bằng left/width % tính trong phần bên trong viền của vùng phím, nên trừ viền trái/phải
       const bed = keybed ? keybed.getBoundingClientRect() : rect;
-      const offset = bed.left - rect.left;
+      const bedStyle = keybed ? getComputedStyle(keybed) : null;
+      const borderLeft = bedStyle ? parseFloat(bedStyle.borderLeftWidth) || 0 : 0;
+      const borderRight = bedStyle ? parseFloat(bedStyle.borderRightWidth) || 0 : 0;
+      const offset = bed.left + borderLeft - rect.left;
+      const bedWidth = bed.width - borderLeft - borderRight;
       keyMap = {};
       KEY_LAYOUT.forEach((key) => {
         keyMap[key.note] = {
-          x: offset + (key.left / 100) * bed.width,
-          width: (key.width / 100) * bed.width,
+          x: offset + (key.left / 100) * bedWidth,
+          width: (key.width / 100) * bedWidth,
           isBlack: key.isBlack,
         };
       });
