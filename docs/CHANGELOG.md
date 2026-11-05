@@ -5,6 +5,22 @@ Mục **Cần làm sau khi pull** là các lệnh phải chạy trên máy của
 
 ---
 
+## 2026-11-05 – Đồng bộ Home và Practice
+
+- Home và Practice dùng chung bàn phím 88 phím (`PianoKeybed`), cách đọc phím (`useKeyboardInput`, `useKeyMapping`), `KeyLabelSelect`, `OctaveShiftControl` và nút How to play.
+- Practice có dải Shortcuts nằm ngang: mỗi cột là một lần nhấn, phím nhấn cùng lúc xếp ở dòng dưới. Nút Hide/Show shortcuts để ẩn hoặc hiện dải.
+- Zone 1 di chuyển bằng mũi tên trái phải, Zone 2 bằng mũi tên lên xuống. Giữ `A F K` hoặc `1 4 8` rồi nhấn một nốt để chơi hợp âm.
+
+**Cần làm sau khi pull:** `npm install`, cập nhật Backend theo `docs/CHANGELOG.md` của repo Backend.
+
+## 2026-11-05 – Phím Practice hai tay
+
+- Bỏ Shift: mỗi nốt thăng có phím riêng, Zone 1 dùng hàng `Z`/`S`, Zone 2 dùng hàng `Q`/`2`.
+- Chế độ Play tự đổi quãng theo bài. Mỗi hợp âm cần nhấn tối đa 4 nốt, các nốt còn lại tự kêu.
+- Practice nhận đàn MIDI nếu trình duyệt được cấp quyền.
+
+**Cần làm sau khi pull:** cập nhật Backend theo `docs/CHANGELOG.md` của repo Backend.
+
 ## 2026-11-05 – Đổi logic Practice
 
 - Auto Play: người dùng chơi được phím trong lúc bài đang chạy.

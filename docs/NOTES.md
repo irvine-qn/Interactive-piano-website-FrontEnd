@@ -60,7 +60,7 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
 - **Tua lùi 1 tick** (khoảng 3ms, xem `setSongTime`). Nếu tua đúng vào tick của một nốt, Tone có lúc làm tròn sang tick sau và bỏ mất nốt đó. Đồng hồ trên Control Bar cộng 10ms khi hiển thị để tua tới 1:00 vẫn hiện `1:00`.
 - **Thứ tự trong Restart/tua:** gọi `silenceNow()` **trước** rồi mới `setSongTime()`. Làm ngược lại thì có lúc nốt nằm đúng điểm tua bị coi là sự kiện cũ và bị bỏ.
 - **Sự kiện `pause`/`stop` của Transport** làm Control Bar tắt âm và xóa phím sáng. Khi làm Wait Mode (T-09B) phải tách "dừng do người dùng bấm" khỏi "dừng để chờ", nếu không phím người chơi đang giữ sẽ bị xóa (đã ghi trong WBS).
-- **Phím tắt:** `useKeyboardInput` bỏ qua phím khi focus đang ở ô gõ chữ (ô search, form), nhưng **không** bỏ qua khi focus ở thanh trượt (timeline, âm lượng). Ô select chọn xong tự bỏ focus. Nhả phím theo `event.code` để nhả Shift trước vẫn không kẹt.
+- **Phím tắt Practice:** bảng phím lấy từ `practiceKeys` của `GET /api/v1/piano`, tra theo `event.code` nên Shift không ảnh hưởng. `useKeyboardInput` bỏ qua phím khi focus đang ở ô gõ chữ (ô search, form), nhưng **không** bỏ qua khi focus ở thanh trượt (timeline, âm lượng). Ô select chọn xong tự bỏ focus.
 - **Thứ tự khóa trong object:** JavaScript luôn xếp khóa dạng số (`"0"`–`"9"`) lên trước, nên đừng lấy "phím đầu/cuối" theo thứ tự `Object.values(noteByKey)` (lỗi cũ: nhãn hiện `E2-C6` thay vì `C1-C6`).
 - **Chữ trên canvas:** font Inter tải từ Google Fonts ở chế độ `display=swap`, nên lúc đầu canvas đo chữ bằng font dự phòng. Waterfall đo lại nhãn khi `document.fonts` báo tải xong.
 
