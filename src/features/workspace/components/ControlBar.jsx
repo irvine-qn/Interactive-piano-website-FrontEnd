@@ -1,56 +1,76 @@
 import { useEffect, useRef } from 'react';
 import * as Tone from 'tone';
+import { useShallow } from 'zustand/react/shallow';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
-import { stopAllNotes } from '../../piano/audio/toneEngine';
-import { Music, BookOpen, PlaySquare, Play, Pause, Volume2 } from 'lucide-react';
+import { resetPlayback } from '../../piano/audio/toneEngine';
+import { Hourglass, PlaySquare, Play, Pause, RotateCcw, Volume1, Volume2, VolumeX } from 'lucide-react';
+import { useWorkspaceVolume } from '../hooks/useWorkspaceVolume';
+import { getSongTime, setSongTime } from '../audio/songClock';
+import { alignOctavesToTime, isWaitPause, isWaitingForNotes, silencePlayback } from '../audio/sheetPlayer';
+import SpeedControl from './SpeedControl';
 
 const MODES = [
-  { id: 'FREE_PLAY', label: 'Free', icon: <Music className="w-4 h-4" /> },
-  { id: 'PRACTICE', label: 'Practice', icon: <BookOpen className="w-4 h-4" /> },
-  { id: 'AUTO_PLAY', label: 'Auto', icon: <PlaySquare className="w-4 h-4" /> },
+  { id: 'AUTO_PLAY', label: 'Auto Play', Icon: PlaySquare },
+  { id: 'PRACTICE', label: 'Play', Icon: Hourglass },
 ];
 
+// Cộng thêm thời gian bù vì điểm tua bị lùi một tick
+const formatTime = (seconds) => {
+  const safe = Number.isFinite(seconds) && seconds > 0 ? seconds + 0.01 : 0;
+  const m = Math.floor(safe / 60);
+  const s = Math.floor(safe % 60).toString().padStart(2, '0');
+  return `${m}:${s}`;
+};
+
+const paintTimeline = (input, label, seconds, duration) => {
+  if (input) {
+    input.value = seconds;
+    const percentage = duration > 0 ? Math.round(Math.min((seconds / duration) * 100, 100) * 1000) / 1000 : 0;
+    input.style.setProperty('--fill', `${percentage}%`);
+  }
+  if (label) label.textContent = formatTime(seconds);
+};
+
+const silenceNow = (resetKeys) => {
+  Tone.Draw.cancel(0);
+  resetKeys();
+  silencePlayback();
+};
+
+const SLIDER_CLASS =
+  'h-2 cursor-pointer appearance-none border-[1.5px] border-solid border-[var(--color-ink)] bg-[linear-gradient(to_right,var(--color-brand)_var(--fill,0%),var(--color-surface-card)_var(--fill,0%))] disabled:cursor-not-allowed disabled:opacity-50 [&::-moz-range-thumb]:h-[18px] [&::-moz-range-thumb]:w-[10px] [&::-moz-range-thumb]:rounded-none [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-[var(--color-ink)] [&::-moz-range-thumb]:bg-[var(--color-surface-card)] [&::-webkit-slider-thumb]:h-[18px] [&::-webkit-slider-thumb]:w-[10px] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-solid [&::-webkit-slider-thumb]:border-[var(--color-ink)] [&::-webkit-slider-thumb]:bg-[var(--color-surface-card)]';
+
 const ControlBar = () => {
-  const { currentMode, setMode, isPlaying, setIsPlaying, duration, clearActiveKeys } = useWorkspaceStore();
-  const progressBarRef = useRef(null);
+  const { currentMode, setMode, isPlaying, setIsPlaying, duration, resetKeys, volume, setVolume } = useWorkspaceStore(
+    useShallow((state) => ({
+      volume: state.volume,
+      setVolume: state.setVolume,
+      currentMode: state.currentMode,
+      setMode: state.setMode,
+      isPlaying: state.isPlaying,
+      setIsPlaying: state.setIsPlaying,
+      duration: state.duration,
+      resetKeys: state.resetKeys,
+    })),
+  );
+  useWorkspaceVolume(volume);
+  const timelineRef = useRef(null);
   const currentTimeRef = useRef(null);
-  const progressFillRef = useRef(null);
   const requestRef = useRef();
   const isDragging = useRef(false);
 
-  const formatTime = (seconds) => {
-    const m = Math.floor(seconds / 60);
-    const s = Math.floor(seconds % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
-  };
-
   useEffect(() => {
     function updateProgress() {
-      if (
-        progressBarRef.current &&
-        currentTimeRef.current &&
-        progressFillRef.current &&
-        !isDragging.current
-      ) {
-        const currentTime = Tone.Transport.seconds;
-        progressBarRef.current.value = currentTime;
-        currentTimeRef.current.innerText = formatTime(currentTime);
-
-        const percentage = duration > 0 ? (currentTime / duration) * 100 : 0;
-        progressFillRef.current.style.width = `${percentage}%`;
-
-        const thumb = document.getElementById('progress-thumb');
-        if (thumb) thumb.style.left = `calc(${percentage}% - 8px)`;
-      }
+      if (!isDragging.current) paintTimeline(timelineRef.current, currentTimeRef.current, getSongTime(), duration);
       requestRef.current = requestAnimationFrame(updateProgress);
     }
 
     const handleStart = () => setIsPlaying(true);
-    // Pause/Stop: tắt âm đang ngân và tắt highlight các phím Auto-play
-    const handleHalt = () => {
+    const handleHalt = (time) => {
+      if (isWaitPause(time)) return;
       setIsPlaying(false);
-      stopAllNotes();
-      clearActiveKeys();
+      silencePlayback(time);
+      if (Tone.Transport.state === 'stopped') alignOctavesToTime(0);
     };
 
     Tone.Transport.on('start', handleStart);
@@ -65,114 +85,134 @@ const ControlBar = () => {
       Tone.Transport.off('pause', handleHalt);
       Tone.Transport.off('stop', handleHalt);
     };
-  }, [setIsPlaying, clearActiveKeys, duration]);
+  }, [setIsPlaying, resetKeys, duration]);
 
   const handlePlay = async () => {
     if (Tone.context.state !== 'running') await Tone.start();
+    if (isWaitingForNotes()) {
+      setIsPlaying(true);
+      return;
+    }
     Tone.Transport.start();
   };
 
   const handlePause = () => {
+    if (isWaitingForNotes()) {
+      setIsPlaying(false);
+      return;
+    }
     Tone.Transport.pause();
+  };
+
+  // Phải tắt âm trước khi đổi vị trí để không bỏ nhầm nốt tại điểm tua
+  const handleRestart = () => {
+    silenceNow(resetKeys);
+    resetPlayback();
+    setSongTime(0);
+    alignOctavesToTime(0);
+    paintTimeline(timelineRef.current, currentTimeRef.current, 0, duration);
   };
 
   const handleSeek = (e) => {
     const newTime = parseFloat(e.target.value);
-    Tone.Transport.seconds = newTime;
-    
-    // Tua thì phải ngắt các nốt đang ngân và tắt highlight
-    stopAllNotes();
-    clearActiveKeys();
-    
-    if (currentTimeRef.current) {
-      currentTimeRef.current.innerText = formatTime(newTime);
-    }
+    const wasWaiting = isPlaying && isWaitingForNotes();
+    silenceNow(resetKeys);
+    setSongTime(newTime);
+    alignOctavesToTime(newTime);
+    if (wasWaiting) Tone.Transport.start();
+    paintTimeline(timelineRef.current, currentTimeRef.current, newTime, duration);
   };
 
+  const PlayIcon = isPlaying ? Pause : Play;
+  const VolumeIcon = volume === 0 ? VolumeX : volume < 50 ? Volume1 : Volume2;
+
   return (
-    <div className="w-full bg-white px-4 py-3 flex flex-col z-10 relative">
-      <div className="w-full flex flex-col md:flex-row items-center justify-between gap-4">
-        {/* Mode Selector */}
-        <div className="flex bg-gray-100 p-1 rounded-xl shrink-0">
-          {MODES.map((mode) => {
-            const isActive = currentMode === mode.id;
-            return (
-              <button
-                key={mode.id}
-                onClick={() => setMode(mode.id)}
-                className={`cursor-pointer flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 ${
-                  isActive 
-                    ? 'bg-white text-[#ff7a1a] shadow-xs'
-                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                {mode.icon}
-                {mode.label}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Timeline Slider */}
-        <div className={`flex-1 w-full flex items-center gap-3 px-4 transition-opacity duration-300 ${currentMode === 'FREE_PLAY' ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
-          <span ref={currentTimeRef} className="text-xs font-bold text-gray-500 w-10 text-right">00:00</span>
-          
-          <div className="relative flex-1 h-2 flex items-center group cursor-pointer">
-            {/* Thanh nền xám */}
-            <div className="absolute w-full h-2 bg-gray-200 rounded-full"></div>
-            {/* Thanh màu cam fill */}
-            <div ref={progressFillRef} className="absolute h-2 bg-[#ff7a1a] rounded-full pointer-events-none" style={{ width: '0%' }}></div>
-            {/* Input Range ẩn đè lên để bắt sự kiện kéo */}
-            <input 
-              type="range" 
-              ref={progressBarRef}
-              min="0" 
-              max={duration} 
-              step="0.1"
-              defaultValue="0"
-              onMouseDown={() => isDragging.current = true}
-              onMouseUp={() => isDragging.current = false}
-              onTouchStart={() => isDragging.current = true}
-              onTouchEnd={() => isDragging.current = false}
-              onChange={handleSeek}
-              onInput={(e) => {
-                // Cập nhật UI thanh màu cam mượt mà khi tay đang kéo
-                const val = parseFloat(e.target.value);
-                const percentage = duration > 0 ? (val / duration) * 100 : 0;
-                progressFillRef.current.style.width = `${percentage}%`;
-                const thumb = document.getElementById('progress-thumb');
-                if (thumb) thumb.style.left = `calc(${percentage}% - 8px)`;
-                if (currentTimeRef.current) currentTimeRef.current.innerText = formatTime(val);
-              }}
-              className="absolute w-full h-full opacity-0 cursor-pointer z-10"
-            />
-            {/* Nút thumb hiển thị khi hover */}
-            <div id="progress-thumb" className="absolute h-4 w-4 bg-white border-2 border-[#ff7a1a] rounded-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-0" style={{ left: 'calc(0% - 8px)' }}></div>
-          </div>
-          
-          <span className="text-xs font-bold text-gray-500 w-10">{formatTime(duration)}</span>
-        </div>
-
-        {/* Trình phát & Âm lượng */}
-        <div className={`flex items-center gap-3 shrink-0 transition-opacity duration-300 ${currentMode === 'FREE_PLAY' ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
-          {!isPlaying ? (
-            <button onClick={handlePlay} className="cursor-pointer p-3 rounded-full bg-[#ffe8d1] text-[#e8630a] hover:bg-[#ffd9b8] transition-colors">
-              <Play className="w-5 h-5 fill-current" />
+    <div className="flex w-full flex-wrap items-center gap-x-6 gap-y-3 px-5 py-4">
+      <div
+        role="group"
+        aria-label="Playback mode"
+        className="flex shrink-0 gap-1 border-2 border-solid border-[var(--color-ink)] bg-[var(--color-surface-soft)] p-1"
+      >
+        {MODES.map(({ id, label, Icon }) => {
+          const isActive = currentMode === id;
+          return (
+            <button
+              key={id}
+              type="button"
+              aria-pressed={isActive}
+              onClick={() => setMode(id)}
+              className={`flex h-9 cursor-pointer items-center gap-2 border-2 border-solid px-4 font-[inherit] text-sm font-bold ${
+                isActive
+                  ? 'border-[var(--color-ink)] bg-[var(--color-brand)] text-[var(--color-neutral-white)] shadow-[var(--shadow-hard-sm)]'
+                  : 'border-transparent bg-transparent text-[var(--color-ink)] hover:bg-[var(--color-brand-tint)]'
+              }`}
+            >
+              <Icon aria-hidden="true" className="h-4 w-4" />
+              {label}
             </button>
-          ) : (
-            <button onClick={handlePause} className="cursor-pointer p-3 rounded-full bg-[#ffe8d1] text-[#e8630a] hover:bg-[#ffd9b8] transition-colors">
-              <Pause className="w-5 h-5 fill-current" />
-            </button>
-          )}
-          
-          <div className="h-6 w-px bg-gray-300 mx-1"></div>
-          
-          <button className="cursor-pointer flex items-center gap-2 p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors group">
-            <Volume2 className="w-5 h-5" />
-            <div className="w-20 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-              <div className="w-3/4 h-full bg-[#ff7a1a] rounded-full group-hover:bg-[#e8630a] transition-colors"></div>
-            </div>
-          </button>
+          );
+        })}
+      </div>
+
+      <div className="flex min-w-[240px] flex-1 items-center gap-3">
+        <span
+          ref={currentTimeRef}
+          className="w-10 shrink-0 text-right text-xs font-bold tabular-nums text-[var(--color-neutral-600)]"
+        >
+          0:00
+        </span>
+        <input
+          type="range"
+          ref={timelineRef}
+          aria-label="Timeline"
+          min="0"
+          max={duration}
+          step="0.1"
+          defaultValue="0"
+          onPointerDown={() => (isDragging.current = true)}
+          onPointerUp={() => (isDragging.current = false)}
+          onChange={handleSeek}
+          className={`${SLIDER_CLASS} min-w-0 flex-1`}
+        />
+        <span className="w-10 shrink-0 text-xs font-bold tabular-nums text-[var(--color-neutral-600)]">
+          {formatTime(duration)}
+        </span>
+      </div>
+
+      <div className="flex shrink-0 flex-wrap items-center gap-4">
+        <SpeedControl />
+        <button
+          type="button"
+          onClick={handleRestart}
+          aria-label="Restart"
+          title="Restart from the beginning"
+          className="flex h-11 w-11 cursor-pointer items-center justify-center border-2 border-solid border-[var(--color-ink)] bg-[var(--color-surface-card)] p-0 text-[var(--color-ink)] shadow-[var(--shadow-hard-sm)] hover:bg-[var(--color-brand-tint)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+        >
+          <RotateCcw aria-hidden="true" className="h-5 w-5" />
+        </button>
+        <button
+          type="button"
+          onClick={isPlaying ? handlePause : handlePlay}
+          aria-label={isPlaying ? 'Pause' : 'Play'}
+          className="flex h-11 w-11 cursor-pointer items-center justify-center border-2 border-solid border-[var(--color-ink)] bg-[var(--color-brand)] p-0 text-[var(--color-neutral-white)] shadow-[var(--shadow-hard-sm)] hover:bg-[var(--color-brand-strong)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+        >
+          <PlayIcon aria-hidden="true" className="h-5 w-5 fill-current" />
+        </button>
+
+        <div className="flex h-11 items-center gap-2 border-2 border-solid border-[var(--color-ink)] bg-[var(--color-surface-soft)] px-3">
+          <VolumeIcon aria-hidden="true" className="h-5 w-5 shrink-0 text-[var(--color-brand-strong)]" />
+          <input
+            type="range"
+            aria-label="Volume"
+            aria-valuetext={`${volume}%`}
+            min="0"
+            max="100"
+            step="1"
+            value={volume}
+            onChange={(e) => setVolume(Number(e.target.value))}
+            style={{ '--fill': `${volume}%` }}
+            className={`${SLIDER_CLASS} w-24`}
+          />
         </div>
       </div>
     </div>

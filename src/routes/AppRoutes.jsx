@@ -1,11 +1,31 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import HomePage from "../pages/HomePage";
-import WorkspacePage from "../pages/sheet/WorkspacePage";
+import LibraryPage from "../pages/LibraryPage";
+import WorkspacePage from "../pages/WorkspacePage";
+import LoginPage from "../pages/auth/LoginPage";
+import RegisterPage from "../pages/auth/RegisterPage";
+import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage";
+import UserProfilePage from "../pages/profile/UserProfilePage";
+import NotFoundPage from "../pages/NotFoundPage";
+import { GuestRoute, ProtectedRoute } from "./RouteGuards";
+import { ROUTES } from "../config/routes";
 
 const AppRoutes = () => (
   <Routes>
-    <Route path="/" element={<HomePage />} />
-    <Route path="/workspace/:sheetId?" element={<WorkspacePage />} />
+    <Route path={ROUTES.HOME} element={<HomePage />} />
+    <Route path={ROUTES.LIBRARY} element={<LibraryPage />} />
+    <Route path={ROUTES.WORKSPACE} element={<Navigate to={ROUTES.LIBRARY} replace />} />
+    <Route path={`${ROUTES.WORKSPACE}/:sheetId`} element={<WorkspacePage />} />
+    <Route element={<GuestRoute />}>
+      <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+      <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
+      <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPasswordPage />} />
+    </Route>
+    <Route element={<ProtectedRoute />}>
+      <Route path={ROUTES.PROFILE} element={<UserProfilePage />} />
+      <Route path={ROUTES.UPLOAD} element={<NotFoundPage />} />
+    </Route>
+    <Route path="*" element={<NotFoundPage />} />
   </Routes>
 );
 

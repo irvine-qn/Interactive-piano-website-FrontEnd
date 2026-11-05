@@ -98,6 +98,9 @@ Lệnh này sẽ đọc file `package.json` và tự động cài toàn bộ th�
 
 ## 4. Chạy Frontend
 
+> Frontend lấy dữ liệu từ Backend (cấu hình piano ở Home, danh sách bài ở Sheet Library, nốt nhạc ở Workspace).
+> Hãy chạy Backend trước theo README của repo `Interactive-piano-website-Backend`: bật PostgreSQL (`docker compose up -d`), `npm run db:migrate`, `npm run db:seed`, rồi `npm start` (mặc định `http://localhost:5000`).
+
 Sau khi cài dependencies:
 
 ```bash
@@ -120,40 +123,76 @@ http://localhost:5173
 
 # 📁 Project Structure
 
-Cấu trúc frontend hiện tại:
+Cấu trúc frontend hiện tại (feature-based: nghiệp vụ nằm trong `features/`, `pages/` chỉ ghép component):
 
 ```text
 frontend/
-│
-├── public/
-│
 ├── src/
 │   ├── assets/
-│   │
+│   ├── components/common/     # Navbar, Footer dùng chung
+│   ├── config/api.js          # API_BASE_URL từ VITE_API_URL
+│   ├── features/
+│   │   ├── home/              # Virtual piano trang chủ
+│   │   ├── piano/audio/       # toneEngine (Tone.js Sampler) dùng chung Home + Workspace
+│   │   ├── workspace/         # Trang luyện tập: store, audio, canvas waterfall, bàn phím
+│   │   └── library/           # Sheet Library
+│   │       ├── api/           # libraryApi: getSheets, getTags
+│   │       ├── components/    # LibraryBrowser, LibraryToolbar, LibraryFilters, SheetGrid, SheetCard, SheetCover, Pagination
+│   │       ├── config/        # difficulty (nhãn + màu badge)
+│   │       ├── hooks/         # useLibraryQuery (bộ lọc theo URL), useTags
+│   │       └── utils/         # pagination (dãy số trang)
+│   ├── lib/axios.js           # apiClient: baseURL `${VITE_API_URL}/api/v1`, chuẩn hoá lỗi
+│   ├── pages/                 # HomePage, LibraryPage, WorkspacePage, NotFoundPage, auth/, profile/
+│   ├── routes/AppRoutes.jsx
+│   ├── utils/format.js        # formatCount (45.2K), formatDuration (03:45)
 │   ├── App.jsx
-│   ├── main.jsx
-│   └── ...
-│
-├── .gitignore
+│   ├── index.css              # Design tokens (--color-*, --shadow-hard...)
+│   └── main.jsx
+├── docs/
+│   ├── NOTES.md               # Ghi chú kỹ thuật cho team (thay đổi lớn, lưu ý khi sửa Workspace, lỗi đã biết)
+│   └── CHANGELOG.md           # Nhật ký thay đổi quan trọng theo ngày
+├── .env.example
 ├── index.html
 ├── package.json
-├── package-lock.json
-├── vite.config.js
-└── README.md
+├── TASK_DECOMPOSITION.md      # WBS: danh sách task và trạng thái
+└── vite.config.js
 ```
 
-### Một số thư mục / file quan trọng
+> Trước khi sửa code dùng chung hoặc Workspace, đọc [`docs/NOTES.md`](docs/NOTES.md). Thay đổi nào ảnh hưởng tới cả team thì ghi thêm vào [`docs/CHANGELOG.md`](docs/CHANGELOG.md).
 
-| File / Folder    | Chức năng                           |
-| ---------------- | ----------------------------------- |
-| `src/`           | Source code chính của Frontend      |
-| `src/assets/`    | Images, icons và các static assets  |
-| `src/App.jsx`    | Component chính của ứng dụng        |
-| `src/main.jsx`   | Entry point của React               |
-| `public/`        | Static files                        |
-| `package.json`   | Quản lý dependencies và scripts     |
-| `vite.config.js` | Cấu hình Vite                       |
-| `.gitignore`     | Các file không được push lên GitHub |
+### Routes
+
+| URL | Page | Ghi chú |
+| --- | --- | --- |
+| `/` | `HomePage` | Virtual piano + metronome |
+| `/library` | `LibraryPage` | Thư viện bản nhạc. Bộ lọc nằm trên URL: `?q=&difficulty=&tag=&sort=&page=` |
+| `/workspace/:sheetId` | `WorkspacePage` | Luyện tập một bài, ví dụ `/workspace/canon-in-d` |
+| `/workspace` | → `/library` | Chưa chọn bài (vd. nút *Practice* trên Navbar) thì chuyển sang Library để chọn |
+| `/login`, `/register`, `/forgot-password` | `pages/auth/*` | Chỉ dành cho khách (`GuestRoute`), đã đăng nhập thì chuyển đi |
+| `/profile`, `/upload` | `pages/profile/*`, … | Cần đăng nhập (`ProtectedRoute`), chưa đăng nhập thì về `/login` |
+| `*` | `NotFoundPage` | Trang 404 |
+
+Đường dẫn được khai báo tập trung trong `src/config/routes.js` (`ROUTES`). Chữ hiển thị trên giao diện dùng **tiếng Anh**.
+
+---
+
+# 🎼 Sheet Library
+
+Trang `/library` hiển thị danh sách bản nhạc từ `GET /api/v1/sheets`.
+
+* **Tìm kiếm** theo tên bài / tác giả: gõ xong 300ms mới tìm (Enter để tìm ngay, ✕ để xoá).
+* **Sắp xếp** (*Sort by*): Most popular (mặc định), Most liked, Newest, Title (A–Z).
+* **Lọc** theo độ khó (*Easy / Medium / Hard / Expert*) và thể loại (*Genre*, lấy từ `GET /api/v1/sheets/tags`).
+* **Phân trang** 8 bài / trang (*Page x of y*).
+* Card **"Practice"** mở `/workspace/:id`.
+
+URL là nguồn sự thật của bộ lọc (hook `useLibraryQuery`): F5, nút Back và chia sẻ link đều giữ nguyên kết quả. Giá trị mặc định không ghi lên URL, giá trị sai trên URL (vd. `?sort=abc`) tự quay về mặc định, `?page` vượt quá số trang tự chuyển về trang cuối.
+
+Các trạng thái: khung xương khi tải lần đầu, giữ lưới cũ (làm mờ) khi đổi bộ lọc, "No sheets found" khi rỗng, thông báo "Could not load the library" + nút "Try again" khi không gọi được Backend.
+
+Ảnh bìa (`SheetCover`) vẽ bằng CSS/SVG, không dùng file ảnh: màu nền theo `coverColor` của bài, nốt nhạc và góc nghiêng sinh cố định theo `id` (mỗi bài một bìa, tải lại không đổi).
+
+Nút Like / Add to collection sẽ được thêm khi có Feature User.
 
 ---
 
@@ -310,39 +349,18 @@ npm run build
 
 ## 3. Environment Variables
 
-Nếu project sử dụng environment variables, tạo file:
-
-```text
-.env
-```
-
-Ví dụ:
+Frontend chỉ có một biến môi trường:
 
 ```env
-VITE_API_URL=http://localhost:5000/api
+# URL gốc của Backend, KHÔNG có /api ở cuối (axios tự nối /api/v1)
+VITE_API_URL=http://localhost:5000
 ```
 
-Sau đó sử dụng trong React:
+Nếu không tạo file `.env`, code mặc định dùng `http://localhost:5000` (xem `src/config/api.js`). Chỉ cần tạo `.env` khi Backend chạy ở địa chỉ khác.
 
-```javascript
-const API_URL = import.meta.env.VITE_API_URL;
-```
+> `.env` đã nằm trong `.gitignore`. Mọi biến `VITE_*` đều bị đưa thẳng vào JS gửi xuống trình duyệt, nên **không bao giờ đặt secret/API key** vào env của Frontend.
 
-> Không commit các secret hoặc API key lên GitHub.
-
-Nếu có `.env`, nên tạo thêm:
-
-```text
-.env.example
-```
-
-Ví dụ:
-
-```env
-VITE_API_URL=
-```
-
-Các thành viên khác có thể copy:
+Tạo `.env` từ file mẫu:
 
 ```bash
 cp .env.example .env
@@ -353,6 +371,16 @@ Trên Windows PowerShell có thể dùng:
 ```powershell
 Copy-Item .env.example .env
 ```
+
+## 4. Tailwind không có preflight
+
+`src/index.css` chỉ import `tailwindcss/theme.css` và `tailwindcss/utilities.css`, **không có preflight** (bộ reset CSS). Vì vậy:
+
+* `h1`–`h6`, `p`, `ul`, `ol` vẫn giữ margin/padding mặc định của trình duyệt → thêm `m-0`, `p-0`, `list-none` khi cần.
+* Khi chỉ muốn viền một cạnh với nét đứt (`border-t-2 border-dashed`), thêm `border-0` trước để 3 cạnh còn lại không hiện viền mặc định.
+* `button`, `input`, `select` không tự kế thừa font → thêm `font-[inherit]`.
+
+Dùng màu và bóng qua design tokens trong `index.css` (vd. `bg-[var(--color-brand)]`, `shadow-[var(--shadow-hard)]`) thay vì mã màu hex.
 
 ---
 
@@ -408,6 +436,8 @@ Sau đó cài thêm dependencies nếu `package.json` đã thay đổi:
 ```bash
 npm install
 ```
+
+Xem mục **Cần làm sau khi pull** trong [`docs/CHANGELOG.md`](docs/CHANGELOG.md) của cả 2 repo (Backend có thể cần cập nhật database).
 
 Chạy
 

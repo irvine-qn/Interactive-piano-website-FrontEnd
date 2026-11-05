@@ -5,7 +5,6 @@ const ROW_HEIGHT = 24;
 const HIT_LINE_HEIGHT = 4;
 const HIT_LINE_OFFSET = 10;
 const BAR_INSET = 3;
-const BAR_SHADOW = 3;
 
 const readColors = (element) => {
   const style = getComputedStyle(element);
@@ -19,6 +18,7 @@ const readColors = (element) => {
     noteTop: read("--color-note-orange-top"),
     noteMid: read("--color-note-orange-mid"),
     noteEnd: read("--color-note-orange-end"),
+    noteBlackKey: read("--color-grass"),
   };
 };
 
@@ -99,14 +99,7 @@ const Waterfall = ({ keyLayout, activeNotes }) => {
         }
         const x = toPixels(key.left) + BAR_INSET;
         const barWidth = toPixels(key.width) - BAR_INSET * 2;
-        const gradient = context.createLinearGradient(0, top, 0, bottom);
-        gradient.addColorStop(0, colors.noteTop);
-        gradient.addColorStop(0.35, colors.noteMid);
-        gradient.addColorStop(1, colors.noteEnd);
-
-        context.fillStyle = colors.ink;
-        context.fillRect(x + BAR_SHADOW, top + BAR_SHADOW, barWidth, bottom - top);
-        context.fillStyle = gradient;
+        context.fillStyle = key.black ? colors.noteBlackKey : colors.noteMid;
         context.fillRect(x, top, barWidth, bottom - top);
         context.strokeStyle = colors.ink;
         context.lineWidth = 2;
@@ -131,7 +124,7 @@ const Waterfall = ({ keyLayout, activeNotes }) => {
   }, []);
 
   return (
-    <div className="border-2 border-[var(--color-ink)] bg-[var(--color-surface-paper)] px-[14px] shadow-[var(--shadow-hard)]">
+    <div className="border-2 border-[var(--color-ink)] bg-[var(--color-surface-paper)] px-[14px]">
       <canvas ref={canvasRef} aria-hidden="true" className="block h-[300px] w-full" />
     </div>
   );
