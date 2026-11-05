@@ -18,6 +18,7 @@ const readColors = (element) => {
     noteTop: read("--color-note-orange-top"),
     noteMid: read("--color-note-orange-mid"),
     noteEnd: read("--color-note-orange-end"),
+    noteBlackKey: read("--color-grass"),
   };
 };
 
@@ -98,7 +99,7 @@ const Waterfall = ({ keyLayout, activeNotes }) => {
         }
         const x = toPixels(key.left) + BAR_INSET;
         const barWidth = toPixels(key.width) - BAR_INSET * 2;
-        context.fillStyle = colors.noteMid;
+        context.fillStyle = key.black ? colors.noteBlackKey : colors.noteMid;
         context.fillRect(x, top, barWidth, bottom - top);
         context.strokeStyle = colors.ink;
         context.lineWidth = 2;
