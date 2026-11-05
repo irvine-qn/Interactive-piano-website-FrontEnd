@@ -7,10 +7,13 @@ import ControlBar from "../features/workspace/components/ControlBar";
 import SheetInfoPanel from "../features/workspace/components/SheetInfoPanel";
 import OctaveShiftControl from "../features/workspace/components/OctaveShiftControl";
 import KeyLabelSelect from "../features/workspace/components/KeyLabelSelect";
+import ShortcutStrip from "../features/workspace/components/ShortcutStrip";
+import ShortcutToggle from "../features/workspace/components/ShortcutToggle";
 import ViewModeToggle from "../features/workspace/components/ViewModeToggle";
 import WaterfallCanvas from "../features/workspace/canvas/practiceWaterfall";
 import { useSheetLoader } from "../features/workspace/hooks/useSheetLoader";
 import Footer from "../components/common/footer";
+import HowToPlay from "../features/home/components/HowToPlay";
 
 const SheetMusicScore = lazy(() => import("../features/workspace/canvas/sheetMusicScore"));
 
@@ -18,12 +21,18 @@ const CARD_CLASS =
   "border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] shadow-[var(--shadow-hard)]";
 
 const WorkspacePage = () => {
-  const { sheet, sheetStatus, sheetError, viewMode } = useWorkspaceStore(
+  const { sheet, sheetStatus, sheetError, viewMode, keyLabels, setKeyLabels, handOctaves, moveHandOctave, showShortcuts, currentMode } = useWorkspaceStore(
     useShallow((state) => ({
       sheet: state.sheet,
       sheetStatus: state.sheetStatus,
       sheetError: state.sheetError,
       viewMode: state.viewMode,
+      showShortcuts: state.showShortcuts,
+      currentMode: state.currentMode,
+      keyLabels: state.keyLabels,
+      setKeyLabels: state.setKeyLabels,
+      handOctaves: state.handOctaves,
+      moveHandOctave: state.moveHandOctave,
     })),
   );
   const isSheetView = viewMode === "sheet";
@@ -47,12 +56,14 @@ const WorkspacePage = () => {
             <h2 className="m-0 text-sm font-bold uppercase tracking-wide text-[var(--color-ink)]">{isSheetView ? "Sheet music" : "Waterfall"}</h2>
             <div className="ml-auto flex flex-wrap items-center gap-x-6 gap-y-2">
               <ViewModeToggle />
-              <KeyLabelSelect />
-              <OctaveShiftControl />
+              <ShortcutToggle />
+              <KeyLabelSelect value={keyLabels} onChange={setKeyLabels} />
+              <OctaveShiftControl handOctaves={handOctaves} onMove={moveHandOctave} automatic={currentMode === "PRACTICE"} />
             </div>
           </header>
 
           <div className="flex flex-col p-[14px]">
+            {showShortcuts && <ShortcutStrip />}
             <div className="relative h-[clamp(260px,calc(100dvh-360px),440px)] w-full overflow-hidden border-2 border-[var(--color-ink)] bg-[var(--color-surface-paper)]">
               {isSheetView ? (
                 <Suspense fallback={null}>
@@ -86,6 +97,7 @@ const WorkspacePage = () => {
           </div>
         </section>
       </main>
+      <HowToPlay />
       <Footer />
     </div>
   );

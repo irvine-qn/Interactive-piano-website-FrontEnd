@@ -10,10 +10,11 @@ let waitingChord = null;
 let clearedChordIndex = -1;
 let waitPauseTime = null;
 const recentPresses = new Map();
+const waitingPresses = new Set();
 let endEventId = null;
 let ignoreBefore = 0;
 const TIME_EPSILON = 1e-6;
-const EARLY_PRESS_WINDOW_MS = 250;
+const EARLY_PRESS_WINDOW_MS = 400;
 const START_POSITION_TOLERANCE_SECONDS = 0.05;
 const WAIT_PAUSE_TIME_TOLERANCE = 0.01;
 const RESUME_DELAY_SECONDS = 0.001;
@@ -23,29 +24,48 @@ const wasPressedRecently = (note) => {
   return pressedAt !== undefined && performance.now() - pressedAt <= EARLY_PRESS_WINDOW_MS;
 };
 
-const isChordComplete = (chord) => [...chord.notes.keys()].every(wasPressedRecently);
+const requiredNotes = (chord) => chord.notes.filter((note) => note.required);
+
+const isChordComplete = (chord) =>
+  requiredNotes(chord).every(({ name }) => wasPressedRecently(name) || waitingPresses.has(name));
+
+const applyChordOctaves = (chord) => {
+  if (chord) useWorkspaceStore.getState().setHandOctaves(chord.octaves);
+};
+
+const finishChord = (chord) => {
+  clearedChordIndex = chord.index;
+  waitingPresses.clear();
+  const rate = getPlaybackRate();
+  chord.notes
+    .filter((note) => !note.required && pianoSampler.loaded)
+    .forEach(({ name, duration, velocity }) => pianoSampler.triggerAttackRelease(name, duration / rate, Tone.immediate(), velocity));
+  applyChordOctaves(chords[chord.index + 1]);
+};
 
 const clearWaitingChord = () => {
   if (!waitingChord) return;
   const store = useWorkspaceStore.getState();
-  waitingChord.notes.forEach((_, name) => store.clearPlaybackKey(name));
-  clearedChordIndex = waitingChord.index;
+  requiredNotes(waitingChord).forEach(({ name }) => store.clearPlaybackKey(name));
+  const chord = waitingChord;
   waitingChord = null;
+  finishChord(chord);
 };
 
 const handleChordReached = (time, chord) => {
   if (useWorkspaceStore.getState().currentMode !== "PRACTICE") return;
   if (time < ignoreBefore - TIME_EPSILON || chord.index === clearedChordIndex) return;
   if (waitingChord?.index === chord.index) return;
+  applyChordOctaves(chord);
   if (isChordComplete(chord)) {
-    clearedChordIndex = chord.index;
+    finishChord(chord);
     return;
   }
   waitingChord = chord;
   waitPauseTime = time;
   Tone.Transport.pause(time);
   const store = useWorkspaceStore.getState();
-  chord.notes.forEach((hand, name) => store.setPlaybackKey(name, hand));
+  requiredNotes(chord).forEach(({ name, hand }) => store.setPlaybackKey(name, hand));
 };
 
 const startFromFirstChord = async () => {
@@ -57,15 +77,21 @@ const startFromFirstChord = async () => {
 export const handleUserNote = (note) => {
   recentPresses.set(note, performance.now());
   const notStarted = Tone.Transport.state !== "started" && getSongTime() < START_POSITION_TOLERANCE_SECONDS;
-  if (notStarted && chords[0]?.notes.has(note)) {
+  if (waitingChord) waitingPresses.add(note);
+  if (notStarted && chords[0] && requiredNotes(chords[0]).some(({ name }) => name === note)) {
     startFromFirstChord();
     return;
   }
   if (!waitingChord || !isChordComplete(waitingChord)) return;
   clearWaitingChord();
   if (useWorkspaceStore.getState().isPlaying) {
-    Tone.Transport.start(Math.max(Tone.now(), waitPauseTime) + RESUME_DELAY_SECONDS);
+    Tone.Transport.start(Math.max(Tone.immediate(), waitPauseTime) + RESUME_DELAY_SECONDS);
   }
+};
+
+export const alignOctavesToTime = (seconds) => {
+  if (useWorkspaceStore.getState().currentMode !== "PRACTICE") return;
+  applyChordOctaves(chords.find((chord) => chord.time >= seconds));
 };
 
 export const isWaitingForNotes = () => waitingChord !== null;
@@ -78,6 +104,7 @@ export const resetWaitState = () => {
   clearedChordIndex = -1;
   waitPauseTime = null;
   recentPresses.clear();
+  waitingPresses.clear();
 };
 
 // Bỏ qua sự kiện tồn đọng của vị trí cũ sau khi dừng hoặc tua
@@ -140,10 +167,8 @@ export const loadSheet = (notes, bpm, sheetChords) => {
     notes.map((n) => [`${songTimeToTicks(n.time)}i`, n]),
   ).start(0);
 
-  chords = sheetChords.map((chord) => ({
-    ...chord,
-    notes: new Map(chord.notes.map(({ name, hand }) => [name, hand])),
-  }));
+  chords = sheetChords;
+  applyChordOctaves(chords[0]);
   chordPart = new Tone.Part(
     handleChordReached,
     chords.map((chord) => [`${songTimeToTicks(chord.time)}i`, chord]),

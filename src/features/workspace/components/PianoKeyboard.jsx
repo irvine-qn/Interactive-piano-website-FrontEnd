@@ -1,76 +1,55 @@
 import { useCallback } from 'react';
-import Key from './Key';
 import { useShallow } from 'zustand/react/shallow';
+import PianoKeybed from './PianoKeybed';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
 import { useKeyMapping } from '../hooks/useKeyMapping';
 import { useKeyboardInput } from '../hooks/useKeyboardInput';
-import { KEY_LAYOUT } from '../config/keyLayout';
+import { useMidiInput } from '../hooks/useMidiInput';
 
 const PianoKeyboard = () => {
-  const { pressedKeys, playbackKeys, pressKey, releaseKey, octaveShift, keyLabels } = useWorkspaceStore(
+  const { pressedKeys, playbackKeys, pressKey, releaseKey, handOctaves, keyLabels, moveHandOctave } = useWorkspaceStore(
     useShallow((state) => ({
       pressedKeys: state.pressedKeys,
       playbackKeys: state.playbackKeys,
       pressKey: state.pressKey,
       releaseKey: state.releaseKey,
-      octaveShift: state.octaveShift,
+      handOctaves: state.handOctaves,
       keyLabels: state.keyLabels,
+      moveHandOctave: state.moveHandOctave,
     })),
   );
 
-  const { noteByKey, keyByNote, status: mappingStatus, retry: retryMapping } = useKeyMapping(octaveShift);
+  const { noteByCode, handByCode, keyByNote, chordKeys, octaveRange, status: mappingStatus, retry: retryMapping } = useKeyMapping(handOctaves);
+  const moveZone = useCallback((hand, delta) => moveHandOctave(hand, delta, octaveRange), [moveHandOctave, octaveRange]);
 
-  const showHints = keyLabels === 'shortcuts';
-
-  useKeyboardInput({ noteByKey, pressKey, releaseKey });
+  useKeyboardInput({ noteByCode, handByCode, chordKeys, pressKey, releaseKey, moveZone });
+  useMidiInput({ pressKey, releaseKey });
 
   const pressWithMouse = useCallback((note) => pressKey(note, 'mouse'), [pressKey]);
   const releaseMouse = useCallback(() => releaseKey('mouse'), [releaseKey]);
 
   return (
     <>
-    {mappingStatus === 'error' && (
-      <p role="alert" className="m-0 mb-2 flex items-center gap-3 text-sm font-semibold text-[var(--color-danger)]">
-        Keyboard shortcuts are unavailable (could not load the key map). You can still play with the mouse.
-        <button
-          type="button"
-          onClick={retryMapping}
-          className="cursor-pointer border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-3 py-1 font-[inherit] text-xs font-bold text-[var(--color-ink)]"
-        >
-          Retry
-        </button>
-      </p>
-    )}
-    <div className="relative border-2 border-[var(--color-ink)] bg-[var(--color-piano-wood)] p-[14px]">
-      <span
-        aria-hidden="true"
-        className="absolute inset-x-[6px] top-[3px] h-[2px] bg-[repeating-linear-gradient(90deg,var(--color-piano-wood-grain)_0_8px,transparent_8px_16px)]"
+      {mappingStatus === 'error' && (
+        <p role="alert" className="m-0 mb-2 flex items-center gap-3 text-sm font-semibold text-[var(--color-danger)]">
+          Keyboard shortcuts are unavailable (could not load the key map). You can still play with the mouse.
+          <button
+            type="button"
+            onClick={retryMapping}
+            className="cursor-pointer border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-3 py-1 font-[inherit] text-xs font-bold text-[var(--color-ink)]"
+          >
+            Retry
+          </button>
+        </p>
+      )}
+      <PianoKeybed
+        keyByNote={keyByNote}
+        showHints={keyLabels === 'shortcuts'}
+        isPressed={(note) => pressedKeys.includes(note)}
+        playbackKeys={playbackKeys}
+        onPress={pressWithMouse}
+        onRelease={releaseMouse}
       />
-      <div className="h-[10px] border-2 border-[var(--color-ink)] bg-[var(--color-piano-felt)]" />
-      <div
-        data-keybed
-        role="group"
-        aria-label="Piano keyboard"
-        className="relative h-[200px] select-none border-l-[1.5px] border-[var(--color-ink)] bg-[var(--color-key-white)]"
-      >
-        {KEY_LAYOUT.map((key) => (
-          <Key
-            key={key.note}
-            note={key.note}
-            left={key.left}
-            width={key.width}
-            isBlack={key.isBlack}
-            hint={keyByNote[key.note]}
-            showHint={showHints}
-            interactive
-            isPressed={pressedKeys.includes(key.note)}
-            playbackHand={playbackKeys[key.note]?.hand ?? null}
-            onMouseDown={pressWithMouse}
-            onMouseUp={releaseMouse}
-          />
-        ))}
-      </div>
-    </div>
     </>
   );
 };

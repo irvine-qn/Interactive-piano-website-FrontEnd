@@ -6,7 +6,7 @@ import { resetPlayback } from '../../piano/audio/toneEngine';
 import { Hourglass, PlaySquare, Play, Pause, RotateCcw, Volume1, Volume2, VolumeX } from 'lucide-react';
 import { useWorkspaceVolume } from '../hooks/useWorkspaceVolume';
 import { getSongTime, setSongTime } from '../audio/songClock';
-import { isWaitPause, isWaitingForNotes, silencePlayback } from '../audio/sheetPlayer';
+import { alignOctavesToTime, isWaitPause, isWaitingForNotes, silencePlayback } from '../audio/sheetPlayer';
 import SpeedControl from './SpeedControl';
 
 const MODES = [
@@ -70,6 +70,7 @@ const ControlBar = () => {
       if (isWaitPause(time)) return;
       setIsPlaying(false);
       silencePlayback(time);
+      if (Tone.Transport.state === 'stopped') alignOctavesToTime(0);
     };
 
     Tone.Transport.on('start', handleStart);
@@ -108,6 +109,7 @@ const ControlBar = () => {
     silenceNow(resetKeys);
     resetPlayback();
     setSongTime(0);
+    alignOctavesToTime(0);
     paintTimeline(timelineRef.current, currentTimeRef.current, 0, duration);
   };
 
@@ -116,6 +118,7 @@ const ControlBar = () => {
     const wasWaiting = isPlaying && isWaitingForNotes();
     silenceNow(resetKeys);
     setSongTime(newTime);
+    alignOctavesToTime(newTime);
     if (wasWaiting) Tone.Transport.start();
     paintTimeline(timelineRef.current, currentTimeRef.current, newTime, duration);
   };

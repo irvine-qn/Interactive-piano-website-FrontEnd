@@ -55,6 +55,15 @@ export const playNote = async (note) => {
   }
 };
 
+export const playNoteImmediately = async (note) => {
+  if (Tone.context.state !== "running") {
+    await Tone.start();
+  }
+  if (pianoSampler.loaded) {
+    pianoSampler.triggerAttack(note, Tone.immediate());
+  }
+};
+
 export const stopNote = (note) => {
   if (pianoSampler.loaded) {
     pianoSampler.triggerRelease(note);

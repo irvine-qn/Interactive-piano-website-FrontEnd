@@ -1,19 +1,20 @@
 import { create } from 'zustand';
-import { playNote, stopNote, resetPlayback } from '../../piano/audio/toneEngine';
+import { playNoteImmediately, stopNote, resetPlayback } from '../../piano/audio/toneEngine';
 import { setPlaybackRate as applyPlaybackRate } from '../audio/songClock';
-import { handleUserNote, resetWaitState } from '../audio/sheetPlayer';
+import { alignOctavesToTime, handleUserNote, resetWaitState } from '../audio/sheetPlayer';
 
 export const useWorkspaceStore = create((set, get) => ({
   currentMode: 'AUTO_PLAY',
   pressedSources: {},
   pressedKeys: [],
-  octaveShift: 0,
+  handOctaves: { left: 3, right: 4 },
   playbackKeys: {},
   isPlaying: false,
   volume: 100,
   playbackRate: 1,
   keyLabels: 'shortcuts',
   viewMode: 'waterfall',
+  showShortcuts: true,
   duration: 250,
   sheet: null,
   sheetStatus: 'idle',
@@ -23,10 +24,12 @@ export const useWorkspaceStore = create((set, get) => ({
     resetWaitState();
     resetPlayback();
     set({ currentMode: mode, pressedSources: {}, pressedKeys: [], playbackKeys: {} });
+    alignOctavesToTime(0);
   },
   setIsPlaying: (status) => set({ isPlaying: status }),
   setKeyLabels: (keyLabels) => set({ keyLabels }),
   setViewMode: (viewMode) => set({ viewMode }),
+  setShowShortcuts: (showShortcuts) => set({ showShortcuts }),
   setVolume: (volume) => set({ volume: Math.min(100, Math.max(0, volume)) }),
   setPlaybackRate: (rate) => {
     applyPlaybackRate(rate);
@@ -45,7 +48,7 @@ export const useWorkspaceStore = create((set, get) => ({
     const { pressedSources } = get();
     if (pressedSources[source]) return;
     const alreadyHeld = Object.values(pressedSources).includes(note);
-    if (!alreadyHeld) playNote(note);
+    if (!alreadyHeld) playNoteImmediately(note);
     const next = { ...pressedSources, [source]: note };
     set({ pressedSources: next, pressedKeys: [...new Set(Object.values(next))] });
     handleUserNote(note);
@@ -62,15 +65,12 @@ export const useWorkspaceStore = create((set, get) => ({
     set({ pressedSources: next, pressedKeys: [...new Set(Object.values(next))] });
   },
 
-  setOctaveShift: (octaveShift) => {
-    const { pressedSources, octaveShift: current } = get();
-    if (octaveShift === current) return;
-    const next = Object.fromEntries(Object.entries(pressedSources).filter(([source]) => !source.startsWith('keyboard:')));
-    const stillHeld = new Set(Object.values(next));
-    new Set(Object.values(pressedSources)).forEach((note) => {
-      if (!stillHeld.has(note)) stopNote(note);
-    });
-    set({ octaveShift, pressedSources: next, pressedKeys: [...stillHeld] });
+  setHandOctaves: (handOctaves) => set({ handOctaves }),
+  moveHandOctave: (hand, delta, { min, max }) => {
+    const { handOctaves, currentMode } = get();
+    if (currentMode === 'PRACTICE') return;
+    const octave = Math.min(max, Math.max(min, handOctaves[hand] + delta));
+    set({ handOctaves: { ...handOctaves, [hand]: octave } });
   },
 
   setPlaybackKey: (note, hand) => {

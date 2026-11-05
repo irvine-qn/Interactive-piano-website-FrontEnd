@@ -1,67 +1,57 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getPianoConfig } from '../../home/api/pianoApi';
+import { KEY_LAYOUT } from '../config/keyLayout';
 
 const OCTAVE = 12;
+const MIDI_OCTAVE_OFFSET = 1;
+const NOTE_BY_MIDI = new Map(KEY_LAYOUT.map(({ midi, note }) => [midi, note]));
 
-const getOctaveRange = (notes) => {
-  const mapped = notes.filter((n) => typeof n.keyboardKey === 'string').map((n) => n.midi);
-  if (!notes.length || !mapped.length) return { min: 0, max: 0 };
-  return {
-    min: -Math.floor((Math.min(...mapped) - notes[0].midi) / OCTAVE),
-    max: Math.floor((notes[notes.length - 1].midi - Math.max(...mapped)) / OCTAVE),
-  };
-};
-
-const buildMapping = (notes, octaveShift) => {
-  const noteByMidi = new Map(notes.map((n) => [n.midi, n.name]));
-  const noteByKey = {};
+const buildMapping = (zones, handOctaves) => {
+  const noteByCode = {};
+  const handByCode = {};
   const keyByNote = {};
-  let lowest = null;
-  let highest = null;
-  notes.forEach(({ midi, keyboardKey }) => {
-    if (typeof keyboardKey !== 'string') return;
-    const targetMidi = midi + octaveShift * OCTAVE;
-    const target = noteByMidi.get(targetMidi);
-    if (!target) return;
-    noteByKey[keyboardKey] = target;
-    keyByNote[target] = keyboardKey;
-    if (lowest === null || targetMidi < lowest.midi) lowest = { midi: targetMidi, name: target };
-    if (highest === null || targetMidi > highest.midi) highest = { midi: targetMidi, name: target };
+  ['left', 'right'].forEach((hand) => {
+    const baseMidi = (handOctaves[hand] + MIDI_OCTAVE_OFFSET) * OCTAVE;
+    (zones?.[hand] ?? []).forEach(({ code, label, offset }) => {
+      const note = NOTE_BY_MIDI.get(baseMidi + offset);
+      if (!note) return;
+      noteByCode[code] = note;
+      handByCode[code] = hand;
+      keyByNote[note] = label;
+    });
   });
-  return {
-    noteByKey,
-    keyByNote,
-    // Lấy dải phím theo số MIDI vì khóa dạng số của object luôn đứng đầu
-    firstNote: lowest?.name ?? null,
-    lastNote: highest?.name ?? null,
-    octaveRange: getOctaveRange(notes),
-  };
+  return { noteByCode, handByCode, keyByNote };
 };
 
-export const useKeyMapping = (octaveShift = 0) => {
+export const useKeyMapping = (handOctaves) => {
   const [reloadKey, setReloadKey] = useState(0);
-  const [result, setResult] = useState({ key: null, notes: null, error: null });
+  const [result, setResult] = useState({ key: null, practiceKeys: null, error: null });
 
   useEffect(() => {
     let cancelled = false;
     getPianoConfig()
       .then((config) => {
-        if (!cancelled) setResult({ key: reloadKey, notes: config.notes, error: null });
+        if (!cancelled) setResult({ key: reloadKey, practiceKeys: config.practiceKeys, error: null });
       })
       .catch((error) => {
-        if (!cancelled) setResult({ key: reloadKey, notes: null, error });
+        if (!cancelled) setResult({ key: reloadKey, practiceKeys: null, error });
       });
     return () => {
       cancelled = true;
     };
   }, [reloadKey]);
 
-  const mapping = useMemo(() => buildMapping(result.notes ?? [], octaveShift), [result.notes, octaveShift]);
+  const mapping = useMemo(
+    () => buildMapping(result.practiceKeys?.zones, handOctaves),
+    [result.practiceKeys, handOctaves],
+  );
   const retry = useCallback(() => setReloadKey((k) => k + 1), [setReloadKey]);
 
   const isLoading = result.key !== reloadKey;
   return {
     ...mapping,
+    chordKeys: result.practiceKeys?.chordKeys ?? null,
+    octaveRange: result.practiceKeys?.octaveRange ?? { min: 0, max: 0 },
     status: isLoading ? 'loading' : result.error ? 'error' : 'ready',
     error: isLoading ? null : result.error,
     retry,
