@@ -5,6 +5,12 @@ Mục **Cần làm sau khi pull** là các lệnh phải chạy trên máy của
 
 ---
 
+## 2026-11-05 – Đổi logic Practice
+
+- Auto Play: người dùng chơi được phím trong lúc bài đang chạy.
+- Khi chưa bắt đầu, nhấn đúng nốt đầu tiên của bài thì bài chạy từ nốt đó.
+- Wait Mode đổi tên thành **Play** và đã có logic chờ: nốt chạm vạch thì dừng, nhấn đủ các nốt mới chạy tiếp. Danh sách nốt phải nhấn lấy từ `chords` của Backend.
+
 ## 2026-11-05 – Bản nhạc trong Workspace
 
 - Workspace có nút chuyển giữa Waterfall và bản nhạc (`canvas/sheetMusicScore.jsx`, dùng VexFlow). Dữ liệu bản nhạc lấy từ `GET /sheets/:id/score` của Backend.

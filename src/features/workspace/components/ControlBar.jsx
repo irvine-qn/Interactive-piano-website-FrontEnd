@@ -6,12 +6,12 @@ import { resetPlayback } from '../../piano/audio/toneEngine';
 import { Hourglass, PlaySquare, Play, Pause, RotateCcw, Volume1, Volume2, VolumeX } from 'lucide-react';
 import { useWorkspaceVolume } from '../hooks/useWorkspaceVolume';
 import { getSongTime, setSongTime } from '../audio/songClock';
-import { silencePlayback } from '../audio/sheetPlayer';
+import { isWaitPause, isWaitingForNotes, silencePlayback } from '../audio/sheetPlayer';
 import SpeedControl from './SpeedControl';
 
 const MODES = [
   { id: 'AUTO_PLAY', label: 'Auto Play', Icon: PlaySquare },
-  { id: 'PRACTICE', label: 'Wait Mode', Icon: Hourglass },
+  { id: 'PRACTICE', label: 'Play', Icon: Hourglass },
 ];
 
 // Cộng thêm thời gian bù vì điểm tua bị lùi một tick
@@ -67,6 +67,7 @@ const ControlBar = () => {
 
     const handleStart = () => setIsPlaying(true);
     const handleHalt = (time) => {
+      if (isWaitPause(time)) return;
       setIsPlaying(false);
       silencePlayback(time);
     };
@@ -87,10 +88,18 @@ const ControlBar = () => {
 
   const handlePlay = async () => {
     if (Tone.context.state !== 'running') await Tone.start();
+    if (isWaitingForNotes()) {
+      setIsPlaying(true);
+      return;
+    }
     Tone.Transport.start();
   };
 
   const handlePause = () => {
+    if (isWaitingForNotes()) {
+      setIsPlaying(false);
+      return;
+    }
     Tone.Transport.pause();
   };
 
@@ -104,8 +113,10 @@ const ControlBar = () => {
 
   const handleSeek = (e) => {
     const newTime = parseFloat(e.target.value);
+    const wasWaiting = isPlaying && isWaitingForNotes();
     silenceNow(resetKeys);
     setSongTime(newTime);
+    if (wasWaiting) Tone.Transport.start();
     paintTimeline(timelineRef.current, currentTimeRef.current, newTime, duration);
   };
 

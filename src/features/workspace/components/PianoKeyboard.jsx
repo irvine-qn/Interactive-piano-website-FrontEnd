@@ -7,13 +7,12 @@ import { useKeyboardInput } from '../hooks/useKeyboardInput';
 import { KEY_LAYOUT } from '../config/keyLayout';
 
 const PianoKeyboard = () => {
-  const { pressedKeys, playbackKeys, pressKey, releaseKey, currentMode, octaveShift, keyLabels } = useWorkspaceStore(
+  const { pressedKeys, playbackKeys, pressKey, releaseKey, octaveShift, keyLabels } = useWorkspaceStore(
     useShallow((state) => ({
       pressedKeys: state.pressedKeys,
       playbackKeys: state.playbackKeys,
       pressKey: state.pressKey,
       releaseKey: state.releaseKey,
-      currentMode: state.currentMode,
       octaveShift: state.octaveShift,
       keyLabels: state.keyLabels,
     })),
@@ -21,8 +20,7 @@ const PianoKeyboard = () => {
 
   const { noteByKey, keyByNote, status: mappingStatus, retry: retryMapping } = useKeyMapping(octaveShift);
 
-  const isAutoPlay = currentMode === 'AUTO_PLAY';
-  const showHints = !isAutoPlay && keyLabels === 'shortcuts';
+  const showHints = keyLabels === 'shortcuts';
 
   useKeyboardInput({ noteByKey, pressKey, releaseKey });
 
@@ -64,7 +62,7 @@ const PianoKeyboard = () => {
             isBlack={key.isBlack}
             hint={keyByNote[key.note]}
             showHint={showHints}
-            interactive={!isAutoPlay}
+            interactive
             isPressed={pressedKeys.includes(key.note)}
             playbackHand={playbackKeys[key.note]?.hand ?? null}
             onMouseDown={pressWithMouse}

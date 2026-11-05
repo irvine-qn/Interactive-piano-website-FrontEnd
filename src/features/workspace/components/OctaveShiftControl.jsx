@@ -6,22 +6,20 @@ const SHIFT_BUTTON_CLASS =
   'h-7 w-10 cursor-pointer border-0 bg-transparent p-0 font-[inherit] text-sm font-bold text-[var(--color-ink)] disabled:cursor-default disabled:text-[var(--color-line-disabled)]';
 
 const OctaveShiftControl = () => {
-  const { octaveShift, setOctaveShift, currentMode } = useWorkspaceStore(
+  const { octaveShift, setOctaveShift } = useWorkspaceStore(
     useShallow((state) => ({
       octaveShift: state.octaveShift,
       setOctaveShift: state.setOctaveShift,
-      currentMode: state.currentMode,
     })),
   );
   const { firstNote, lastNote, octaveRange, status } = useKeyMapping(octaveShift);
 
-  const locked = currentMode === 'AUTO_PLAY' || status !== 'ready';
+  const locked = status !== 'ready';
   const label = firstNote && lastNote ? `${firstNote}-${lastNote}` : '--';
   const shiftText = octaveShift > 0 ? `+${octaveShift}` : `${octaveShift}`;
-  const hint = currentMode === 'AUTO_PLAY' ? 'Keyboard shortcuts are used in Wait Mode' : undefined;
 
   return (
-    <div className="flex items-center gap-3" title={hint}>
+    <div className="flex items-center gap-3">
       <span className="text-xs font-bold uppercase tracking-wide text-[var(--color-neutral-600)]">Octave Shift</span>
       <div
         role="group"

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { playNote, stopNote, resetPlayback } from '../../piano/audio/toneEngine';
 import { setPlaybackRate as applyPlaybackRate } from '../audio/songClock';
+import { handleUserNote, resetWaitState } from '../audio/sheetPlayer';
 
 export const useWorkspaceStore = create((set, get) => ({
   currentMode: 'AUTO_PLAY',
@@ -19,6 +20,7 @@ export const useWorkspaceStore = create((set, get) => ({
   sheetError: null,
 
   setMode: (mode) => {
+    resetWaitState();
     resetPlayback();
     set({ currentMode: mode, pressedSources: {}, pressedKeys: [], playbackKeys: {} });
   },
@@ -40,13 +42,13 @@ export const useWorkspaceStore = create((set, get) => ({
   },
 
   pressKey: (note, source = 'mouse') => {
-    const { pressedSources, currentMode } = get();
-    if (currentMode === 'AUTO_PLAY') return;
+    const { pressedSources } = get();
     if (pressedSources[source]) return;
     const alreadyHeld = Object.values(pressedSources).includes(note);
     if (!alreadyHeld) playNote(note);
     const next = { ...pressedSources, [source]: note };
     set({ pressedSources: next, pressedKeys: [...new Set(Object.values(next))] });
+    handleUserNote(note);
   },
 
   releaseKey: (source = 'mouse') => {

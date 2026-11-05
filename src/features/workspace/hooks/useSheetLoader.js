@@ -28,7 +28,7 @@ export const useSheetLoader = (sheetId) => {
       .then((data) => {
         if (controller.signal.aborted) return;
         setSheet(data);
-        loadSheet(data.notes, data.bpm);
+        loadSheet(data.notes, data.bpm, data.chords);
       })
       .catch((error) => {
         if (controller.signal.aborted) return;

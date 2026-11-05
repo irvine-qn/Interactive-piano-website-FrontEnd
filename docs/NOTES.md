@@ -83,7 +83,7 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
 
 ## 5. Việc đang chờ
 
-- **Wait Mode** (T-09A → T-09E) và review Workspace (T-10): **pending**, làm sau Feature Upload MIDI. Trong lúc này nút *Wait Mode* chỉ chuyển sang chế độ người dùng tự chơi (có nhãn phím tắt, Octave Shift), chưa dừng chờ theo bài.
+- Review Workspace (T-10): **pending**. Chế độ chờ nốt nay có tên **Play** và đã chạy, logic nằm trong `audio/sheetPlayer.js`.
 - **C-04** chữ thương hiệu trên Navbar mới (giữ con cáo), **C-05** tách bundle, **E-02** trang bài không tồn tại.
 - **Upload sheet MIDI** (Bình): việc tiếp theo, sau đó mới làm lại Wait Mode.
 - **User profile / edit profile** (Quỳnh).
@@ -98,6 +98,6 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
      - Play/Pause/Restart, tua;
      - đổi tốc độ 0.5x–1.5x, âm lượng (rời sang Home thì âm lượng Home vẫn như cũ);
      - nốt rơi đúng phím, tay phải cam, tay trái xanh;
-     - Wait Mode: phím tắt, Octave Shift, Key labels.
+     - Play: nốt chạm vạch thì dừng, nhấn đủ mới chạy tiếp; phím tắt, Octave Shift, Key labels.
    - `/workspace` chuyển sang `/library`; `/login`, `/register`, một URL không tồn tại ra trang 404.
 3. Mở DevTools Console: không có lỗi đỏ mới (ngoài favicon và MIDI ở Home đã biết).
