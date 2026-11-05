@@ -1,31 +1,73 @@
-const Key = ({ note, hint, showHint = true, isBlack, isActive, onMouseDown, onMouseUp }) => {
+import { memo } from 'react';
+
+// Màu theo trạng thái, cùng phong cách bàn phím HomePage.
+// pressed = người dùng nhấn (cam như Home); playback-right = cam, playback-left = xanh dương (giống màu nốt rơi).
+const WHITE_STYLES = {
+  idle: { key: 'bg-[var(--color-key-white)]', name: 'text-[var(--color-key-label)]', bed: 'bg-[var(--color-line-keybed)]', dot: null },
+  pressed: { key: 'bg-[var(--color-key-pressed)]', name: 'text-[var(--color-brand)]', bed: 'bg-[var(--color-brand-light)]', dot: 'bg-[var(--color-brand)]' },
+  'playback-right': { key: 'bg-[var(--color-key-pressed)]', name: 'text-[var(--color-brand)]', bed: 'bg-[var(--color-brand-light)]', dot: 'bg-[var(--color-brand)]' },
+  'playback-left': { key: 'bg-[var(--color-note-blue-top)]', name: 'text-[var(--color-note-blue-end)]', bed: 'bg-[var(--color-note-blue-mid)]', dot: 'bg-[var(--color-note-blue-end)]' },
+};
+const BLACK_STYLES = {
+  idle: 'bg-[var(--color-key-black)]',
+  pressed: 'bg-[var(--color-brand-light)]',
+  'playback-right': 'bg-[var(--color-brand-light)]',
+  'playback-left': 'bg-[var(--color-note-blue-mid)]',
+};
+
+// Một phím đàn đặt theo KEY_LAYOUT (left/width tính theo %).
+// isPressed: người dùng đang nhấn; playbackHand: 'left' | 'right' | null khi bài nhạc bật sáng phím.
+// interactive = false (AUTO_PLAY): phím chỉ để xem, con trỏ thường thay vì bàn tay.
+const Key = ({ note, left, width, isBlack, hint, showHint = true, isPressed, playbackHand, interactive = true, onMouseDown, onMouseUp }) => {
+  // Người dùng nhấn được ưu tiên hiển thị hơn phím bài nhạc bật sáng
+  const state = isPressed ? 'pressed' : playbackHand ? `playback-${playbackHand}` : 'idle';
+  const label = hint && showHint ? `${note}, key ${hint}` : note;
+
+  const handleMouseDown = (event) => {
+    event.preventDefault(); // không focus nút / bôi đen chữ khi nhấn chuột
+    onMouseDown(note);
+  };
+
+  const common = {
+    type: 'button',
+    tabIndex: -1,
+    'data-note': note,
+    'data-state': state,
+    'aria-label': label,
+    'aria-pressed': state !== 'idle',
+    onMouseDown: handleMouseDown,
+    onMouseUp: () => onMouseUp(note),
+    onMouseLeave: () => onMouseUp(note),
+    style: { left: `${left}%`, width: `${width}%` },
+  };
+  const cursor = interactive ? 'cursor-pointer' : 'cursor-default';
+
+  if (isBlack) {
+    return (
+      <button
+        {...common}
+        className={`absolute top-0 z-10 flex h-[60%] flex-col items-center justify-end border-[1.5px] border-t-0 border-[var(--color-ink)] px-0 pb-[8px] font-[inherit] ${cursor} ${BLACK_STYLES[state]}`}
+      >
+        {showHint && hint && <kbd className="font-[inherit] text-[9px] font-bold text-[var(--color-brand-light)]">{hint}</kbd>}
+        <span className="text-[9px] font-bold text-[var(--color-key-label-black)]">{note}</span>
+        <span aria-hidden="true" className="mt-[3px] h-1 w-[80%] bg-[var(--color-key-black-edge)]" />
+      </button>
+    );
+  }
+
+  const style = WHITE_STYLES[state];
   return (
-    <div
-      data-note={note}
-      onMouseDown={() => onMouseDown(note)}
-      onMouseUp={() => onMouseUp(note)}
-      onMouseLeave={() => onMouseUp(note)}
-      // Thêm overflow-hidden và min-w-0 để phím có thể co lại nhỏ hơn cả nội dung text
-      className={`
-        flex flex-col justify-end items-center pb-1 md:pb-2 cursor-pointer select-none border border-gray-400
-        transition-all duration-75 ease-in-out w-full h-full overflow-hidden min-w-0
-        ${isBlack 
-          ? 'bg-black text-white rounded-b-xs' 
-          : 'bg-white text-black rounded-b-md relative z-0'
-        }
-        ${isActive && isBlack ? 'bg-gray-700' : ''}
-        ${isActive && !isBlack ? 'bg-gray-300' : ''}
-      `}
+    <button
+      {...common}
+      className={`absolute top-0 flex h-full flex-col items-center justify-end border-[1.5px] border-l-0 border-t-0 border-[var(--color-ink)] px-0 pb-[12px] font-[inherit] ${cursor} ${style.key}`}
     >
-      {/* Dùng hidden md:block để TỰ ĐỘNG ẨN CHỮ trên màn hình nhỏ/điện thoại */}
-      {showHint && hint && (
-        <span className={`font-bold hidden md:block ${isBlack ? 'text-[8px] lg:text-[10px] text-white mb-0.5' : 'text-[10px] lg:text-[14px] text-gray-800 mb-1 lg:mb-2'}`}>
-          {hint}
-        </span>
-      )}
-      <span className={`font-bold opacity-40 hidden md:block ${isBlack ? 'text-[7px]' : 'text-[9px]'}`}>{note}</span>
-    </div>
+      {style.dot && <span aria-hidden="true" className={`mb-[4px] h-[6px] w-[6px] ${style.dot}`} />}
+      {showHint && hint && <kbd className="font-[inherit] text-[11px] font-bold text-[var(--color-ink)]">{hint}</kbd>}
+      <span className={`text-[11px] font-bold ${style.name}`}>{note}</span>
+      <span aria-hidden="true" className={`absolute inset-x-0 bottom-0 h-[6px] ${style.bed}`} />
+    </button>
   );
 };
 
-export default Key;
+// memo: bàn phím render lại mỗi khi một phím sáng/tắt, nhưng chỉ phím đổi trạng thái mới phải render lại
+export default memo(Key);

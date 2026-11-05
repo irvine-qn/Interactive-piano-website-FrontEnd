@@ -5,7 +5,7 @@ import { useAuthStore } from '../store/useAuthStore';
 export { API_BASE_URL };
 
 const apiClient = axios.create({
-  baseURL: `${API_BASE_URL}/api`,
+  baseURL: `${API_BASE_URL}/api/v1`,
   timeout: 10000,
 });
 
