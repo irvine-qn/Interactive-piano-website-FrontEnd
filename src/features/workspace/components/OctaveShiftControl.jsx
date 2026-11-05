@@ -2,13 +2,9 @@ import { useShallow } from 'zustand/react/shallow';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
 import { useKeyMapping } from '../hooks/useKeyMapping';
 
-// Nút -1 / +1 giống cụm Octave Shift của HomePage
 const SHIFT_BUTTON_CLASS =
   'h-7 w-10 cursor-pointer border-0 bg-transparent p-0 font-[inherit] text-sm font-bold text-[var(--color-ink)] disabled:cursor-default disabled:text-[var(--color-line-disabled)]';
 
-// Dịch bảng phím tắt theo quãng: "-1 [C1-C6 (0)] +1" như Home.
-// Bảng ánh xạ dùng chung request đã cache với PianoKeyboard (getPianoConfig) nên không tải thêm.
-// AUTO_PLAY: bài tự phát, phím tắt không dùng -> khoá.
 const OctaveShiftControl = () => {
   const { octaveShift, setOctaveShift, currentMode } = useWorkspaceStore(
     useShallow((state) => ({

@@ -2,8 +2,6 @@ import { ChevronDown, Keyboard } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
 
-// Chọn nhãn hiển thị trên phím như HomePage: "Shortcuts + Note names" / "Note names".
-// AUTO_PLAY không nhận phím máy tính nên nhãn phím tắt luôn ẩn -> khoá ô chọn (giống Octave Shift).
 const KeyLabelSelect = () => {
   const { keyLabels, setKeyLabels, currentMode } = useWorkspaceStore(
     useShallow((state) => ({
@@ -26,7 +24,6 @@ const KeyLabelSelect = () => {
           value={keyLabels}
           onChange={(event) => {
             setKeyLabels(event.target.value);
-            // Bỏ focus để gõ phím đàn ngay (đang focus select thì phím chữ chỉ đổi lựa chọn, xem useKeyboardInput)
             event.target.blur();
           }}
           disabled={locked}

@@ -4,9 +4,7 @@ import { loadSheet, disposeSheet } from '../audio/sheetPlayer';
 import { useShallow } from 'zustand/react/shallow';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
 
-// Tải bài nhạc từ API vào store và lên lịch phát. Trả về hàm tải lại khi lỗi.
 export const useSheetLoader = (sheetId) => {
-  // Chỉ lấy các action (không đổi) để component gọi hook này không render lại theo mọi thay đổi của store
   const { setSheetLoading, setSheet, setSheetError, setSheetViews } = useWorkspaceStore(
     useShallow((state) => ({
       setSheetLoading: state.setSheetLoading,
@@ -26,8 +24,6 @@ export const useSheetLoader = (sheetId) => {
         if (controller.signal.aborted) return;
         setSheet(data);
         loadSheet(data.notes, data.bpm);
-        // Mỗi lần mở bài tính 1 lượt xem. StrictMode (dev) chạy effect 2 lần nhưng request của lần đầu
-        // đã bị abort ở cleanup nên chỉ lần tải thành công này gọi. Lỗi đếm lượt xem không ảnh hưởng luyện tập.
         recordView(data.id)
           .then(({ views }) => setSheetViews(data.id, views))
           .catch(() => {});

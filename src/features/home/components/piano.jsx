@@ -6,6 +6,7 @@ import Waterfall from "../canvas/waterfall";
 
 const BLACK_KEY_RATIO = 0.62;
 const OCTAVE_SIZE = 12;
+const CLICK_NOTE_DURATION_MS = 250;
 
 const Piano = ({ children }) => {
   const [notes, setNotes] = useState([]);
@@ -259,7 +260,7 @@ const Piano = ({ children }) => {
     }
     const source = `click:${note.midi}`;
     startNote(note, source);
-    window.setTimeout(() => releaseNote(source), 250);
+    window.setTimeout(() => releaseNote(source), CLICK_NOTE_DURATION_MS);
   };
 
   return (

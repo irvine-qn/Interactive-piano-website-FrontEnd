@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import * as Tone from "tone";
 import { getPianoConfig } from "../api/pianoApi";
 
+const MS_PER_MINUTE = 60000;
+
 const useMetronome = () => {
   const [config, setConfig] = useState(null);
   const [bpm, setBpm] = useState(null);
@@ -69,7 +71,7 @@ const useMetronome = () => {
     const tick = () => {
       try {
         playClick();
-        timer = window.setTimeout(tick, 60000 / bpm);
+        timer = window.setTimeout(tick, MS_PER_MINUTE / bpm);
       } catch (audioError) {
         setError(`Unable to play metronome: ${audioError.message}`);
         setEnabled(false);

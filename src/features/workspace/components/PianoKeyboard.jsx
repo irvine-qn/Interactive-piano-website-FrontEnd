@@ -22,12 +22,10 @@ const PianoKeyboard = () => {
   const { noteByKey, keyByNote, status: mappingStatus, retry: retryMapping } = useKeyMapping(octaveShift);
 
   const isAutoPlay = currentMode === 'AUTO_PLAY';
-  // Nhãn phím tắt theo lựa chọn của người dùng (KeyLabelSelect). AUTO_PLAY không nhận phím máy tính nên luôn ẩn
   const showHints = !isAutoPlay && keyLabels === 'shortcuts';
 
   useKeyboardInput({ noteByKey, pressKey, releaseKey });
 
-  // Chuột là một nguồn riêng ('mouse'); callback ổn định để memo của Key còn tác dụng
   const pressWithMouse = useCallback((note) => pressKey(note, 'mouse'), [pressKey]);
   const releaseMouse = useCallback(() => releaseKey('mouse'), [releaseKey]);
 
@@ -45,14 +43,12 @@ const PianoKeyboard = () => {
         </button>
       </p>
     )}
-    {/* Khung gỗ + dải nỉ đỏ như bàn phím HomePage */}
     <div className="relative border-2 border-[var(--color-ink)] bg-[var(--color-piano-wood)] p-[14px]">
       <span
         aria-hidden="true"
         className="absolute inset-x-[6px] top-[3px] h-[2px] bg-[repeating-linear-gradient(90deg,var(--color-piano-wood-grain)_0_8px,transparent_8px_16px)]"
       />
       <div className="h-[10px] border-2 border-[var(--color-ink)] bg-[var(--color-piano-felt)]" />
-      {/* data-keybed: vùng chứa phím, Waterfall đo vị trí vùng này để đặt nốt theo cùng KEY_LAYOUT */}
       <div
         data-keybed
         role="group"

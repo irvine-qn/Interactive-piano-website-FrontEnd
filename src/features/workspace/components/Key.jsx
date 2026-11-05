@@ -1,7 +1,5 @@
 import { memo } from 'react';
 
-// Màu theo trạng thái, cùng phong cách bàn phím HomePage.
-// pressed = người dùng nhấn (cam như Home); playback-right = cam, playback-left = xanh dương (giống màu nốt rơi).
 const WHITE_STYLES = {
   idle: { key: 'bg-[var(--color-key-white)]', name: 'text-[var(--color-key-label)]', bed: 'bg-[var(--color-line-keybed)]', dot: null },
   pressed: { key: 'bg-[var(--color-key-pressed)]', name: 'text-[var(--color-brand)]', bed: 'bg-[var(--color-brand-light)]', dot: 'bg-[var(--color-brand)]' },
@@ -15,16 +13,12 @@ const BLACK_STYLES = {
   'playback-left': 'bg-[var(--color-note-blue-mid)]',
 };
 
-// Một phím đàn đặt theo KEY_LAYOUT (left/width tính theo %).
-// isPressed: người dùng đang nhấn; playbackHand: 'left' | 'right' | null khi bài nhạc bật sáng phím.
-// interactive = false (AUTO_PLAY): phím chỉ để xem, con trỏ thường thay vì bàn tay.
 const Key = ({ note, left, width, isBlack, hint, showHint = true, isPressed, playbackHand, interactive = true, onMouseDown, onMouseUp }) => {
-  // Người dùng nhấn được ưu tiên hiển thị hơn phím bài nhạc bật sáng
   const state = isPressed ? 'pressed' : playbackHand ? `playback-${playbackHand}` : 'idle';
   const label = hint && showHint ? `${note}, key ${hint}` : note;
 
   const handleMouseDown = (event) => {
-    event.preventDefault(); // không focus nút / bôi đen chữ khi nhấn chuột
+    event.preventDefault();
     onMouseDown(note);
   };
 
@@ -69,5 +63,4 @@ const Key = ({ note, left, width, isBlack, hint, showHint = true, isPressed, pla
   );
 };
 
-// memo: bàn phím render lại mỗi khi một phím sáng/tắt, nhưng chỉ phím đổi trạng thái mới phải render lại
 export default memo(Key);

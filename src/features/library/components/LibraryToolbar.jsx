@@ -10,9 +10,6 @@ const SORT_LABELS = {
   title: 'Title (A–Z)',
 };
 
-// Ô tìm kiếm: gõ xong 300ms mới cập nhật URL, Enter thì tìm ngay.
-// `draft` chỉ tồn tại khi đang có chữ gõ chưa gửi; gửi xong thì bỏ draft và ô nhập hiển thị theo URL,
-// nhờ vậy URL đổi từ nơi khác (Back/Forward, link) thì ô nhập tự cập nhật theo.
 const SearchBox = ({ value, onSearch }) => {
   const inputId = useId();
   const inputRef = useRef(null);
@@ -104,7 +101,6 @@ const SortSelect = ({ value, onChange }) => {
   );
 };
 
-// Thanh công cụ của Library: tìm kiếm, số bài đang hiển thị, sắp xếp; `children` là hàng bộ lọc bên dưới
 const LibraryToolbar = ({ query, meta, shownCount, onSearch, onSortChange, children }) => (
   <section
     aria-label="Search, sort and filter"

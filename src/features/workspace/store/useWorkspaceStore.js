@@ -1,39 +1,29 @@
 import { create } from 'zustand';
-import { playNote, stopNote, resetPlayback } from '../../piano/audio/toneEngine'; // Import động cơ âm thanh
+import { playNote, stopNote, resetPlayback } from '../../piano/audio/toneEngine';
 import { setPlaybackRate as applyPlaybackRate } from '../audio/songClock';
 
 export const useWorkspaceStore = create((set, get) => ({
-  currentMode: 'AUTO_PLAY', // 'AUTO_PLAY' | 'PRACTICE'
-  // Nguồn đang giữ phím: { 'mouse' | 'keyboard:<event.code>': note }. Một nốt có thể được nhiều nguồn giữ cùng lúc
-  // (chuột + phím máy tính) -> chỉ tắt tiếng khi nguồn cuối cùng nhả.
+  currentMode: 'AUTO_PLAY',
   pressedSources: {},
-  // Danh sách nốt đang được giữ (suy ra từ pressedSources) để vẽ bàn phím
   pressedKeys: [],
-  // Dịch bảng phím tắt theo quãng: 0 = C1-C6, +1 = C2-C7 (phạm vi lấy từ useKeyMapping().octaveRange)
   octaveShift: 0,
-  // Phím do bài nhạc bật sáng (Auto-play, sau này là gợi ý của Wait Mode): { [note]: { hand, count } }.
-  // count: cùng một nốt có thể được đánh chồng (lần sau bắt đầu trước khi lần trước tắt) nên chỉ tắt khi về 0.
   playbackKeys: {},
   isPlaying: false,
-  // Âm lượng của Workspace (0-100%, 100 = mức gốc của sampler). Giữ trong store để đổi bài vẫn nhớ
   volume: 100,
-  // Tốc độ phát so với bản gốc (0.5 - 1.5). Nạp bài mới thì về 1 (xem loadSheet)
   playbackRate: 1,
-  // Nhãn trên phím: 'shortcuts' = phím tắt + tên nốt (mặc định như Home), 'names' = chỉ tên nốt
   keyLabels: 'shortcuts',
   duration: 250,
-  sheet: null, // { id, title, composer, notes, ... } lấy từ API
-  sheetStatus: 'idle', // 'idle' | 'loading' | 'ready' | 'error'
+  sheet: null,
+  sheetStatus: 'idle',
   sheetError: null,
 
   setMode: (mode) => {
-    resetPlayback(); // Đổi chế độ thì dừng Transport, quay về 0:00 và tắt âm đang ngân
+    resetPlayback();
     set({ currentMode: mode, pressedSources: {}, pressedKeys: [], playbackKeys: {} });
   },
   setIsPlaying: (status) => set({ isPlaying: status }),
   setKeyLabels: (keyLabels) => set({ keyLabels }),
   setVolume: (volume) => set({ volume: Math.min(100, Math.max(0, volume)) }),
-  // Đổi Transport.bpm (cả âm thanh, waterfall, timeline cùng co giãn) và lưu lại để UI hiển thị
   setPlaybackRate: (rate) => {
     applyPlaybackRate(rate);
     set({ playbackRate: rate });
@@ -42,16 +32,13 @@ export const useWorkspaceStore = create((set, get) => ({
   setSheetLoading: () => set({ sheet: null, sheetStatus: 'loading', sheetError: null }),
   setSheet: (sheet) => set({ sheet, sheetStatus: 'ready', sheetError: null }),
   setSheetError: (error) => set({ sheet: null, sheetStatus: 'error', sheetError: error }),
-  // Cập nhật lượt xem sau khi BE đếm (bỏ qua nếu đã chuyển sang bài khác)
   setSheetViews: (id, views) => {
     const { sheet } = get();
     if (sheet?.id === id) set({ sheet: { ...sheet, views } });
   },
 
-  // source: 'mouse' hoặc 'keyboard:<event.code>' (xem useKeyboardInput)
   pressKey: (note, source = 'mouse') => {
     const { pressedSources, currentMode } = get();
-    // AUTO_PLAY: bài tự phát, người dùng chỉ xem. Chuột và bàn phím đều đi qua đây nên chặn một chỗ là đủ.
     if (currentMode === 'AUTO_PLAY') return;
     if (pressedSources[source]) return;
     const alreadyHeld = Object.values(pressedSources).includes(note);
@@ -71,7 +58,6 @@ export const useWorkspaceStore = create((set, get) => ({
     set({ pressedSources: next, pressedKeys: [...new Set(Object.values(next))] });
   },
 
-  // Đổi quãng thì phím máy tính đang giữ sẽ trỏ sang nốt khác -> nhả chúng trước (chuột giữ nguyên vì không đổi nốt)
   setOctaveShift: (octaveShift) => {
     const { pressedSources, octaveShift: current } = get();
     if (octaveShift === current) return;
@@ -99,6 +85,5 @@ export const useWorkspaceStore = create((set, get) => ({
     set({ playbackKeys: rest });
   },
 
-  // Dừng / tua: âm thanh đã bị tắt hết (stopAllNotes) nên tắt luôn mọi phím đang sáng
   resetKeys: () => set({ pressedSources: {}, pressedKeys: [], playbackKeys: {} }),
 }));

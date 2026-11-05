@@ -4,7 +4,6 @@ import SheetCover from './SheetCover';
 import PianoKeysIcon from '../../../components/icons/PianoKeysIcon';
 import { formatCount, formatDuration } from '../../../utils/format';
 
-// Card một bản nhạc trong lưới Library. Nút Thích / Thêm vào bộ sưu tập chờ Feature User nên chưa hiển thị.
 const SheetCard = ({ sheet }) => {
   const byline = sheet.subtitle ? `${sheet.composer} · ${sheet.subtitle}` : sheet.composer;
 
@@ -15,7 +14,6 @@ const SheetCard = ({ sheet }) => {
       </div>
 
       <div className="flex flex-1 flex-col px-4 pb-4 pt-3.5">
-        {/* index.css không nạp preflight nên phải tự bỏ margin/padding mặc định của h2, p, ul */}
         <h2 title={sheet.title} className="m-0 truncate text-[19px] font-bold leading-tight text-[var(--color-ink)]">
           {sheet.title}
         </h2>

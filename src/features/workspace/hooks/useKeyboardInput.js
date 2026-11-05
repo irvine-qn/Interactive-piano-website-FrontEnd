@@ -1,8 +1,5 @@
 import { useEffect, useRef } from 'react';
 
-// Phím đang gõ chữ (ô search trên Navbar, form...) thì không phải phím đàn.
-// Thanh trượt / checkbox / nút không gõ chữ (range chỉ dùng mũi tên, Home/End, PageUp/Down - không phải phím đàn)
-// nên vẫn chơi được: kéo timeline hay âm lượng xong gõ phím đàn ngay, không phải click ra chỗ khác.
 const NON_TEXT_INPUTS = ['range', 'checkbox', 'radio', 'button', 'submit', 'reset', 'color', 'file'];
 const isTypingTarget = (target) => {
   if (!(target instanceof HTMLElement)) return false;
@@ -11,16 +8,10 @@ const isTypingTarget = (target) => {
   return !(field instanceof HTMLInputElement && NON_TEXT_INPUTS.includes(field.type));
 };
 
-// Chơi đàn bằng bàn phím máy tính, theo cách HomePage đang làm:
-// - Tìm nốt theo event.key lúc nhấn, nhưng nhả theo event.code (vị trí phím): nhả Shift trước rồi mới nhả "T"
-//   thì event.key đã thành "t", còn event.code vẫn là "KeyT" -> vẫn nhả đúng nốt, không kẹt.
-// - Bỏ qua auto-repeat, ô nhập liệu và tổ hợp Ctrl/Cmd/Alt (để Ctrl+S... vẫn là phím tắt của trình duyệt).
-// - Cửa sổ mất focus (Alt+Tab, đổi tab) hoặc rời trang thì nhả hết phím đang giữ.
+// Nhả phím theo event code để nhả Shift trước vẫn không kẹt nốt
 export const useKeyboardInput = ({ noteByKey, pressKey, releaseKey }) => {
-  // event.code -> source đang giữ (một phím vật lý giữ đúng một nốt)
   const heldRef = useRef(new Map());
-  // Bảng phím đổi (Octave Shift, tải xong cấu hình) không được làm nhả phím đang giữ, nên listener chỉ đăng ký
-  // một lần và đọc giá trị mới nhất qua ref; releaseAll chỉ chạy khi mất focus hoặc rời trang.
+  // Listener chỉ đăng ký một lần để đổi bảng phím không làm nhả phím đang giữ
   const latestRef = useRef({ noteByKey, pressKey, releaseKey });
   useEffect(() => {
     latestRef.current = { noteByKey, pressKey, releaseKey };
@@ -51,7 +42,6 @@ export const useKeyboardInput = ({ noteByKey, pressKey, releaseKey }) => {
       const { releaseKey: release } = latestRef.current;
       held.forEach((source) => release(source));
       held.clear();
-      // Đang giữ chuột trên phím mà cửa sổ mất focus thì mouseup không bao giờ tới
       release('mouse');
     };
 
