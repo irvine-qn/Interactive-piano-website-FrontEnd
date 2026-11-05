@@ -71,8 +71,10 @@ export const stopAllNotes = () => {
   }
 };
 
-// Dừng Transport, quay về đầu bài và tắt toàn bộ âm đang ngân
+// Dừng Transport, quay về đầu bài và tắt toàn bộ âm đang ngân (chỉ Workspace dùng).
+// Transport đã dừng sẵn thì không gọi stop(): Tone vẫn xếp sự kiện "stop", và khi AudioContext còn tạm dừng
+// (chưa có tương tác phát âm) sự kiện đó chỉ được phát lúc phím đầu tiên bật âm thanh -> xoá mất phím vừa nhấn.
 export const resetPlayback = () => {
-  Tone.Transport.stop();
+  if (Tone.Transport.state !== "stopped") Tone.Transport.stop();
   stopAllNotes();
 };

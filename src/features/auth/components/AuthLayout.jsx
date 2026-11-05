@@ -23,19 +23,29 @@ const AuthLayout = ({ title, subtitle, children }) => (
       />
     ))}
 
-    <section className="grid w-full max-w-[1120px] grid-cols-1 border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] shadow-[var(--shadow-hard-lg)] lg:grid-cols-2">
+    <section className="grid w-full max-w-[1120px] grid-cols-1 border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] lg:grid-cols-2">
       <div className="relative hidden min-h-[640px] flex-col overflow-hidden border-r-2 border-[var(--color-ink)] bg-[linear-gradient(to_bottom,var(--color-sky-1)_0_16%,var(--color-sky-2)_16%_33%,var(--color-sky-3)_33%_50%,var(--color-sky-4)_50%_66%,var(--color-sky-5)_66%_83%,var(--color-sky-6)_83%)] lg:flex">
         <Sun
           aria-hidden="true"
           className="absolute right-8 top-8 h-14 w-14 fill-[var(--color-sun)] text-[var(--color-sun-ray)]"
         />
-        <span aria-hidden="true" className="absolute left-[60px] top-[238px] h-2 w-9 bg-[var(--color-cloud)]" />
-        <span aria-hidden="true" className="absolute right-[100px] top-[222px] h-3 w-12 bg-[var(--color-cloud)]" />
+        <span
+          aria-hidden="true"
+          className="absolute left-[60px] top-[238px] h-2 w-9 bg-[var(--color-cloud)]"
+        />
+        <span
+          aria-hidden="true"
+          className="absolute right-[100px] top-[222px] h-3 w-12 bg-[var(--color-cloud)]"
+        />
 
         <div className="relative px-10 pt-14">
           <img src={fianoLogo} alt="Fiano" className="h-[58px] w-[120px]" />
-          <h1 className="mb-0 mt-6 text-[26px] font-extrabold text-[var(--color-ink)]">{title}</h1>
-          <p className="mt-2 text-sm font-medium text-[var(--color-ink-soft)]">{subtitle}</p>
+          <h1 className="mb-0 mt-6 text-[26px] font-extrabold text-[var(--color-ink)]">
+            {title}
+          </h1>
+          <p className="mt-2 text-sm font-medium text-[var(--color-ink-soft)]">
+            {subtitle}
+          </p>
         </div>
 
         <div className="relative mt-auto">
@@ -44,7 +54,10 @@ const AuthLayout = ({ title, subtitle, children }) => (
             alt=""
             className="absolute bottom-[92px] left-1/2 z-10 w-[245px] -translate-x-1/2"
           />
-          <div aria-hidden="true" className="relative border-t-2 border-[var(--color-ink)]">
+          <div
+            aria-hidden="true"
+            className="relative border-t-2 border-[var(--color-ink)]"
+          >
             {Array.from({ length: BRICK_ROWS }, (_, i) => (
               <span
                 key={i}
@@ -57,7 +70,9 @@ const AuthLayout = ({ title, subtitle, children }) => (
         </div>
       </div>
 
-      <div className="flex flex-col justify-center px-6 py-10 sm:px-14">{children}</div>
+      <div className="flex flex-col justify-center px-6 py-10 sm:px-14">
+        {children}
+      </div>
     </section>
   </main>
 );

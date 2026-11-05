@@ -1,18 +1,23 @@
-import { Navigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import Footer from "../../components/common/footer";
 import { useAuthStore } from "../../store/useAuthStore";
-import { ROUTES } from "../../config/routes";
 
 const UserProfilePage = () => {
+  const location = useLocation();
   const user = useAuthStore((state) => state.user);
-
-  if (!user)
-    return <Navigate to={ROUTES.LOGIN} replace state={{ from: ROUTES.PROFILE }} />;
 
   return (
     <div className="flex flex-1 flex-col">
       <main className="mx-auto w-full max-w-[1120px] flex-1 px-4 py-14">
-        <section className="border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-10 py-8 shadow-[var(--shadow-hard)]">
+        {location.state?.welcome && (
+          <p
+            role="status"
+            className="mb-6 mt-0 border-2 border-[var(--color-success-border)] bg-[var(--color-success-banner)] px-4 py-3 text-sm font-semibold text-[var(--color-success-deep)]"
+          >
+            Welcome to Fiano, {user.displayName}! Your account has been created.
+          </p>
+        )}
+        <section className="border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-10 py-8">
           <h1 className="m-0 text-[30px] font-extrabold text-[var(--color-ink)]">
             {user.displayName}
           </h1>

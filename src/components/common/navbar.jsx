@@ -1,36 +1,64 @@
+import { useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import defaultAvatar from "../../assets/virtual-piano-assets/default-avatar.jpeg";
 import fianoLogo from "../../assets/virtual-piano-assets/fiano-logo.png";
 import foxMascot from "../../assets/virtual-piano-assets/fox-mascot.png";
-import { LogOut, Search, User } from "lucide-react";
+import { LogOut, Menu, Search, User, X } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
 import { ROUTES } from "../../config/routes";
 
 const NAV_ITEMS = [
   { to: ROUTES.HOME, label: "Piano" },
-  { to: ROUTES.LIBRARY, label: "Library" },
-  { to: ROUTES.WORKSPACE, label: "Practice_sample" },
-  { to: ROUTES.UPLOAD, label: "Upload" },
-  { to: ROUTES.LOGIN, label: "Login", guestOnly: true },
-  { to: ROUTES.REGISTER, label: "Register", guestOnly: true },
+  { to: ROUTES.LIBRARY, label: "Sheet library" },
+  { to: ROUTES.WORKSPACE, label: "Practice" },
+  { to: ROUTES.UPLOAD, label: "Upload", authOnly: true },
+  { to: ROUTES.LOGIN, label: "Log in", guestOnly: true },
+  { to: ROUTES.REGISTER, label: "Sign up", guestOnly: true },
 ];
 
 const AUTH_PATHS = [ROUTES.LOGIN, ROUTES.REGISTER, ROUTES.FORGOT_PASSWORD];
+
+const navLinkClass = ({ isActive }) =>
+  `flex h-9 items-center border-2 border-[var(--color-ink)] px-[18px] text-[15px] font-bold no-underline ${
+    isActive
+      ? "bg-[var(--color-brand)] text-[var(--color-neutral-white)]"
+      : "bg-[var(--color-surface-card)] text-[var(--color-ink)]"
+  }`;
+
+const closeFocusedMenu = () => document.activeElement?.blur();
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
   const clearAuth = useAuthStore((state) => state.clearAuth);
-  const navItems = NAV_ITEMS.filter((item) => !(user && item.guestOnly));
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const navItems = NAV_ITEMS.filter((item) =>
+    user ? !item.guestOnly : !item.authOnly,
+  );
   const from = AUTH_PATHS.includes(location.pathname)
     ? location.state?.from
     : `${location.pathname}${location.search}`;
 
   const handleLogout = () => {
+    closeFocusedMenu();
     clearAuth();
     navigate(ROUTES.HOME, { replace: true });
   };
+
+  const renderNavLinks = (onItemClick) =>
+    navItems.map((item) => (
+      <NavLink
+        key={item.to}
+        to={item.to}
+        state={item.to === ROUTES.LOGIN || item.to === ROUTES.REGISTER ? { from } : undefined}
+        end
+        onClick={onItemClick}
+        className={navLinkClass}
+      >
+        {item.label}
+      </NavLink>
+    ));
 
   return (
     <header className="relative z-20 border-b-4 border-[var(--color-ink)] bg-[linear-gradient(to_bottom,var(--color-sky-1)_0_16px,var(--color-sky-2)_16px_32px,var(--color-sky-3)_32px_48px,var(--color-sky-4)_48px_64px,var(--color-sky-5)_64px_80px,var(--color-sky-6)_80px)]">
@@ -51,7 +79,7 @@ const Navbar = () => {
             className="ml-[120px] h-[46px] w-[95px]"
           />
         </NavLink>
-        <label className="ml-10 hidden h-10 w-[380px] shrink items-center border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-4 shadow-[var(--shadow-hard-sm)] md:flex">
+        <label className="ml-10 hidden h-10 w-[380px] shrink items-center border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-4 md:flex">
           <input
             type="search"
             placeholder="Find some music?"
@@ -64,28 +92,28 @@ const Navbar = () => {
         </label>
         <nav
           aria-label="Main navigation"
-          className="ml-12 flex items-center gap-[14px]"
+          className="ml-12 hidden items-center gap-[14px] lg:flex"
         >
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              state={item.to === ROUTES.LOGIN ? { from } : undefined}
-              end
-              className={({ isActive }) =>
-                `flex h-9 items-center border-2 border-[var(--color-ink)] px-[18px] text-[15px] font-bold no-underline shadow-[var(--shadow-hard-sm)] ${
-                  isActive
-                    ? "bg-[var(--color-brand)] text-[var(--color-neutral-white)]"
-                    : "bg-[var(--color-surface-card)] text-[var(--color-ink)]"
-                }`
-              }
-            >
-              {item.label}
-            </NavLink>
-          ))}
+          {renderNavLinks()}
         </nav>
+
+        <button
+          type="button"
+          onClick={() => setMobileOpen((open) => !open)}
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-navigation"
+          aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          className="ml-auto flex h-10 w-10 cursor-pointer items-center justify-center border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] text-[var(--color-ink)] lg:hidden"
+        >
+          {mobileOpen ? (
+            <X aria-hidden="true" className="h-5 w-5" />
+          ) : (
+            <Menu aria-hidden="true" className="h-5 w-5" />
+          )}
+        </button>
+
         {user && (
-          <div className="group relative ml-auto shrink-0">
+          <div className="group relative shrink-0 lg:ml-auto">
             <button
               type="button"
               aria-haspopup="menu"
@@ -100,7 +128,7 @@ const Navbar = () => {
             <div className="invisible absolute right-0 top-full pt-3 opacity-0 transition-opacity group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
               <div
                 role="menu"
-                className="flex w-48 flex-col border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] shadow-[var(--shadow-hard)]"
+                className="flex w-48 flex-col border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)]"
               >
                 <p className="m-0 truncate border-b-2 border-[var(--color-line-dashed)] px-4 py-3 text-sm font-bold text-[var(--color-ink)]">
                   {user.displayName}
@@ -108,6 +136,7 @@ const Navbar = () => {
                 <NavLink
                   to={ROUTES.PROFILE}
                   role="menuitem"
+                  onClick={closeFocusedMenu}
                   className="flex items-center gap-2 px-4 py-3 text-sm font-semibold text-[var(--color-ink)] no-underline hover:bg-[var(--color-brand-tint)]"
                 >
                   <User aria-hidden="true" className="h-4 w-4" />
@@ -120,13 +149,23 @@ const Navbar = () => {
                   className="flex cursor-pointer items-center gap-2 border-0 bg-transparent px-4 py-3 text-left font-[inherit] text-sm font-semibold text-[var(--color-danger)] hover:bg-[var(--color-danger-wash)]"
                 >
                   <LogOut aria-hidden="true" className="h-4 w-4" />
-                  Đăng xuất
+                  Log out
                 </button>
               </div>
             </div>
           </div>
         )}
       </div>
+
+      {mobileOpen && (
+        <nav
+          id="mobile-navigation"
+          aria-label="Mobile navigation"
+          className="absolute left-0 right-0 top-full flex flex-col gap-3 border-b-4 border-[var(--color-ink)] bg-[var(--color-surface-page)] px-4 py-4 lg:hidden"
+        >
+          {renderNavLinks(() => setMobileOpen(false))}
+        </nav>
+      )}
     </header>
   );
 };

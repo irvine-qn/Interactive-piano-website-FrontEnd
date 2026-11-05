@@ -4,7 +4,10 @@ import LoginForm from "../../features/auth/components/LoginForm";
 
 const LoginPage = () => (
   <div className="flex flex-1 flex-col">
-    <AuthLayout title="Chào mừng trở lại!" subtitle="Tiếp tục hành trình luyện piano của bạn.">
+    <AuthLayout
+      title="Welcome back!"
+      subtitle="Continue your piano journey."
+    >
       <LoginForm />
     </AuthLayout>
     <Footer />

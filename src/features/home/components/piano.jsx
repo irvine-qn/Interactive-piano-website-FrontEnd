@@ -271,7 +271,7 @@ const Piano = ({ children }) => {
 
       <section
         aria-label="Piano controls"
-        className="sticky left-0 flex w-[min(100%,calc(100vw-2rem))] flex-wrap items-center gap-x-5 gap-y-3 border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-[14px] py-[12px] shadow-[var(--shadow-hard)]"
+        className="sticky left-0 flex w-[min(100%,calc(100vw-2rem))] flex-wrap items-center gap-x-5 gap-y-3 border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-[14px] py-[12px]"
       >
         {children}
         <label className="flex md:ml-10 items-center gap-2 text-sm font-bold text-[var(--color-ink)]">
@@ -279,7 +279,7 @@ const Piano = ({ children }) => {
             aria-hidden="true"
             className="h-4 w-4 text-[var(--color-brand-strong)]"
           />
-          Hiển thị phím:
+          Key labels:
           <span className="relative ml-4 flex">
             <select
               value={showKeyboardHints ? "hints" : "names"}
@@ -288,8 +288,8 @@ const Piano = ({ children }) => {
               }
               className="h-9 w-[186px] cursor-pointer appearance-none font-[inherit] border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] pl-3 pr-8 text-sm font-bold text-[var(--color-brand-strong)] outline-none"
             >
-              <option value="hints">Phím tắt + Tên nốt</option>
-              <option value="names">Tên nốt</option>
+              <option value="hints">Shortcuts + Note names</option>
+              <option value="names">Note names</option>
             </select>
             <ChevronDown
               aria-hidden="true"
@@ -334,7 +334,7 @@ const Piano = ({ children }) => {
             role="status"
             className="w-full text-sm font-semibold text-[var(--color-neutral-500)]"
           >
-            Đang tải âm thanh piano...
+            Loading piano sounds...
           </p>
         )}
         {error && (
@@ -347,7 +347,7 @@ const Piano = ({ children }) => {
         )}
       </section>
 
-      <div className="relative border-2 border-[var(--color-ink)] bg-[var(--color-piano-wood)] p-[14px] shadow-[var(--shadow-hard-lg)]">
+      <div className="relative border-2 border-[var(--color-ink)] bg-[var(--color-piano-wood)] p-[14px]">
         <span
           aria-hidden="true"
           className="absolute inset-x-[6px] top-[3px] h-[2px] bg-[repeating-linear-gradient(90deg,var(--color-piano-wood-grain)_0_8px,transparent_8px_16px)]"
@@ -374,7 +374,7 @@ const Piano = ({ children }) => {
                 style={{ left: `${left}%`, width: `${width}%` }}
                 className={
                   black
-                    ? `absolute top-0 z-10 flex px-0 font-[inherit] h-[60%] flex-col items-center justify-end border-[1.5px] border-t-0 border-[var(--color-ink)] pb-[8px] shadow-[var(--shadow-hard-sm)] ${
+                    ? `absolute top-0 z-10 flex px-0 font-[inherit] h-[60%] flex-col items-center justify-end border-[1.5px] border-t-0 border-[var(--color-ink)] pb-[8px] ${
                         isActive
                           ? "bg-[var(--color-brand-light)]"
                           : "bg-[var(--color-key-black)]"
