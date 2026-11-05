@@ -5,6 +5,19 @@ Mục **Cần làm sau khi pull** là các lệnh phải chạy trên máy của
 
 ---
 
+## 2026-11-05 – Bản nhạc trong Workspace
+
+- Workspace có nút chuyển giữa Waterfall và bản nhạc (`canvas/sheetMusicScore.jsx`, dùng VexFlow).
+
+**Cần làm sau khi pull:** `npm install`.
+
+## 2026-11-05 – Lượt xem và lượt thích thật
+
+- Lượt xem chỉ tăng khi bấm *Practice* ở Library. F5 hoặc mở thẳng link không tính.
+- Thêm `LikeButton` ở card Library và Workspace. Chưa đăng nhập thì chuyển sang trang đăng nhập.
+
+**Cần làm sau khi pull:** cập nhật Backend theo `docs/CHANGELOG.md` của repo Backend.
+
 ## 2026-11-05
 
 - Thêm thư mục `docs/` (`NOTES.md`, `CHANGELOG.md`) để ghi chú kỹ thuật và nhật ký thay đổi.
