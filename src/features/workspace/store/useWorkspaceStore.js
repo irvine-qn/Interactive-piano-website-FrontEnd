@@ -12,6 +12,7 @@ export const useWorkspaceStore = create((set, get) => ({
   volume: 100,
   playbackRate: 1,
   keyLabels: 'shortcuts',
+  viewMode: 'waterfall',
   duration: 250,
   sheet: null,
   sheetStatus: 'idle',
@@ -23,6 +24,7 @@ export const useWorkspaceStore = create((set, get) => ({
   },
   setIsPlaying: (status) => set({ isPlaying: status }),
   setKeyLabels: (keyLabels) => set({ keyLabels }),
+  setViewMode: (viewMode) => set({ viewMode }),
   setVolume: (volume) => set({ volume: Math.min(100, Math.max(0, volume)) }),
   setPlaybackRate: (rate) => {
     applyPlaybackRate(rate);

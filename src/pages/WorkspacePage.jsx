@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { useParams } from "react-router-dom";
 import { useShallow } from "zustand/react/shallow";
 import { useWorkspaceStore } from "../features/workspace/store/useWorkspaceStore";
@@ -6,17 +7,26 @@ import ControlBar from "../features/workspace/components/ControlBar";
 import SheetInfoPanel from "../features/workspace/components/SheetInfoPanel";
 import OctaveShiftControl from "../features/workspace/components/OctaveShiftControl";
 import KeyLabelSelect from "../features/workspace/components/KeyLabelSelect";
+import ViewModeToggle from "../features/workspace/components/ViewModeToggle";
 import WaterfallCanvas from "../features/workspace/canvas/practiceWaterfall";
 import { useSheetLoader } from "../features/workspace/hooks/useSheetLoader";
 import Footer from "../components/common/footer";
+
+const SheetMusicScore = lazy(() => import("../features/workspace/canvas/sheetMusicScore"));
 
 const CARD_CLASS =
   "border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] shadow-[var(--shadow-hard)]";
 
 const WorkspacePage = () => {
-  const { sheet, sheetStatus, sheetError } = useWorkspaceStore(
-    useShallow((state) => ({ sheet: state.sheet, sheetStatus: state.sheetStatus, sheetError: state.sheetError })),
+  const { sheet, sheetStatus, sheetError, viewMode } = useWorkspaceStore(
+    useShallow((state) => ({
+      sheet: state.sheet,
+      sheetStatus: state.sheetStatus,
+      sheetError: state.sheetError,
+      viewMode: state.viewMode,
+    })),
   );
+  const isSheetView = viewMode === "sheet";
   const { sheetId } = useParams();
   const reloadSheet = useSheetLoader(sheetId);
 
@@ -34,8 +44,9 @@ const WorkspacePage = () => {
         <section aria-label="Waterfall and piano" className={CARD_CLASS}>
           <header className="flex flex-wrap items-center gap-3 border-0 border-b-2 border-solid border-[var(--color-ink)] bg-[var(--color-surface-soft)] px-5 py-2">
             <span aria-hidden="true" className="h-3 w-3 border-2 border-[var(--color-ink)] bg-[var(--color-brand)]" />
-            <h2 className="m-0 text-sm font-bold uppercase tracking-wide text-[var(--color-ink)]">Waterfall</h2>
+            <h2 className="m-0 text-sm font-bold uppercase tracking-wide text-[var(--color-ink)]">{isSheetView ? "Sheet music" : "Waterfall"}</h2>
             <div className="ml-auto flex flex-wrap items-center gap-x-6 gap-y-2">
+              <ViewModeToggle />
               <KeyLabelSelect />
               <OctaveShiftControl />
             </div>
@@ -43,7 +54,13 @@ const WorkspacePage = () => {
 
           <div className="flex flex-col p-[14px]">
             <div className="relative h-[clamp(260px,calc(100dvh-360px),440px)] w-full overflow-hidden border-2 border-[var(--color-ink)] bg-[var(--color-surface-paper)]">
-              <WaterfallCanvas />
+              {isSheetView ? (
+                <Suspense fallback={null}>
+                  <SheetMusicScore />
+                </Suspense>
+              ) : (
+                <WaterfallCanvas />
+              )}
               {sheetStatus === "loading" && (
                 <div className="absolute inset-0 flex items-center justify-center text-sm font-bold text-[var(--color-neutral-600)]">
                   Loading sheet...

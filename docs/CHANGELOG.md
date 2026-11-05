@@ -7,7 +7,7 @@ Mục **Cần làm sau khi pull** là các lệnh phải chạy trên máy của
 
 ## 2026-11-05 – Bản nhạc trong Workspace
 
-- Workspace có nút chuyển giữa Waterfall và bản nhạc (`canvas/sheetMusicScore.jsx`, dùng VexFlow).
+- Workspace có nút chuyển giữa Waterfall và bản nhạc (`canvas/sheetMusicScore.jsx`, dùng VexFlow). Dữ liệu bản nhạc lấy từ `GET /sheets/:id/score` của Backend.
 
 **Cần làm sau khi pull:** `npm install`.
 
