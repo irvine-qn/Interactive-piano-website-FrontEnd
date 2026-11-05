@@ -1,12 +1,17 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { getSheet, recordView } from '../api/sheetsApi';
 import { loadSheet, disposeSheet } from '../audio/sheetPlayer';
 import { useShallow } from 'zustand/react/shallow';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
 
 export const useSheetLoader = (sheetId) => {
-  const { setSheetLoading, setSheet, setSheetError, setSheetViews } = useWorkspaceStore(
+  const location = useLocation();
+  const navigate = useNavigate();
+  const countedLocationKey = useRef(null);
+  const { loadedSheetId, setSheetLoading, setSheet, setSheetError, setSheetViews } = useWorkspaceStore(
     useShallow((state) => ({
+      loadedSheetId: state.sheet?.id,
       setSheetLoading: state.setSheetLoading,
       setSheet: state.setSheet,
       setSheetError: state.setSheetError,
@@ -24,9 +29,6 @@ export const useSheetLoader = (sheetId) => {
         if (controller.signal.aborted) return;
         setSheet(data);
         loadSheet(data.notes, data.bpm);
-        recordView(data.id)
-          .then(({ views }) => setSheetViews(data.id, views))
-          .catch(() => {});
       })
       .catch((error) => {
         if (controller.signal.aborted) return;
@@ -37,7 +39,18 @@ export const useSheetLoader = (sheetId) => {
       controller.abort();
       disposeSheet();
     };
-  }, [sheetId, reloadKey, setSheetLoading, setSheet, setSheetError, setSheetViews]);
+  }, [sheetId, reloadKey, setSheetLoading, setSheet, setSheetError]);
+
+  useEffect(() => {
+    if (!location.state?.countView || loadedSheetId !== sheetId) return;
+    if (countedLocationKey.current === location.key) return;
+    countedLocationKey.current = location.key;
+
+    navigate(`${location.pathname}${location.search}`, { replace: true, state: null });
+    recordView(sheetId)
+      .then(({ views }) => setSheetViews(sheetId, views))
+      .catch(() => {});
+  }, [location, loadedSheetId, sheetId, navigate, setSheetViews]);
 
   return useCallback(() => setReloadKey((k) => k + 1), []);
 };

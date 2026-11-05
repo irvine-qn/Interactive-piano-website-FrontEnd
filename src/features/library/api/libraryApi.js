@@ -10,3 +10,6 @@ export const getSheets = (params = {}, { signal } = {}) =>
 
 export const getTags = ({ signal } = {}) =>
   apiClient.get('/sheets/tags', { signal }).then((res) => res.data);
+
+export const toggleSheetLike = (id) =>
+  apiClient.post(`/sheets/${encodeURIComponent(id)}/like`).then((res) => res.data);

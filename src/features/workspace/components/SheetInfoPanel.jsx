@@ -1,5 +1,6 @@
-import { Eye, Heart } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import PianoKeysIcon from '../../../components/icons/PianoKeysIcon';
+import LikeButton from '../../library/components/LikeButton';
 import { DIFFICULTY_META } from '../../library/config/difficulty';
 import { formatCount } from '../../../utils/format';
 
@@ -65,9 +66,8 @@ const SheetInfoPanel = ({ sheet, status }) => {
               {formatCount(sheet.views)} views
             </li>
             <li aria-hidden="true"><Dot /></li>
-            <li className="flex items-center gap-1.5" aria-label={`${sheet.likes} likes`}>
-              <Heart aria-hidden="true" className="h-4 w-4 text-[var(--color-danger)]" />
-              {formatCount(sheet.likes)} likes
+            <li>
+              <LikeButton sheetId={sheet.id} liked={sheet.likedByMe} likes={sheet.likes} suffix=" likes" />
             </li>
           </ul>
         </div>
