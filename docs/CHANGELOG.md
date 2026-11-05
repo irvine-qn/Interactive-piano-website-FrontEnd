@@ -5,6 +5,15 @@ Mục **Cần làm sau khi pull** là các lệnh phải chạy trên máy của
 
 ---
 
+## 2026-11-05 – Hoá biểu, dấu nối và test
+
+- Bản nhạc có hoá biểu và dấu nối (dữ liệu từ Backend).
+- Home không còn hiện lỗi đỏ khi trình duyệt không cấp quyền Web MIDI.
+- Chế độ Play: Zone về đúng vị trí ngay khi vào chế độ và khi hết bài, khoá dời Zone bằng tay.
+- Thêm `npm test` (Vitest), file test đặt cạnh code.
+
+**Cần làm sau khi pull:** `npm install`.
+
 ## 2026-11-05 – Đồng bộ Home và Practice
 
 - Home và Practice dùng chung bàn phím 88 phím (`PianoKeybed`), cách đọc phím (`useKeyboardInput`, `useKeyMapping`), `KeyLabelSelect`, `OctaveShiftControl` và nút How to play.

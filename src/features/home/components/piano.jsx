@@ -107,9 +107,7 @@ const Piano = ({ children }) => {
         syncInputs();
         access.onstatechange = syncInputs;
       })
-      .catch((midiError) => {
-        setError(`Unable to access MIDI devices: ${midiError.message}`);
-      });
+      .catch(() => {});
 
     return () => {
       if (access) {

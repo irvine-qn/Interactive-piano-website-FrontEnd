@@ -79,7 +79,6 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
 | Mở bài không tồn tại: timeline vẫn hiện độ dài của bài trước | Sẽ sửa ở E-02 (trang báo bài không tồn tại) |
 | Bundle JS lớn hơn 500 kB (Vite cảnh báo khi build) | Sẽ tách theo route ở C-05 |
 | `/favicon.ico` báo 404 ở mọi trang | `index.html` chưa có favicon |
-| Home hiện lỗi đỏ "Unable to access MIDI devices…" khi không cấp quyền Web MIDI | Thuộc Home (Quỳnh), đã ghi trong WBS |
 
 ## 5. Việc đang chờ
 
@@ -90,7 +89,7 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
 
 ## 6. Kiểm tra trước khi tạo PR
 
-1. `npm run lint` và `npm run build` không lỗi (cảnh báo bundle lớn hơn 500 kB là bình thường cho tới C-05).
+1. `npm run lint`, `npm test` và `npm run build` không lỗi (cảnh báo bundle lớn hơn 500 kB là bình thường cho tới C-05).
 2. Chạy Backend (PostgreSQL bật, đã migrate và seed), `npm run dev`, rồi mở thử:
    - `/`: Home chơi được bằng chuột và phím, metronome chạy, Octave Shift của Home đúng.
    - `/library`: tìm kiếm, lọc, sắp xếp, phân trang; bấm *Practice* mở Workspace.
