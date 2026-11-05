@@ -9,6 +9,8 @@ const HIT_LINE_HEIGHT = 4;
 const SHADOW_OFFSET = 2;
 const LABEL_SIZES = [10, 8];
 const LABEL_PADDING = 3;
+const LABEL_BACKGROUND_HEIGHT = 12;
+const LABEL_BASELINE_OFFSET = 3;
 const LABEL_MIN_HEIGHT = 16;
 
 const readColors = (element) => {
@@ -107,12 +109,11 @@ const WaterfallCanvas = () => {
       const label = height >= LABEL_MIN_HEIGHT ? fitLabel(note.name, width) : null;
       if (label) {
         ctx.font = label.font;
-        const labelY = top + height - 5;
-        const centerX = x + (label.overShadow ? width + SHADOW_OFFSET : width) / 2;
-        ctx.lineWidth = 3;
-        ctx.strokeText(label.text, centerX, labelY);
+        const bottom = top + height - 2;
+        ctx.fillStyle = colors.ink;
+        ctx.fillRect(x + 2, bottom - LABEL_BACKGROUND_HEIGHT, width - 4, LABEL_BACKGROUND_HEIGHT);
         ctx.fillStyle = colors.label;
-        ctx.fillText(label.text, centerX, labelY);
+        ctx.fillText(label.text, x + width / 2, bottom - LABEL_BASELINE_OFFSET);
       }
     };
 
@@ -134,10 +135,10 @@ const WaterfallCanvas = () => {
       let result = null;
       for (const option of options) {
         ctx.font = option.font;
-        const needed = ctx.measureText(option.text).width + LABEL_PADDING;
-        if (needed <= space) result = { ...option, overShadow: false };
-        else if (needed <= space + SHADOW_OFFSET) result = { ...option, overShadow: true };
-        if (result) break;
+        if (ctx.measureText(option.text).width + LABEL_PADDING <= space - 4) {
+          result = option;
+          break;
+        }
       }
       labelCache.set(cacheKey, result);
       return result;

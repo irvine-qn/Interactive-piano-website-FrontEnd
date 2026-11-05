@@ -13,6 +13,8 @@ const BLACK_STYLES = {
   'playback-left': 'bg-[var(--color-note-blue-mid)]',
 };
 
+const OCTAVE_NUMBER = /-?\d+$/;
+
 const Key = ({ note, left, width, isBlack, hint, showHint = true, isPressed, playbackHand, interactive = true, onMouseDown, onMouseUp }) => {
   const state = isPressed ? 'pressed' : playbackHand ? `playback-${playbackHand}` : 'idle';
   const label = hint && showHint ? `${note}, key ${hint}` : note;
@@ -37,13 +39,14 @@ const Key = ({ note, left, width, isBlack, hint, showHint = true, isPressed, pla
   const cursor = interactive ? 'cursor-pointer' : 'cursor-default';
 
   if (isBlack) {
+    const isIdle = state === 'idle';
     return (
       <button
         {...common}
-        className={`absolute top-0 z-10 flex h-[60%] flex-col items-center justify-end border-[1.5px] border-t-0 border-[var(--color-ink)] px-0 pb-[8px] font-[inherit] ${cursor} ${BLACK_STYLES[state]}`}
+        className={`absolute top-0 z-10 flex h-[60%] flex-col items-center justify-end overflow-hidden border-[1.5px] border-t-0 border-[var(--color-ink)] px-0 pb-[8px] font-[inherit] ${cursor} ${BLACK_STYLES[state]}`}
       >
-        {showHint && hint && <kbd className="font-[inherit] text-[9px] font-bold text-[var(--color-brand-light)]">{hint}</kbd>}
-        <span className="text-[9px] font-bold text-[var(--color-key-label-black)]">{note}</span>
+        {showHint && hint && <kbd className={`font-[inherit] text-[11px] font-bold leading-none ${isIdle ? 'text-[var(--color-neutral-white)]' : 'text-[var(--color-ink)]'}`}>{hint}</kbd>}
+        <span className={`mt-[2px] text-[9px] font-bold leading-none ${isIdle ? 'text-[var(--color-key-label-black)]' : 'text-[var(--color-ink)]'}`}>{note.replace(OCTAVE_NUMBER, '')}</span>
         <span aria-hidden="true" className="mt-[3px] h-1 w-[80%] bg-[var(--color-key-black-edge)]" />
       </button>
     );
