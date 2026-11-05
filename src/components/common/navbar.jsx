@@ -10,7 +10,6 @@ import { ROUTES } from "../../config/routes";
 const NAV_ITEMS = [
   { to: ROUTES.HOME, label: "Piano" },
   { to: ROUTES.LIBRARY, label: "Sheet library" },
-  { to: ROUTES.WORKSPACE, label: "Practice" },
   { to: ROUTES.UPLOAD, label: "Upload", authOnly: true },
   { to: ROUTES.LOGIN, label: "Log in", guestOnly: true },
   { to: ROUTES.REGISTER, label: "Sign up", guestOnly: true },
