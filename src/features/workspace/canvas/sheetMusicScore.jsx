@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import { Accidental, Beam, Dot, Formatter, Renderer, Stave, StaveConnector, StaveNote, Voice } from 'vexflow';
+import { Accidental, Beam, Dot, Formatter, Renderer, Stave, StaveConnector, StaveNote, StaveTie, Voice } from 'vexflow';
 import { getSheetScore } from '../api/sheetsApi';
 import { getSongTime } from '../audio/songClock';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
 
 const MIN_MEASURE_WIDTH = 300;
 const WIDTH_PER_NOTE_EVENT = 34;
-const FIRST_MEASURE_EXTRA_WIDTH = 70;
+const FIRST_MEASURE_EXTRA_WIDTH = 120;
 const PADDING_X = 12;
 const ROW_HEIGHT = 210;
 const TREBLE_OFFSET_Y = 10;
@@ -36,7 +36,7 @@ const buildTickables = (events, clef) => {
 const countNoteEvents = (events) => events.filter((event) => !event.isRest).length;
 
 const drawScore = (container, score) => {
-  const { measures, measureSeconds, beats, beatUnit } = score;
+  const { measures, measureSeconds, beats, beatUnit, keySignature } = score;
   const availableWidth = container.clientWidth - PADDING_X * 2;
   const densestMeasure = Math.max(
     ...measures.map(({ treble, bass }) => Math.max(countNoteEvents(treble), countNoteEvents(bass))),
@@ -50,6 +50,23 @@ const drawScore = (container, score) => {
   renderer.resize(container.clientWidth, rows * ROW_HEIGHT);
   const context = renderer.getContext();
   const positions = [];
+  const pendingTies = { treble: null, bass: null };
+
+  const drawTies = (clef, events, tickables, row) => {
+    events.forEach((event, eventIndex) => {
+      const indices = event.notes.map((_, noteIndex) => noteIndex);
+      const pending = pendingTies[clef];
+      if (pending && !event.isRest) {
+        if (pending.row === row) {
+          new StaveTie({ first_note: pending.note, last_note: tickables[eventIndex], first_indices: indices, last_indices: indices }).setContext(context).draw();
+        } else {
+          new StaveTie({ first_note: pending.note, first_indices: indices, last_indices: indices }).setContext(context).draw();
+          new StaveTie({ last_note: tickables[eventIndex], first_indices: indices, last_indices: indices }).setContext(context).draw();
+        }
+      }
+      pendingTies[clef] = event.tieToNext ? { note: tickables[eventIndex], row } : null;
+    });
+  };
 
   measures.forEach((measure, index) => {
     const row = Math.floor(index / perRow);
@@ -62,8 +79,8 @@ const drawScore = (container, score) => {
     const trebleStave = new Stave(x, y + TREBLE_OFFSET_Y, width);
     const bassStave = new Stave(x, y + BASS_OFFSET_Y, width);
     if (isRowStart) {
-      trebleStave.addClef('treble');
-      bassStave.addClef('bass');
+      trebleStave.addClef('treble').addKeySignature(keySignature);
+      bassStave.addClef('bass').addKeySignature(keySignature);
     }
     if (index === 0) {
       trebleStave.addTimeSignature(`${beats}/${beatUnit}`);
@@ -93,6 +110,8 @@ const drawScore = (container, score) => {
     trebleVoice.draw(context, trebleStave);
     bassVoice.draw(context, bassStave);
     beams.forEach((beam) => beam.setContext(context).draw());
+    drawTies('treble', measure.treble, trebleNotes, row);
+    drawTies('bass', measure.bass, bassNotes, row);
 
     positions.push({ startX: noteStartX, endX: x + width, y });
   });
