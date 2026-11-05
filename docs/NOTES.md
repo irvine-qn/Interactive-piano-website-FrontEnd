@@ -60,7 +60,7 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
 - **Tua lùi 1 tick** (khoảng 3ms, xem `setSongTime`). Nếu tua đúng vào tick của một nốt, Tone có lúc làm tròn sang tick sau và bỏ mất nốt đó. Đồng hồ trên Control Bar cộng 10ms khi hiển thị để tua tới 1:00 vẫn hiện `1:00`.
 - **Thứ tự trong Restart/tua:** gọi `silenceNow()` **trước** rồi mới `setSongTime()`. Làm ngược lại thì có lúc nốt nằm đúng điểm tua bị coi là sự kiện cũ và bị bỏ.
 - **Sự kiện `pause`/`stop` của Transport** làm Control Bar tắt âm và xóa phím sáng. Khi làm Wait Mode (T-09B) phải tách "dừng do người dùng bấm" khỏi "dừng để chờ", nếu không phím người chơi đang giữ sẽ bị xóa (đã ghi trong WBS).
-- **Phím tắt:** `useKeyboardInput` bỏ qua phím khi focus đang ở ô gõ chữ (ô search, form), nhưng **không** bỏ qua khi focus ở thanh trượt (timeline, âm lượng). Ô select chọn xong tự bỏ focus. Nhả phím theo `event.code` để nhả Shift trước vẫn không kẹt.
+- **Phím tắt Practice:** bảng phím lấy từ `practiceKeys` của `GET /api/v1/piano`, tra theo `event.code` nên Shift không ảnh hưởng. `useKeyboardInput` bỏ qua phím khi focus đang ở ô gõ chữ (ô search, form), nhưng **không** bỏ qua khi focus ở thanh trượt (timeline, âm lượng). Ô select chọn xong tự bỏ focus.
 - **Thứ tự khóa trong object:** JavaScript luôn xếp khóa dạng số (`"0"`–`"9"`) lên trước, nên đừng lấy "phím đầu/cuối" theo thứ tự `Object.values(noteByKey)` (lỗi cũ: nhãn hiện `E2-C6` thay vì `C1-C6`).
 - **Chữ trên canvas:** font Inter tải từ Google Fonts ở chế độ `display=swap`, nên lúc đầu canvas đo chữ bằng font dự phòng. Waterfall đo lại nhãn khi `document.fonts` báo tải xong.
 
@@ -79,18 +79,17 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
 | Mở bài không tồn tại: timeline vẫn hiện độ dài của bài trước | Sẽ sửa ở E-02 (trang báo bài không tồn tại) |
 | Bundle JS lớn hơn 500 kB (Vite cảnh báo khi build) | Sẽ tách theo route ở C-05 |
 | `/favicon.ico` báo 404 ở mọi trang | `index.html` chưa có favicon |
-| Home hiện lỗi đỏ "Unable to access MIDI devices…" khi không cấp quyền Web MIDI | Thuộc Home (Quỳnh), đã ghi trong WBS |
 
 ## 5. Việc đang chờ
 
-- **Wait Mode** (T-09A → T-09E) và review Workspace (T-10): **pending**, làm sau Feature Upload MIDI. Trong lúc này nút *Wait Mode* chỉ chuyển sang chế độ người dùng tự chơi (có nhãn phím tắt, Octave Shift), chưa dừng chờ theo bài.
+- Review Workspace (T-10): **pending**. Chế độ chờ nốt nay có tên **Play** và đã chạy, logic nằm trong `audio/sheetPlayer.js`.
 - **C-04** chữ thương hiệu trên Navbar mới (giữ con cáo), **C-05** tách bundle, **E-02** trang bài không tồn tại.
 - **Upload sheet MIDI** (Bình): việc tiếp theo, sau đó mới làm lại Wait Mode.
 - **User profile / edit profile** (Quỳnh).
 
 ## 6. Kiểm tra trước khi tạo PR
 
-1. `npm run lint` và `npm run build` không lỗi (cảnh báo bundle lớn hơn 500 kB là bình thường cho tới C-05).
+1. `npm run lint`, `npm test` và `npm run build` không lỗi (cảnh báo bundle lớn hơn 500 kB là bình thường cho tới C-05).
 2. Chạy Backend (PostgreSQL bật, đã migrate và seed), `npm run dev`, rồi mở thử:
    - `/`: Home chơi được bằng chuột và phím, metronome chạy, Octave Shift của Home đúng.
    - `/library`: tìm kiếm, lọc, sắp xếp, phân trang; bấm *Practice* mở Workspace.
@@ -98,6 +97,6 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
      - Play/Pause/Restart, tua;
      - đổi tốc độ 0.5x–1.5x, âm lượng (rời sang Home thì âm lượng Home vẫn như cũ);
      - nốt rơi đúng phím, tay phải cam, tay trái xanh;
-     - Wait Mode: phím tắt, Octave Shift, Key labels.
+     - Play: nốt chạm vạch thì dừng, nhấn đủ mới chạy tiếp; phím tắt, Octave Shift, Key labels.
    - `/workspace` chuyển sang `/library`; `/login`, `/register`, một URL không tồn tại ra trang 404.
 3. Mở DevTools Console: không có lỗi đỏ mới (ngoài favicon và MIDI ở Home đã biết).

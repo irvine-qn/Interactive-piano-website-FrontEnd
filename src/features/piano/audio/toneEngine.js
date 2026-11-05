@@ -1,6 +1,6 @@
 import * as Tone from "tone";
+import { PIANO_SAMPLES_BASE_URL } from "../../../config/api";
 
-// Đặt Limiter ở ngưỡng an toàn để cắt peak đột ngột, không nén gắt làm vỡ tiếng
 const masterLimiter = new Tone.Limiter(-2).toDestination();
 
 Tone.Destination.volume.value = -5;
@@ -38,9 +38,7 @@ export const pianoSampler = new Tone.Sampler({
     A7: "A7.mp3",
     C8: "C8.mp3",
   },
-  // Sử dụng bộ âm thanh Salamander Grand Piano mã nguồn mở được host sẵn trên server của Tone.js
-  // (Sau này chúng ta có thể tải về host trên S3 của mình sau)
-  baseUrl: "https://tonejs.github.io/audio/salamander/",
+  baseUrl: PIANO_SAMPLES_BASE_URL,
   release: 0.5,
   volume: -5,
   onload: () => {
@@ -48,7 +46,6 @@ export const pianoSampler = new Tone.Sampler({
   },
 }).connect(masterLimiter);
 
-// Hàm phát nốt
 export const playNote = async (note) => {
   if (Tone.context.state !== "running") {
     await Tone.start();
@@ -58,22 +55,28 @@ export const playNote = async (note) => {
   }
 };
 
+export const playNoteImmediately = async (note) => {
+  if (Tone.context.state !== "running") {
+    await Tone.start();
+  }
+  if (pianoSampler.loaded) {
+    pianoSampler.triggerAttack(note, Tone.immediate());
+  }
+};
+
 export const stopNote = (note) => {
   if (pianoSampler.loaded) {
     pianoSampler.triggerRelease(note);
   }
 };
 
-// Hàm ngắt toàn bộ âm thanh (BẮT BUỘC GỌI HÀM NÀY KHI TUA)
 export const stopAllNotes = () => {
   if (pianoSampler.loaded) {
     pianoSampler.releaseAll();
   }
 };
 
-// Dừng Transport, quay về đầu bài và tắt toàn bộ âm đang ngân (chỉ Workspace dùng).
-// Transport đã dừng sẵn thì không gọi stop(): Tone vẫn xếp sự kiện "stop", và khi AudioContext còn tạm dừng
-// (chưa có tương tác phát âm) sự kiện đó chỉ được phát lúc phím đầu tiên bật âm thanh -> xoá mất phím vừa nhấn.
+// Không gọi stop khi Transport đã dừng vì sự kiện stop đến trễ sẽ xóa phím vừa nhấn
 export const resetPlayback = () => {
   if (Tone.Transport.state !== "stopped") Tone.Transport.stop();
   stopAllNotes();

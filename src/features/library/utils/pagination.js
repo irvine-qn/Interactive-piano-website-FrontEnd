@@ -1,5 +1,3 @@
-// Danh sách nút phân trang: luôn có trang đầu, trang cuối và các trang quanh trang hiện tại,
-// chỗ bị lược bỏ thay bằng '…'. Vd. (1, 155) -> [1, 2, 3, '…', 155]; (50, 155) -> [1, '…', 49, 50, 51, '…', 155]
 export const getPageItems = (page, totalPages) => {
   if (totalPages <= 7) {
     return Array.from({ length: totalPages }, (_, i) => i + 1);

@@ -3,7 +3,6 @@ import SheetCard from './SheetCard';
 
 const GRID_CLASS = 'grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
 
-// Khung xương có cùng kích thước với SheetCard để trang không bị nhảy khi dữ liệu về
 const SkeletonCard = () => (
   <div aria-hidden="true" className="flex flex-col border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] shadow-[var(--shadow-hard)]">
     <div className="aspect-[8/5] w-full animate-pulse border-0 border-b-2 border-solid border-[var(--color-ink)] bg-[var(--color-skeleton)]" />
@@ -16,7 +15,6 @@ const SkeletonCard = () => (
   </div>
 );
 
-// Khung thông báo dùng chung cho trạng thái rỗng và lỗi
 const StatePanel = ({ icon, title, description, children, role }) => (
   <div
     role={role}
@@ -29,7 +27,6 @@ const StatePanel = ({ icon, title, description, children, role }) => (
   </div>
 );
 
-// status: 'loading' | 'success' | 'error' (từ useLibraryQuery)
 const SheetGrid = ({ sheets, status, error, onRetry, skeletonCount }) => {
   if (status === 'error') {
     return (
@@ -51,7 +48,6 @@ const SheetGrid = ({ sheets, status, error, onRetry, skeletonCount }) => {
     );
   }
 
-  // Lần tải đầu (chưa có dữ liệu cũ để giữ) thì hiện khung xương
   if (status === 'loading' && sheets.length === 0) {
     return (
       <div className={GRID_CLASS} aria-busy="true" aria-label="Loading sheets">
@@ -72,7 +68,6 @@ const SheetGrid = ({ sheets, status, error, onRetry, skeletonCount }) => {
     );
   }
 
-  // Đang tải trang/bộ lọc mới: giữ lưới cũ, làm mờ để báo đang cập nhật
   const isRefreshing = status === 'loading';
   return (
     <div className={`${GRID_CLASS} transition-opacity ${isRefreshing ? 'opacity-60' : ''}`} aria-busy={isRefreshing}>

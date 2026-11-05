@@ -27,7 +27,6 @@ const Pagination = ({ page, totalPages, onChange }) => (
       </li>
       {getPageItems(page, totalPages).map((item, index) =>
         item === '…' ? (
-          // Hai dấu … có thể cùng xuất hiện nên key kèm vị trí
           <li key={`gap-${index}`} aria-hidden="true" className="px-1 text-sm text-[var(--color-neutral-400)]">
             …
           </li>

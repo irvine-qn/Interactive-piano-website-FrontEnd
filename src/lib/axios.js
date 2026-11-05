@@ -15,7 +15,6 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-// Chuẩn hoá lỗi: BE trả { error: { code, message } }, mất kết nối thì không có response
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {

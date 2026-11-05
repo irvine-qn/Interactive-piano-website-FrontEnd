@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import sheetCoverDots from '../../../assets/virtual-piano-assets/sheet-cover-dots.svg';
 import { DIFFICULTY_META } from '../config/difficulty';
 
 const COVER_BG = {
@@ -8,7 +8,6 @@ const COVER_BG = {
   lavender: 'bg-[var(--color-pastel-lavender)]',
 };
 
-// Số ngẫu nhiên cố định theo id: mỗi bài có bìa riêng nhưng tải lại trang không đổi
 const createRandom = (seedText) => {
   let seed = [...seedText].reduce((hash, char) => (hash * 31 + char.charCodeAt(0)) | 0, 7);
   return () => {
@@ -19,7 +18,6 @@ const createRandom = (seedText) => {
   };
 };
 
-// Toạ độ trong viewBox 320x220 của tờ nhạc
 const STAFF_LEFT = 10;
 const STAFF_RIGHT = 310;
 const LINE_GAP = 9.5;
@@ -29,7 +27,6 @@ const STEM_LENGTH = 27;
 const NOTE_RX = 4.8;
 const NOTE_RY = 3.6;
 
-// Sinh nốt cho một khuông: 2 ô nhịp, mỗi ô 6 nốt; một số cặp nốt nối gạch (nốt móc), thỉnh thoảng nốt trắng
 const buildStaffNotes = (random, staffTop) => {
   const staffBottom = staffTop + LINE_GAP * 4;
   const middleY = staffTop + LINE_GAP * 2;
@@ -48,7 +45,6 @@ const buildStaffNotes = (random, staffTop) => {
       if (canBeam) {
         const x2 = x + (measureWidth - 20) / MEASURE_SLOTS;
         const y2 = staffBottom - Math.floor(random() * 9) * (LINE_GAP / 2);
-        // Cặp nốt nằm thấp thì gạch nối ở trên, nằm cao thì gạch nối ở dưới
         const stemUp = (y + y2) / 2 > middleY;
         const beamY = stemUp ? Math.min(y, y2) - STEM_LENGTH : Math.max(y, y2) + STEM_LENGTH;
         const offset = stemUp ? NOTE_RX - 0.6 : -(NOTE_RX - 0.6);
@@ -66,14 +62,12 @@ const buildStaffNotes = (random, staffTop) => {
   return { staffTop, notes, beams, barX: STAFF_LEFT + 40 + measureWidth };
 };
 
-// Hàm thuần: cùng id luôn ra cùng hình (góc nghiêng + nốt của 2 khuông)
 const buildCoverArt = (id) => {
   const random = createRandom(id);
   const tilt = Number((random() * 5 - 2.5).toFixed(2));
   return { tilt, staves: STAFF_TOPS.map((staffTop) => buildStaffNotes(random, staffTop)) };
 };
 
-// Khoá Sol vẽ cho khuông cao 32 (4 khoảng x 8), phóng theo LINE_GAP thực tế
 const TrebleClef = ({ x, staffTop }) => (
   <path
     transform={`translate(${x} ${staffTop}) scale(${LINE_GAP / 8})`}
@@ -131,24 +125,16 @@ const DifficultyBadge = ({ difficulty }) => {
   );
 };
 
-// Ảnh bìa vẽ bằng CSS/SVG: nền pastel theo coverColor, tờ nhạc nghiêng, badge độ khó và nhãn MIDI
 const SheetCover = ({ sheet }) => {
-  const patternId = useId();
   const { tilt, staves } = buildCoverArt(sheet.id);
 
   return (
     <div className={`relative aspect-[8/5] w-full overflow-hidden ${COVER_BG[sheet.coverColor] ?? COVER_BG.yellow}`}>
-      {/* Chấm vuông trắng trang trí trên nền */}
-      <svg aria-hidden="true" className="absolute inset-0 h-full w-full">
-        <defs>
-          <pattern id={patternId} width="96" height="72" patternUnits="userSpaceOnUse">
-            <rect x="10" y="12" width="5" height="5" fill="white" opacity="0.7" />
-            <rect x="62" y="30" width="4" height="4" fill="white" opacity="0.6" />
-            <rect x="34" y="56" width="5" height="5" fill="white" opacity="0.5" />
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill={`url(#${patternId})`} />
-      </svg>
+      <div
+        aria-hidden="true"
+        className="absolute inset-0"
+        style={{ backgroundImage: `url("${sheetCoverDots}")` }}
+      />
 
       <div
         className="absolute left-1/2 top-[52%] w-[70%] border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] shadow-[var(--shadow-hard)]"

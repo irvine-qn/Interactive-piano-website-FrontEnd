@@ -6,12 +6,10 @@ import LibraryToolbar from './LibraryToolbar';
 import Pagination from './Pagination';
 import SheetGrid from './SheetGrid';
 
-// Khối chính của trang Library: nối dữ liệu từ useLibraryQuery vào toolbar, lưới và phân trang
 const LibraryBrowser = () => {
   const { query, sheets, meta, status, error, updateQuery, retry } = useLibraryQuery();
   const tags = useTags();
 
-  // replace: gõ tìm kiếm không tạo thêm mục lịch sử trình duyệt
   const handleSearch = useCallback((q) => updateQuery({ q }, { replace: true }), [updateQuery]);
   const handleSortChange = useCallback((sort) => updateQuery({ sort }), [updateQuery]);
   const handlePageChange = (page) => {
@@ -19,8 +17,6 @@ const LibraryBrowser = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Link cũ trỏ quá số trang hiện có (vd. ?page=99) thì chuyển về trang cuối.
-  // Trong lúc chuyển vẫn coi là đang tải để không nháy lên "Không tìm thấy bản nhạc".
   const lastPage = meta?.totalPages ?? 0;
   const isPageOutOfRange = status === 'success' && lastPage > 0 && query.page > lastPage;
   useEffect(() => {

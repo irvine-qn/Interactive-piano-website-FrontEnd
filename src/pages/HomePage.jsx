@@ -1,4 +1,5 @@
 import Footer from "../components/common/footer";
+import HowToPlay from "../features/home/components/HowToPlay";
 import Metronome from "../features/home/components/metronome";
 import Piano from "../features/home/components/piano";
 
@@ -9,6 +10,7 @@ const HomePage = () => (
         <Metronome />
       </Piano>
     </main>
+    <HowToPlay />
     <Footer />
   </div>
 );

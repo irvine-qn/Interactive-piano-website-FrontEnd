@@ -1,14 +1,17 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { getSheet, recordView } from '../api/sheetsApi';
 import { loadSheet, disposeSheet } from '../audio/sheetPlayer';
 import { useShallow } from 'zustand/react/shallow';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
 
-// Tải bài nhạc từ API vào store và lên lịch phát. Trả về hàm tải lại khi lỗi.
 export const useSheetLoader = (sheetId) => {
-  // Chỉ lấy các action (không đổi) để component gọi hook này không render lại theo mọi thay đổi của store
-  const { setSheetLoading, setSheet, setSheetError, setSheetViews } = useWorkspaceStore(
+  const location = useLocation();
+  const navigate = useNavigate();
+  const countedLocationKey = useRef(null);
+  const { loadedSheetId, setSheetLoading, setSheet, setSheetError, setSheetViews } = useWorkspaceStore(
     useShallow((state) => ({
+      loadedSheetId: state.sheet?.id,
       setSheetLoading: state.setSheetLoading,
       setSheet: state.setSheet,
       setSheetError: state.setSheetError,
@@ -25,12 +28,7 @@ export const useSheetLoader = (sheetId) => {
       .then((data) => {
         if (controller.signal.aborted) return;
         setSheet(data);
-        loadSheet(data.notes, data.bpm);
-        // Mỗi lần mở bài tính 1 lượt xem. StrictMode (dev) chạy effect 2 lần nhưng request của lần đầu
-        // đã bị abort ở cleanup nên chỉ lần tải thành công này gọi. Lỗi đếm lượt xem không ảnh hưởng luyện tập.
-        recordView(data.id)
-          .then(({ views }) => setSheetViews(data.id, views))
-          .catch(() => {});
+        loadSheet(data.notes, data.bpm, data.chords);
       })
       .catch((error) => {
         if (controller.signal.aborted) return;
@@ -41,7 +39,18 @@ export const useSheetLoader = (sheetId) => {
       controller.abort();
       disposeSheet();
     };
-  }, [sheetId, reloadKey, setSheetLoading, setSheet, setSheetError, setSheetViews]);
+  }, [sheetId, reloadKey, setSheetLoading, setSheet, setSheetError]);
+
+  useEffect(() => {
+    if (!location.state?.countView || loadedSheetId !== sheetId) return;
+    if (countedLocationKey.current === location.key) return;
+    countedLocationKey.current = location.key;
+
+    navigate(`${location.pathname}${location.search}`, { replace: true, state: null });
+    recordView(sheetId)
+      .then(({ views }) => setSheetViews(sheetId, views))
+      .catch(() => {});
+  }, [location, loadedSheetId, sheetId, navigate, setSheetViews]);
 
   return useCallback(() => setReloadKey((k) => k + 1), []);
 };

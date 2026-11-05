@@ -1,6 +1,6 @@
-import { Eye, Heart } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import PianoKeysIcon from '../../../components/icons/PianoKeysIcon';
-// Dùng chung nhãn + màu độ khó với card của Library
+import LikeButton from '../../library/components/LikeButton';
 import { DIFFICULTY_META } from '../../library/config/difficulty';
 import { formatCount } from '../../../utils/format';
 
@@ -8,7 +8,6 @@ const Dot = () => (
   <span aria-hidden="true" className="block h-1 w-1 bg-[var(--color-neutral-250)]" />
 );
 
-// Khung xương lúc đang tải bài, cùng chiều cao với panel thật
 const SkeletonInfo = () => (
   <div aria-hidden="true" className="flex flex-col gap-2.5">
     <div className="h-7 w-72 animate-pulse bg-[var(--color-skeleton)]" />
@@ -17,8 +16,6 @@ const SkeletonInfo = () => (
   </div>
 );
 
-// Card thông tin bài (tầng 1 của Workspace) theo thiết kế Sheet_Practice_Studio_Waterfall.
-// Uploader, nút Like / Add to collection / Export / Share chờ Feature User nên chưa có.
 const SheetInfoPanel = ({ sheet, status }) => {
   const difficulty = sheet ? DIFFICULTY_META[sheet.difficulty] : null;
 
@@ -69,9 +66,8 @@ const SheetInfoPanel = ({ sheet, status }) => {
               {formatCount(sheet.views)} views
             </li>
             <li aria-hidden="true"><Dot /></li>
-            <li className="flex items-center gap-1.5" aria-label={`${sheet.likes} likes`}>
-              <Heart aria-hidden="true" className="h-4 w-4 text-[var(--color-danger)]" />
-              {formatCount(sheet.likes)} likes
+            <li>
+              <LikeButton sheetId={sheet.id} liked={sheet.likedByMe} likes={sheet.likes} suffix=" likes" />
             </li>
           </ul>
         </div>

@@ -23,9 +23,7 @@ const FilterRow = ({ label, children }) => (
   </div>
 );
 
-// Lọc theo độ khó và thể loại (tag lấy từ GET /sheets/tags, kèm số bài)
 const LibraryFilters = ({ difficulty, tag, tags, onChange }) => {
-  // Link cũ có thể chứa tag không còn trong danh sách: vẫn hiện để người dùng bỏ chọn được
   const tagOptions = tag && !tags.some((t) => t.name === tag) ? [{ name: tag, count: 0 }, ...tags] : tags;
 
   return (

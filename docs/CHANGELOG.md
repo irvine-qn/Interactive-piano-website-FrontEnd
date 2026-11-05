@@ -5,6 +5,50 @@ Mục **Cần làm sau khi pull** là các lệnh phải chạy trên máy của
 
 ---
 
+## 2026-11-05 – Hoá biểu, dấu nối và test
+
+- Bản nhạc có hoá biểu và dấu nối (dữ liệu từ Backend).
+- Home không còn hiện lỗi đỏ khi trình duyệt không cấp quyền Web MIDI.
+- Chế độ Play: Zone về đúng vị trí ngay khi vào chế độ và khi hết bài, khoá dời Zone bằng tay.
+- Thêm `npm test` (Vitest), file test đặt cạnh code.
+
+**Cần làm sau khi pull:** `npm install`.
+
+## 2026-11-05 – Đồng bộ Home và Practice
+
+- Home và Practice dùng chung bàn phím 88 phím (`PianoKeybed`), cách đọc phím (`useKeyboardInput`, `useKeyMapping`), `KeyLabelSelect`, `OctaveShiftControl` và nút How to play.
+- Practice có dải Shortcuts nằm ngang: mỗi cột là một lần nhấn, phím nhấn cùng lúc xếp ở dòng dưới. Nút Hide/Show shortcuts để ẩn hoặc hiện dải.
+- Zone 1 di chuyển bằng mũi tên trái phải, Zone 2 bằng mũi tên lên xuống. Giữ `A F K` hoặc `1 4 8` rồi nhấn một nốt để chơi hợp âm.
+
+**Cần làm sau khi pull:** `npm install`, cập nhật Backend theo `docs/CHANGELOG.md` của repo Backend.
+
+## 2026-11-05 – Phím Practice hai tay
+
+- Bỏ Shift: mỗi nốt thăng có phím riêng, Zone 1 dùng hàng `Z`/`S`, Zone 2 dùng hàng `Q`/`2`.
+- Chế độ Play tự đổi quãng theo bài. Mỗi hợp âm cần nhấn tối đa 4 nốt, các nốt còn lại tự kêu.
+- Practice nhận đàn MIDI nếu trình duyệt được cấp quyền.
+
+**Cần làm sau khi pull:** cập nhật Backend theo `docs/CHANGELOG.md` của repo Backend.
+
+## 2026-11-05 – Đổi logic Practice
+
+- Auto Play: người dùng chơi được phím trong lúc bài đang chạy.
+- Khi chưa bắt đầu, nhấn đúng nốt đầu tiên của bài thì bài chạy từ nốt đó.
+- Wait Mode đổi tên thành **Play** và đã có logic chờ: nốt chạm vạch thì dừng, nhấn đủ các nốt mới chạy tiếp. Danh sách nốt phải nhấn lấy từ `chords` của Backend.
+
+## 2026-11-05 – Bản nhạc trong Workspace
+
+- Workspace có nút chuyển giữa Waterfall và bản nhạc (`canvas/sheetMusicScore.jsx`, dùng VexFlow). Dữ liệu bản nhạc lấy từ `GET /sheets/:id/score` của Backend.
+
+**Cần làm sau khi pull:** `npm install`.
+
+## 2026-11-05 – Lượt xem và lượt thích thật
+
+- Lượt xem chỉ tăng khi bấm *Practice* ở Library. F5 hoặc mở thẳng link không tính.
+- Thêm `LikeButton` ở card Library và Workspace. Chưa đăng nhập thì chuyển sang trang đăng nhập.
+
+**Cần làm sau khi pull:** cập nhật Backend theo `docs/CHANGELOG.md` của repo Backend.
+
 ## 2026-11-05
 
 - Thêm thư mục `docs/` (`NOTES.md`, `CHANGELOG.md`) để ghi chú kỹ thuật và nhật ký thay đổi.

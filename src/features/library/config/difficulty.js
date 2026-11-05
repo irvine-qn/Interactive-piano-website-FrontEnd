@@ -1,4 +1,3 @@
-// Nhãn + màu badge cho từng độ khó (dùng chung cho card và bộ lọc)
 export const DIFFICULTY_META = {
   EASY: {
     label: 'Easy',

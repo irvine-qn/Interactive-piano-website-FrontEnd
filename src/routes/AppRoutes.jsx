@@ -14,7 +14,6 @@ const AppRoutes = () => (
   <Routes>
     <Route path={ROUTES.HOME} element={<HomePage />} />
     <Route path={ROUTES.LIBRARY} element={<LibraryPage />} />
-    {/* Chưa chọn bài (vd. nút "Practice" trên Navbar) thì sang Library để chọn */}
     <Route path={ROUTES.WORKSPACE} element={<Navigate to={ROUTES.LIBRARY} replace />} />
     <Route path={`${ROUTES.WORKSPACE}/:sheetId`} element={<WorkspacePage />} />
     <Route element={<GuestRoute />}>
