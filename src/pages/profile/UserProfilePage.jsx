@@ -7,11 +7,11 @@ import ProfileSheetList from "../../features/profile/components/ProfileSheetList
 import ProfileStats from "../../features/profile/components/ProfileStats";
 import ProfileTabs from "../../features/profile/components/ProfileTabs";
 import SavedSheets from "../../features/profile/components/SavedSheets";
-import { useAuthStore } from "../../store/useAuthStore";
+import { useProfile } from "../../features/profile/hooks/useProfile";
 
 const UserProfilePage = () => {
   const location = useLocation();
-  const user = useAuthStore((state) => state.user);
+  const user = useProfile();
   const [activeTab, setActiveTab] = useState("uploadedSheets");
   const [search, setSearch] = useState("");
   const [difficulty, setDifficulty] = useState();
