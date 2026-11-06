@@ -1,5 +1,10 @@
 import { useLocation } from "react-router-dom";
 import Footer from "../../components/common/footer";
+import AccountSecurityPanel from "../../features/profile/components/AccountSecurityPanel";
+import ProfileHeader from "../../features/profile/components/ProfileHeader";
+import ProfileSheetList from "../../features/profile/components/ProfileSheetList";
+import ProfileStats from "../../features/profile/components/ProfileStats";
+import ProfileTabs from "../../features/profile/components/ProfileTabs";
 import { useAuthStore } from "../../store/useAuthStore";
 
 const UserProfilePage = () => {
@@ -17,14 +22,11 @@ const UserProfilePage = () => {
             Welcome to Fiano, {user.displayName}! Your account has been created.
           </p>
         )}
-        <section className="border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-10 py-8">
-          <h1 className="m-0 text-[30px] font-extrabold text-[var(--color-ink)]">
-            {user.displayName}
-          </h1>
-          <p className="mt-2 text-sm font-medium text-[var(--color-neutral-600)]">
-            @{user.username}
-          </p>
-        </section>
+        <ProfileHeader user={user} />
+        <ProfileStats />
+        <ProfileTabs />
+        <ProfileSheetList />
+        <AccountSecurityPanel user={user} />
       </main>
       <Footer />
     </div>
