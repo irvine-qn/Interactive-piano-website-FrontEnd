@@ -11,7 +11,7 @@ Mục **Cần làm sau khi pull** là các lệnh phải chạy trên máy của
 - **Library / Workspace:** bài người dùng upload có dòng *Uploaded by …*; bài *Private* có nhãn khoá và chỉ người upload thấy.
 - **Workspace:** mở bài không tồn tại (hoặc bài *Private* của người khác) hiện *Sheet not found* kèm nút về Library (E-02).
 - **`lib/axios.js`** (dùng chung): lỗi có thêm `details` nếu Backend gửi. Chỉ thêm trường, hành vi cũ giữ nguyên.
-- Chưa có: danh sách *My uploads* để sửa / xoá bài trên giao diện (U-FE-09, chờ trang profile của Quỳnh; API đã có).
+- Sửa / xoá bài đã upload nằm ở tab *Uploaded sheets* của `/profile` (U-FE-09).
 
 **Cần làm sau khi pull:** cập nhật Backend theo CHANGELOG của Backend (`npm install`, `npm run db:deploy`, `npm run db:seed`). Phía FE không cần chạy lệnh gì thêm.
 

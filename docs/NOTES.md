@@ -94,7 +94,6 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
 
 - Review Workspace (T-10): **pending**. Chế độ chờ nốt nay có tên **Play** và đã chạy, logic nằm trong `audio/sheetPlayer.js`.
 - **C-04** chữ thương hiệu trên Navbar mới (giữ con cáo), **C-05** tách bundle.
-- **My uploads** (U-FE-09, Bình): chờ trang profile của Quỳnh rồi thống nhất chỗ đặt. **Không** thêm link vào Navbar.
 - **User profile / edit profile** (Quỳnh).
 
 ## 6. Kiểm tra trước khi tạo PR
