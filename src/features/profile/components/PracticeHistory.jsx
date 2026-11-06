@@ -1,13 +1,37 @@
-import { ChevronDown, Clock, Piano } from "lucide-react";
+import { Clock, Eye, Piano } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ROUTES } from "../../../config/routes";
 import { formatDuration } from "../../../utils/format";
 import { usePracticeHistory } from "../hooks/usePracticeHistory";
+import ProfileSheetList, { SheetIconButton } from "./ProfileSheetList";
 
 const MESSAGE_CLASS =
   "m-0 mt-4 border-2 border-dashed border-[var(--color-ink)] bg-[var(--color-surface-card)] p-8 text-center text-sm font-semibold text-[var(--color-neutral-600)]";
 const BUTTON_CLASS =
-  "flex h-10 cursor-pointer items-center gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-4 font-[inherit] text-sm font-bold text-[var(--color-ink)] transition-colors hover:bg-[var(--color-surface-soft)]";
+  "h-10 cursor-pointer border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-4 font-[inherit] text-sm font-bold text-[var(--color-ink)] hover:bg-[var(--color-surface-soft)]";
+
+const renderSessionMeta = (session) => (
+  <>
+    <p className="m-0 flex items-center gap-1 text-[var(--color-brand-deep)]">
+      <Piano size={14} aria-hidden="true" />
+      {session.noteCount} keys
+    </p>
+    <p className="m-0 flex items-center gap-1 text-[var(--color-neutral-600)]">
+      <Clock size={14} aria-hidden="true" />
+      {formatDuration(session.durationSec)}
+    </p>
+  </>
+);
+
+const renderSessionActions = (session) => (
+  <SheetIconButton
+    as={Link}
+    to={`${ROUTES.WORKSPACE}/${encodeURIComponent(session.sheetId)}`}
+    aria-label={`View ${session.title}`}
+  >
+    <Eye size={16} aria-hidden="true" />
+  </SheetIconButton>
+);
 
 const PracticeHistory = () => {
   const { sessions, total, status, retry, loadMore } = usePracticeHistory();
@@ -22,7 +46,7 @@ const PracticeHistory = () => {
 
   if (status === "error" && sessions.length === 0) {
     return (
-      <div role="alert" className={`${MESSAGE_CLASS} flex flex-col items-center gap-3`}>
+      <div role="alert" className="mt-4 flex flex-col items-center gap-3 border-2 border-dashed border-[var(--color-ink)] bg-[var(--color-surface-card)] p-8 text-sm font-semibold text-[var(--color-danger)]">
         Unable to load practice history.
         <button type="button" onClick={retry} className={BUTTON_CLASS}>
           Try again
@@ -31,48 +55,17 @@ const PracticeHistory = () => {
     );
   }
 
-  if (sessions.length === 0) {
-    return <p className={MESSAGE_CLASS}>No practice history yet.</p>;
-  }
-
   return (
-    <section aria-label="Practice history" className="mt-4">
-      <ul className="m-0 flex list-none flex-col gap-3 p-0">
-        {sessions.map((session) => (
-          <li
-            key={session.id}
-            className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] p-4"
-          >
-            <h3 className="m-0 min-w-0 truncate text-lg font-bold">
-              <Link
-                to={`${ROUTES.WORKSPACE}/${encodeURIComponent(session.sheetId)}`}
-                className="text-[var(--color-ink)] no-underline hover:text-[var(--color-brand-strong)]"
-              >
-                {session.title}
-              </Link>
-            </h3>
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-1 text-sm font-semibold">
-              <p className="m-0 flex items-center gap-1.5 text-[var(--color-brand-deep)]">
-                <Piano size={16} aria-hidden="true" />
-                {session.noteCount} keys
-              </p>
-              <p className="m-0 flex items-center gap-1.5 text-[var(--color-neutral-600)]">
-                <Clock size={16} aria-hidden="true" />
-                {formatDuration(session.durationSec)}
-              </p>
-            </div>
-          </li>
-        ))}
-      </ul>
-      {sessions.length < total && (
-        <div className="mt-4 flex justify-end">
-          <button type="button" onClick={loadMore} className={BUTTON_CLASS}>
-            Load more
-            <ChevronDown size={16} aria-hidden="true" />
-          </button>
-        </div>
-      )}
-    </section>
+    <ProfileSheetList
+      ariaLabel="Practice history"
+      emptyMessage="No practice history yet."
+      itemName="sessions"
+      sheets={sessions}
+      total={total}
+      onLoadMore={loadMore}
+      renderMeta={renderSessionMeta}
+      renderActions={renderSessionActions}
+    />
   );
 };
 
