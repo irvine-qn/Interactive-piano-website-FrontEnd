@@ -1,14 +1,17 @@
+import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import Footer from "../../components/common/footer";
 import ProfileHeader from "../../features/profile/components/ProfileHeader";
 import ProfileSheetList from "../../features/profile/components/ProfileSheetList";
 import ProfileStats from "../../features/profile/components/ProfileStats";
 import ProfileTabs from "../../features/profile/components/ProfileTabs";
+import SavedSheets from "../../features/profile/components/SavedSheets";
 import { useAuthStore } from "../../store/useAuthStore";
 
 const UserProfilePage = () => {
   const location = useLocation();
   const user = useAuthStore((state) => state.user);
+  const [activeTab, setActiveTab] = useState("uploadedSheets");
 
   return (
     <div className="flex flex-1 flex-col">
@@ -26,8 +29,9 @@ const UserProfilePage = () => {
           )}
           <ProfileStats />
           <div className="mt-6">
-            <ProfileTabs />
-            <ProfileSheetList />
+            <ProfileTabs activeTab={activeTab} onTabChange={setActiveTab} />
+            {activeTab === "uploadedSheets" && <ProfileSheetList />}
+            {activeTab === "savedCollections" && <SavedSheets />}
           </div>
         </div>
       </main>
