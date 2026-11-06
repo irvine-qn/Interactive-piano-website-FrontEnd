@@ -5,6 +5,11 @@ Mục **Cần làm sau khi pull** là các lệnh phải chạy trên máy của
 
 ---
 
+## 2026-11-06 – Chọn file MIDI (U-FE-03, Bình)
+
+- Thẻ ① của `/upload`: kéo thả hoặc *Choose a file*, kiểm tra đuôi và dung lượng ngay ở FE, gửi đi phân tích, dòng file có thanh tiến trình và trạng thái (*Ready* / *Failed* kèm lý do), nút ✕ để bỏ file. Phân tích xong thì thẻ ② ③ và Preview mở khoá (nội dung làm ở các task sau).
+- Thêm `formatFileSize` trong `utils/format.js`.
+
 ## 2026-11-06 – Trang /upload (U-FE-02, Bình)
 
 - `/upload` (link *Upload* trên Navbar, cần đăng nhập) không còn là trang 404: khung trang theo thiết kế, thẻ ① File nhạc, ② Tracks, ③ Sheet details, Preview, Privacy, Copyright note. Chưa chọn được file (U-FE-03).

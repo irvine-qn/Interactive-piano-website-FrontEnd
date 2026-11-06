@@ -1,20 +1,20 @@
 import { Link } from 'react-router-dom';
-import { ArrowUpFromLine, Upload } from 'lucide-react';
+import { ArrowUpFromLine } from 'lucide-react';
 import Footer from '../components/common/footer';
 import { ROUTES } from '../config/routes';
 import UploadCard from '../features/upload/components/UploadCard';
 import CopyrightNote from '../features/upload/components/CopyrightNote';
+import FileDropzone from '../features/upload/components/FileDropzone';
+import FileRow from '../features/upload/components/FileRow';
 import { useUploadForm } from '../features/upload/hooks/useUploadForm';
-import { MAX_MIDI_BYTES, MIDI_EXTENSIONS } from '../features/upload/config/upload';
 
-const MAX_SIZE_LABEL = `${MAX_MIDI_BYTES / (1024 * 1024)} MB`;
 const LOCKED_MESSAGE = 'Add a MIDI file first.';
 
 // Trang tải bài lên: 1 trang 2 cột theo thiết kế User_Upload_Sheet_Cartoon (WBS D6).
 // Cột trái: các thẻ đánh số ① File → ② Tracks → ③ Details, thẻ sau mở khi đã phân tích file.
 // Cột phải: Preview, Privacy, Copyright note.
 const UploadPage = () => {
-  const { isAnalyzed } = useUploadForm();
+  const { file, upload, analysis, selectFile, removeFile, isAnalyzed } = useUploadForm();
 
   return (
     <div className="flex flex-1 flex-col">
@@ -39,11 +39,11 @@ const UploadPage = () => {
               Turn a MIDI file into a sheet you can practice, then share it with the Fiano community.
             </p>
           </div>
-          {/* Gửi bài làm ở U-FE-07; trước khi phân tích file xong thì khoá */}
+          {/* Gửi bài làm ở U-FE-07 (bật khi đã phân tích file và form hợp lệ), tới lúc đó luôn khoá */}
           <button
             type="button"
-            disabled={!isAnalyzed}
-            title={isAnalyzed ? undefined : LOCKED_MESSAGE}
+            disabled
+            title={isAnalyzed ? 'Fill in the sheet details first.' : LOCKED_MESSAGE}
             className="flex h-11 cursor-pointer items-center gap-2 border-2 border-solid border-[var(--color-ink)] bg-[var(--color-brand)] px-6 font-[inherit] text-[15px] font-bold text-[var(--color-neutral-white)] shadow-[var(--shadow-hard-sm)] hover:bg-[var(--color-brand-strong)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none disabled:cursor-not-allowed disabled:bg-[var(--color-surface-disabled)] disabled:text-[var(--color-neutral-500)] disabled:shadow-none"
           >
             <ArrowUpFromLine aria-hidden="true" className="h-4 w-4" />
@@ -54,13 +54,9 @@ const UploadPage = () => {
         <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(320px,540px)]">
           <div className="flex min-w-0 flex-col gap-6">
             <UploadCard number={1} title="MIDI file">
-              {/* Chọn / kéo thả file thật làm ở U-FE-03 */}
-              <div className="flex flex-col items-center gap-2 border-2 border-dashed border-[var(--color-brand)] px-6 py-10 text-center">
-                <Upload aria-hidden="true" className="h-10 w-10 text-[var(--color-brand)]" />
-                <p className="m-0 text-base font-bold text-[var(--color-ink)]">Drag and drop a MIDI file here</p>
-                <p className="m-0 text-xs font-medium text-[var(--color-neutral-400)]">
-                  Supports {MIDI_EXTENSIONS.join(', ')} • Up to {MAX_SIZE_LABEL}
-                </p>
+              <div className="flex flex-col gap-4">
+                <FileDropzone onFile={selectFile} />
+                {file && <FileRow file={file} upload={upload} analysis={analysis} onRemove={removeFile} />}
               </div>
             </UploadCard>
             <UploadCard number={2} title="Tracks" locked={!isAnalyzed} lockedMessage={`${LOCKED_MESSAGE} Its tracks will show up here.`} />

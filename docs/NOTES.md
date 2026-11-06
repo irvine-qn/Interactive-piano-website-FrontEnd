@@ -77,6 +77,8 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
 - `lib/axios.js` (dùng chung) biến request bị huỷ (`AbortController`) thành `NETWORK_ERROR` *"Unable to connect to the server"*. Các hàm trong `uploadApi.js` trả mã riêng `CANCELED` khi request bị huỷ để giao diện bỏ qua; nơi khác dùng `signal` thì nên kiểm tra `signal.aborted` trước khi hiện lỗi.
 - `getUserSheets(userId)` dành cho trang profile của Quỳnh (bài PUBLIC của một người dùng).
 - Trang `/upload` (`pages/UploadPage.jsx`): 1 trang 2 cột theo thiết kế (WBS D6). Thẻ dùng `features/upload/components/UploadCard.jsx` (`number` = ô số thứ tự, `locked` = chưa dùng được). **Toàn bộ state của trang nằm trong hook `useUploadForm`** (file, kết quả analyze, thông tin bài): thẻ mới chỉ đọc/ghi qua hook này, không tự giữ state riêng, để sửa thẻ này không mất dữ liệu thẻ khác. Thẻ ② ③ và Preview mở khi `isAnalyzed`.
+- `useUploadForm` lo việc chọn file: `selectFile(file)` kiểm tra ở FE (`utils/midiFile.js`, câu lỗi giống Backend) rồi gọi analyze; `analyze(file, tracks)` dùng lại khi đổi track; `removeFile()`. Trạng thái ở `upload.status`: `idle` → `uploading` (`progress` %) → `analyzing` → `ready` | `error` (`upload.error.message` hiện thẳng). Mỗi lần gọi mới huỷ lần cũ và **kết quả cũ không bao giờ ghi đè kết quả mới** (so `requestRef`).
+- `FileDropzone` chặn trình duyệt tự mở file khi lỡ thả ra ngoài vùng thả (nếu không sẽ rời trang, mất dữ liệu đang nhập).
 
 ## 4. Giới hạn đã biết (chưa sửa)
 
