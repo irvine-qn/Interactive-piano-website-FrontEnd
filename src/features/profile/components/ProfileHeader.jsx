@@ -177,10 +177,13 @@ const ProfileHeader = ({ user }) => (
 
       <div className="flex w-full flex-col gap-2 sm:w-auto">
         <div className="flex gap-2">
-          <button type="button" className={`${OUTLINE_BUTTON_CLASS} flex-1`}>
+          <Link
+            to={ROUTES.PROFILE_EDIT}
+            className={`${OUTLINE_BUTTON_CLASS} flex-1 no-underline`}
+          >
             <Pencil size={16} aria-hidden="true" />
             Edit profile
-          </button>
+          </Link>
           <ProfileSettingsMenu user={user} />
         </div>
         <Link
