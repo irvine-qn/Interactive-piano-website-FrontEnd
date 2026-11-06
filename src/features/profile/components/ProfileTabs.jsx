@@ -12,7 +12,7 @@ const TAB_ITEMS = [
   { key: "practiceHistory", label: "Practice history", Icon: BarChart3 },
 ];
 
-const ProfileTabs = ({ counts = {}, activeTab = TAB_ITEMS[0].key }) => (
+const ProfileTabs = ({ counts = {}, activeTab = TAB_ITEMS[0].key, onTabChange }) => (
   <section
     aria-label="Profile content"
     className="flex flex-col gap-3 border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] p-4"
@@ -26,6 +26,7 @@ const ProfileTabs = ({ counts = {}, activeTab = TAB_ITEMS[0].key }) => (
             key={key}
             type="button"
             aria-current={isActive ? "page" : undefined}
+            onClick={() => onTabChange?.(key)}
             className={`flex h-10 cursor-pointer items-center gap-2 border-2 px-3 font-[inherit] text-sm font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-ink)] ${
               isActive
                 ? "border-[var(--color-ink)] bg-[var(--color-brand)] text-[var(--color-neutral-white)]"

@@ -14,6 +14,10 @@ import {
 const ICON_BUTTON_CLASS =
   "flex size-9 cursor-pointer items-center justify-center border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] text-[var(--color-ink)] transition-colors hover:bg-[var(--color-surface-soft)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-brand)]";
 
+export const SheetIconButton = ({ as: Component = "button", ...props }) => (
+  <Component className={ICON_BUTTON_CLASS} {...props} />
+);
+
 const PublishedSheetActions = ({ sheet }) => (
   <div className="flex flex-wrap items-center gap-2">
     <button
@@ -63,7 +67,7 @@ const DraftSheetActions = ({ sheet }) => (
   </div>
 );
 
-const ProfileSheetItem = ({ sheet }) => (
+const ProfileSheetItem = ({ sheet, renderActions }) => (
   <li
     className={`flex flex-wrap items-center gap-4 border-2 border-[var(--color-ink)] p-4 ${
       sheet.isDraft
@@ -99,15 +103,19 @@ const ProfileSheetItem = ({ sheet }) => (
             <Gauge size={14} aria-hidden="true" />
             {sheet.bpm} BPM
           </p>
-          <p className="m-0 flex items-center gap-1 text-[var(--color-neutral-600)]">
-            <Music size={14} aria-hidden="true" />
-            {sheet.keySignature}
-          </p>
+          {sheet.keySignature && (
+            <p className="m-0 flex items-center gap-1 text-[var(--color-neutral-600)]">
+              <Music size={14} aria-hidden="true" />
+              {sheet.keySignature}
+            </p>
+          )}
           <p className="m-0 text-[var(--color-ink)]">{sheet.views} plays</p>
         </div>
       )}
     </div>
-    {sheet.isDraft ? (
+    {renderActions ? (
+      renderActions(sheet)
+    ) : sheet.isDraft ? (
       <DraftSheetActions sheet={sheet} />
     ) : (
       <PublishedSheetActions sheet={sheet} />
@@ -115,8 +123,15 @@ const ProfileSheetItem = ({ sheet }) => (
   </li>
 );
 
-const ProfileSheetList = ({ sheets = [], total = sheets.length }) => (
-  <section aria-label="Uploaded sheets" className="mt-4">
+const ProfileSheetList = ({
+  sheets = [],
+  total = sheets.length,
+  ariaLabel = "Uploaded sheets",
+  emptyMessage = "No sheets yet.",
+  renderActions,
+  onLoadMore,
+}) => (
+  <section aria-label={ariaLabel} className="mt-4">
     <header className="mb-3 flex flex-wrap items-center gap-x-6 gap-y-1">
       <h2 className="m-0 text-sm font-bold uppercase text-[var(--color-ink)]">
         All sheets ({total})
@@ -130,13 +145,13 @@ const ProfileSheetList = ({ sheets = [], total = sheets.length }) => (
     </header>
     {sheets.length === 0 ? (
       <p className="m-0 border-2 border-dashed border-[var(--color-ink)] bg-[var(--color-surface-card)] p-8 text-center text-sm font-semibold text-[var(--color-neutral-600)]">
-        No sheets yet.
+        {emptyMessage}
       </p>
     ) : (
       <>
         <ul className="m-0 flex list-none flex-col gap-3 p-0">
           {sheets.map((sheet) => (
-            <ProfileSheetItem key={sheet.id} sheet={sheet} />
+            <ProfileSheetItem key={sheet.id} sheet={sheet} renderActions={renderActions} />
           ))}
         </ul>
         <footer className="mt-4 flex flex-wrap items-center justify-between gap-3">
@@ -146,6 +161,7 @@ const ProfileSheetList = ({ sheets = [], total = sheets.length }) => (
           {sheets.length < total && (
             <button
               type="button"
+              onClick={onLoadMore}
               className="flex h-10 cursor-pointer items-center gap-6 border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-4 font-[inherit] text-sm font-bold text-[var(--color-ink)] transition-colors hover:bg-[var(--color-surface-soft)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-brand)]"
             >
               Load more sheets
