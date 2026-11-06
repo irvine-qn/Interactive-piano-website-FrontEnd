@@ -5,19 +5,10 @@ Mục **Cần làm sau khi pull** là các lệnh phải chạy trên máy của
 
 ---
 
-## 2026-11-06 – Chọn file MIDI (U-FE-03, Bình)
+## 2026-11-06 – Upload MIDI (Bình, đang làm)
 
-- Thẻ ① của `/upload`: kéo thả hoặc *Choose a file*, kiểm tra đuôi và dung lượng ngay ở FE, gửi đi phân tích, dòng file có thanh tiến trình và trạng thái (*Ready* / *Failed* kèm lý do), nút ✕ để bỏ file. Phân tích xong thì thẻ ② ③ và Preview mở khoá (nội dung làm ở các task sau).
-- Thêm `formatFileSize` trong `utils/format.js`.
-
-## 2026-11-06 – Trang /upload (U-FE-02, Bình)
-
-- `/upload` (link *Upload* trên Navbar, cần đăng nhập) không còn là trang 404: khung trang theo thiết kế, thẻ ① File nhạc, ② Tracks, ③ Sheet details, Preview, Privacy, Copyright note. Chưa chọn được file (U-FE-03).
-
-## 2026-11-06 – Lớp gọi API upload (U-FE-01, Bình)
-
-- Thêm `features/upload/api/uploadApi.js` và `features/upload/config/upload.js`: phân tích file MIDI, tạo bài, bài của tôi / của một người dùng (cho trang profile của Quỳnh), sửa, xoá. Chưa có giao diện.
-- Request bị huỷ trả mã `CANCELED` thay vì `NETWORK_ERROR` (xem `docs/NOTES.md` mục 3b).
+- Trang `/upload` (link *Upload* trên Navbar, cần đăng nhập) không còn là 404: đã chọn được file MIDI và track, chưa đăng được bài.
+- Cần Backend nhánh `upload-midi` (xem CHANGELOG của Backend). Phía FE không cần chạy lệnh gì thêm.
 
 ## 2026-11-05 – Hoá biểu, dấu nối và test
 

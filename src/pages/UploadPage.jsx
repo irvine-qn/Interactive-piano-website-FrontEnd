@@ -6,6 +6,7 @@ import UploadCard from '../features/upload/components/UploadCard';
 import CopyrightNote from '../features/upload/components/CopyrightNote';
 import FileDropzone from '../features/upload/components/FileDropzone';
 import FileRow from '../features/upload/components/FileRow';
+import TrackTable from '../features/upload/components/TrackTable';
 import { useUploadForm } from '../features/upload/hooks/useUploadForm';
 
 const LOCKED_MESSAGE = 'Add a MIDI file first.';
@@ -14,7 +15,18 @@ const LOCKED_MESSAGE = 'Add a MIDI file first.';
 // Cột trái: các thẻ đánh số ① File → ② Tracks → ③ Details, thẻ sau mở khi đã phân tích file.
 // Cột phải: Preview, Privacy, Copyright note.
 const UploadPage = () => {
-  const { file, upload, analysis, selectFile, removeFile, isAnalyzed } = useUploadForm();
+  const {
+    file,
+    upload,
+    analysis,
+    selectFile,
+    removeFile,
+    changeTracks,
+    selectedTracks,
+    isUpdatingTracks,
+    trackError,
+    isAnalyzed,
+  } = useUploadForm();
 
   return (
     <div className="flex flex-1 flex-col">
@@ -59,7 +71,17 @@ const UploadPage = () => {
                 {file && <FileRow file={file} upload={upload} analysis={analysis} onRemove={removeFile} />}
               </div>
             </UploadCard>
-            <UploadCard number={2} title="Tracks" locked={!isAnalyzed} lockedMessage={`${LOCKED_MESSAGE} Its tracks will show up here.`} />
+            <UploadCard number={2} title="Tracks" locked={!isAnalyzed} lockedMessage={`${LOCKED_MESSAGE} Its tracks will show up here.`}>
+              {isAnalyzed && (
+                <TrackTable
+                  analysis={analysis}
+                  selectedTracks={selectedTracks}
+                  isUpdating={isUpdatingTracks}
+                  error={trackError}
+                  onChange={changeTracks}
+                />
+              )}
+            </UploadCard>
             <UploadCard
               number={3}
               title="Sheet details"

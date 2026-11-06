@@ -72,13 +72,12 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
 
 ## 3b. Upload sheet (Bình, đang làm)
 
-- Gọi API qua `features/upload/api/uploadApi.js` (`analyzeMidi`, `createSheet`, `getMySheets`, `getUserSheets`, `updateSheet`, `deleteSheet`). File gửi bằng `FormData`, **không tự đặt `Content-Type`** (axios tự thêm boundary). Mảng (tracks, tags) gửi thành nhiều trường cùng tên. Request có file dùng timeout 30 s (`config/upload.js`), dài hơn 10 s chung của `apiClient`.
-- Giới hạn file (1 MB, `.mid`/`.midi`) ở `features/upload/config/upload.js`, phải khớp Backend.
-- `lib/axios.js` (dùng chung) biến request bị huỷ (`AbortController`) thành `NETWORK_ERROR` *"Unable to connect to the server"*. Các hàm trong `uploadApi.js` trả mã riêng `CANCELED` khi request bị huỷ để giao diện bỏ qua; nơi khác dùng `signal` thì nên kiểm tra `signal.aborted` trước khi hiện lỗi.
+- Gửi file bằng `FormData` thì **không tự đặt `Content-Type`** (axios tự thêm boundary). Mảng (tracks, tags) gửi thành nhiều trường cùng tên.
+- Giới hạn file (1 MB, `.mid`/`.midi`, timeout 30 s) ở `features/upload/config/upload.js`, **phải khớp Backend**.
+- `lib/axios.js` (dùng chung) biến request bị huỷ thành `NETWORK_ERROR` *"Unable to connect to the server"*. `uploadApi.js` trả mã `CANCELED` để giao diện bỏ qua; nơi khác dùng `signal` thì kiểm tra `signal.aborted` trước khi hiện lỗi.
+- **Mọi state của trang `/upload` nằm trong `useUploadForm`**: thẻ mới chỉ đọc/ghi qua hook, không tự giữ state riêng. Không gộp trạng thái đổi track vào trạng thái file (dòng file sẽ nhảy về *Analyzing*/*Failed* khi chỉ đổi track).
+- Đừng bỏ đoạn chặn thả file toàn trang trong `FileDropzone`: lỡ thả ra ngoài thì trình duyệt mở file, rời trang, mất dữ liệu đang nhập.
 - `getUserSheets(userId)` dành cho trang profile của Quỳnh (bài PUBLIC của một người dùng).
-- Trang `/upload` (`pages/UploadPage.jsx`): 1 trang 2 cột theo thiết kế (WBS D6). Thẻ dùng `features/upload/components/UploadCard.jsx` (`number` = ô số thứ tự, `locked` = chưa dùng được). **Toàn bộ state của trang nằm trong hook `useUploadForm`** (file, kết quả analyze, thông tin bài): thẻ mới chỉ đọc/ghi qua hook này, không tự giữ state riêng, để sửa thẻ này không mất dữ liệu thẻ khác. Thẻ ② ③ và Preview mở khi `isAnalyzed`.
-- `useUploadForm` lo việc chọn file: `selectFile(file)` kiểm tra ở FE (`utils/midiFile.js`, câu lỗi giống Backend) rồi gọi analyze; `analyze(file, tracks)` dùng lại khi đổi track; `removeFile()`. Trạng thái ở `upload.status`: `idle` → `uploading` (`progress` %) → `analyzing` → `ready` | `error` (`upload.error.message` hiện thẳng). Mỗi lần gọi mới huỷ lần cũ và **kết quả cũ không bao giờ ghi đè kết quả mới** (so `requestRef`).
-- `FileDropzone` chặn trình duyệt tự mở file khi lỡ thả ra ngoài vùng thả (nếu không sẽ rời trang, mất dữ liệu đang nhập).
 
 ## 4. Giới hạn đã biết (chưa sửa)
 

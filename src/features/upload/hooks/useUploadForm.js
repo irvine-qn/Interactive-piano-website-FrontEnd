@@ -22,6 +22,10 @@ export const useUploadForm = () => {
   // Kết quả POST /uploads/midi/analyze (tracks, gợi ý tên, độ khó, BPM...), null = chưa phân tích
   const [analysis, setAnalysis] = useState(null);
   const [upload, setUpload] = useState(IDLE);
+  // Đổi track: lựa chọn đang chờ BE tính lại (hiện ngay trên checkbox) và lỗi của lần đổi gần nhất.
+  // Tách khỏi `upload` để dòng file không nhảy về "Analyzing" / "Failed" khi chỉ đổi track.
+  const [pendingTracks, setPendingTracks] = useState(null);
+  const [trackError, setTrackError] = useState(null);
   const [fields, setFields] = useState(INITIAL_FIELDS);
   // Lần phân tích đang chạy: chọn file khác / đổi track / rời trang thì huỷ, kết quả cũ không ghi đè kết quả mới
   const requestRef = useRef(null);
@@ -33,33 +37,28 @@ export const useUploadForm = () => {
 
   useEffect(() => cancelRequest, [cancelRequest]);
 
-  // tracks (tuỳ chọn): phân tích lại theo track đang chọn (U-FE-04)
-  const analyze = useCallback(
-    async (target, tracks) => {
+  // Gọi analyze, huỷ lần trước. -> { result } | { error } | { stale: true } (đã bị lần gọi mới hơn thay thế)
+  const requestAnalysis = useCallback(
+    async (target, tracks, onProgress) => {
       cancelRequest();
       const controller = new AbortController();
       requestRef.current = controller;
       const isCurrent = () => requestRef.current === controller;
-      setUpload({ status: 'uploading', progress: 0, error: null });
-
       try {
         const result = await analyzeMidi(target, {
           tracks,
           signal: controller.signal,
-          onUploadProgress: ({ loaded, total }) => {
-            if (!isCurrent() || !total) return;
-            const progress = Math.min(100, Math.round((loaded / total) * 100));
-            setUpload({ status: progress < 100 ? 'uploading' : 'analyzing', progress, error: null });
+          onUploadProgress: (event) => {
+            if (isCurrent()) onProgress?.(event);
           },
         });
-        if (!isCurrent()) return;
+        if (!isCurrent()) return { stale: true };
         requestRef.current = null;
-        setAnalysis(result);
-        setUpload({ status: 'ready', progress: 100, error: null });
+        return { result };
       } catch (error) {
-        if (error.code === CANCELED || !isCurrent()) return;
+        if (error.code === CANCELED || !isCurrent()) return { stale: true };
         requestRef.current = null;
-        setUpload({ status: 'error', progress: 0, error });
+        return { error };
       }
     },
     [cancelRequest],
@@ -67,18 +66,48 @@ export const useUploadForm = () => {
 
   // Chọn / thả file mới: thay file cũ (huỷ lần phân tích cũ), kiểm tra ở FE trước khi gửi
   const selectFile = useCallback(
-    (nextFile) => {
+    async (nextFile) => {
       cancelRequest();
       setFile(nextFile);
       setAnalysis(null);
+      setPendingTracks(null);
+      setTrackError(null);
       const problem = validateMidiFile(nextFile);
       if (problem) {
         setUpload({ status: 'error', progress: 0, error: problem });
         return;
       }
-      analyze(nextFile);
+      setUpload({ status: 'uploading', progress: 0, error: null });
+      const { result, error, stale } = await requestAnalysis(nextFile, undefined, ({ loaded, total }) => {
+        if (!total) return;
+        const progress = Math.min(100, Math.round((loaded / total) * 100));
+        setUpload({ status: progress < 100 ? 'uploading' : 'analyzing', progress, error: null });
+      });
+      if (stale) return;
+      if (error) {
+        setUpload({ status: 'error', progress: 0, error });
+        return;
+      }
+      setAnalysis(result);
+      setUpload({ status: 'ready', progress: 100, error: null });
     },
-    [analyze, cancelRequest],
+    [cancelRequest, requestAnalysis],
+  );
+
+  // Đổi track đang chọn (thẻ Tracks): BE tính lại số nốt, thời lượng, độ khó gợi ý, cảnh báo.
+  // Lỗi (vd các track đã chọn không có nốt nào trong 88 phím) -> giữ lựa chọn cũ, báo lỗi trong thẻ.
+  const changeTracks = useCallback(
+    async (tracks) => {
+      if (!file || !tracks.length) return;
+      setPendingTracks(tracks);
+      setTrackError(null);
+      const { result, error, stale } = await requestAnalysis(file, tracks);
+      if (stale) return;
+      setPendingTracks(null);
+      if (error) setTrackError(error);
+      else setAnalysis(result);
+    },
+    [file, requestAnalysis],
   );
 
   // Bỏ file (nút ✕): thẻ Tracks / Details khoá lại, thông tin đã nhập vẫn giữ
@@ -86,6 +115,8 @@ export const useUploadForm = () => {
     cancelRequest();
     setFile(null);
     setAnalysis(null);
+    setPendingTracks(null);
+    setTrackError(null);
     setUpload(IDLE);
   }, [cancelRequest]);
 
@@ -98,7 +129,11 @@ export const useUploadForm = () => {
     fields,
     selectFile,
     removeFile,
-    analyze,
+    changeTracks,
+    // Track đang chọn: lựa chọn đang chờ BE (nếu có), không thì lựa chọn BE đã tính
+    selectedTracks: pendingTracks ?? analysis?.selectedTracks ?? [],
+    isUpdatingTracks: pendingTracks !== null,
+    trackError,
     updateField,
     // Thẻ Tracks / Details / Preview và nút Publish chỉ mở khi đã phân tích xong file
     isAnalyzed: analysis !== null,
