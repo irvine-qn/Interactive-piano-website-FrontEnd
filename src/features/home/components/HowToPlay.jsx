@@ -30,7 +30,7 @@ const HowToPlay = () => {
       <button
         type="button"
         onClick={() => dialogRef.current.showModal()}
-        className="fixed right-4 top-[100px] z-10 flex h-8 cursor-pointer items-center gap-2 border-2 border-solid border-[var(--color-ink)] bg-[var(--color-brand-deep)] px-3 font-[inherit] text-sm font-bold text-[var(--color-neutral-white)] shadow-[var(--shadow-hard-sm)] hover:bg-[var(--color-brand-strong)]"
+        className="fixed right-4 top-[76px] z-10 flex h-8 cursor-pointer items-center gap-2 border-2 border-solid border-[var(--color-ink)] bg-[var(--color-brand-deep)] px-3 font-[inherit] text-sm font-bold text-[var(--color-neutral-white)] shadow-[var(--shadow-hard-sm)] hover:bg-[var(--color-brand-strong)]"
       >
         <CircleHelp aria-hidden="true" className="h-4 w-4" />
         How to play
