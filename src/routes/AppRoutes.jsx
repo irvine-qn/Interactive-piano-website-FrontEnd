@@ -27,7 +27,6 @@ const AppRoutes = () => (
       <Route path={ROUTES.PROFILE} element={<UserProfilePage />} />
       <Route path={ROUTES.UPLOAD} element={<UploadPage />} />
       <Route path={ROUTES.PROFILE_EDIT} element={<EditProfilePage />} />
-      <Route path={ROUTES.UPLOAD} element={<NotFoundPage />} />
     </Route>
     <Route path="*" element={<NotFoundPage />} />
   </Routes>
