@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import Footer from "../../components/common/footer";
 import ProfileHeader from "../../features/profile/components/ProfileHeader";
+import ProfileMusicInfo from "../../features/profile/components/ProfileMusicInfo";
 import ProfileSheetList from "../../features/profile/components/ProfileSheetList";
 import ProfileStats from "../../features/profile/components/ProfileStats";
 import ProfileTabs from "../../features/profile/components/ProfileTabs";
@@ -30,6 +31,7 @@ const UserProfilePage = () => {
             </p>
           )}
           <ProfileStats />
+          <ProfileMusicInfo user={user} />
           <div className="mt-6">
             <ProfileTabs
               activeTab={activeTab}

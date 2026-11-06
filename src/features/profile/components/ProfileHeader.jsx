@@ -65,9 +65,9 @@ const PixelRects = ({ pixels }) =>
     />
   ));
 
-const BannerDecorations = () => (
+export const BannerDecorations = ({ notes = BANNER_NOTES, showStar = true }) => (
   <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
-    {BANNER_NOTES.map(({ className }) => (
+    {notes.map(({ className }) => (
       <svg
         key={className}
         viewBox="0 0 24 28"
@@ -77,16 +77,18 @@ const BannerDecorations = () => (
         <PixelRects pixels={NOTE_PIXELS} />
       </svg>
     ))}
-    <svg
-      viewBox="0 0 66 60"
-      shapeRendering="crispEdges"
-      className="absolute left-[83.85%] top-[13.7%] h-[60px] w-[66px] text-[var(--color-sun)]"
-    >
-      <PixelRects pixels={STAR_PIXELS} />
-      <g className="text-[var(--color-ink)]">
-        <PixelRects pixels={STAR_EYE_PIXELS} />
-      </g>
-    </svg>
+    {showStar && (
+      <svg
+        viewBox="0 0 66 60"
+        shapeRendering="crispEdges"
+        className="absolute left-[83.85%] top-[13.7%] h-[60px] w-[66px] text-[var(--color-sun)]"
+      >
+        <PixelRects pixels={STAR_PIXELS} />
+        <g className="text-[var(--color-ink)]">
+          <PixelRects pixels={STAR_EYE_PIXELS} />
+        </g>
+      </svg>
+    )}
   </div>
 );
 
