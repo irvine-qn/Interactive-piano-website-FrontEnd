@@ -56,11 +56,12 @@
 | **C-10** `[BE]` | Comment và tài liệu sau merge | Xoá comment cũ về `uploaderId` trong `schema.prisma`; khôi phục comment của `escapeLike` và `scope` trong `sheets.repository.js`; chuyển comment 404 về đúng `sheetNotFound` trong `sheets.service.js`; thêm dòng trống trong `docs/CHANGELOG.md`. Không đổi logic. **Kết quả:** `npm test` (72), `prisma validate` đều qua. | Done |
 | **C-11** `[BE]` | Áp dụng migration lệch thứ tự | DB đã chạy migration của `profile` (timestamp mới hơn) nhưng thiếu `20261106064950_add_sheet_uploads`, nên các API sheet trả 500 (`P2022`, thiếu cột `sheets.visibility`). Mỗi máy đang gặp lỗi chạy `npm run db:deploy` rồi `npm run db:seed`, sau đó `npm run uploads:smoke`. Không dùng `db:migrate`, và **không đồng ý** nếu lệnh đòi reset DB. **Kết quả:** đã chạy xong trên một máy (2026-11-07), `uploads:smoke` đạt; máy khác đang lỗi vẫn cần tự chạy. | Done |
 
-### Ảnh hồ sơ (2026-11-08)
+### Ảnh hồ sơ (2026-11-07)
 
 | Sub-Task | Component | Contract & Constraints | Status |
 | :--- | :--- | :--- | :--- |
 | **UE-IMG** `[BE+FE]` | Tải / xoá avatar và ảnh bìa | Nhận file bằng `multer` (RAM, tối đa 5 MB), `sharp` kiểm tra và đổi sang WebP, tạm lưu trong PostgreSQL (bảng `user_images`). API: `PUT` / `DELETE /users/profile/images/:kind`, `GET /users/:id/images/:kind`. Chọn ảnh xong kéo để chỉnh vị trí trong hộp thoại, trình duyệt cắt đúng vùng đó rồi mới tải lên; profile và Navbar hiện ảnh mới. Sau này chuyển sang Cloudinary. | Done |
+| **UP-06** `[BE+FE]` | Practice history giống Saved collections | Dùng chung `ProfileSheetList` (thêm `renderMeta`, `itemName`). `GET /sheets/practice-history` trả thêm `composer`, `coverColor`. Chưa có tìm kiếm / lọc vì API chưa hỗ trợ. | Done |
 
 ## Feature: Piano Workspace 
 

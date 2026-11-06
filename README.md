@@ -174,7 +174,8 @@ frontend/
 | `/workspace/:sheetId` | `WorkspacePage` | Luyện tập một bài, ví dụ `/workspace/canon-in-d` |
 | `/workspace` | → `/library` | Chưa chọn bài (vd. nút *Practice* trên Navbar) thì chuyển sang Library để chọn |
 | `/login`, `/register`, `/forgot-password` | `pages/auth/*` | Chỉ dành cho khách (`GuestRoute`), đã đăng nhập thì chuyển đi |
-| `/profile` | `pages/profile/*` | Cần đăng nhập (`ProtectedRoute`), chưa đăng nhập thì về `/login` |
+| `/profile` | `UserProfilePage` | Cần đăng nhập (`ProtectedRoute`), chưa đăng nhập thì về `/login`. Tab bài đã upload, bài đã lưu, lịch sử chơi |
+| `/profile/edit` | `EditProfilePage` | Cần đăng nhập. Sửa thông tin, đổi avatar và ảnh bìa |
 | `/upload` | `UploadPage` | Tải file MIDI lên thành bài nhạc (cần đăng nhập). 1 trang 2 cột theo thiết kế `User_Upload_Sheet_Cartoon` |
 | `*` | `NotFoundPage` | Trang 404 |
 

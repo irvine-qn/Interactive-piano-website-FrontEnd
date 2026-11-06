@@ -79,6 +79,9 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
 - Đừng bỏ đoạn chặn thả file toàn trang trong `FileDropzone`: lỡ thả ra ngoài thì trình duyệt mở file, rời trang, mất dữ liệu đang nhập.
 - Bìa bài vẽ theo `id`. Preview ở `/upload` đoán id bằng `toSlug(title)` (`utils/sheetDetails.js`): đổi cách Backend tạo id thì sửa cả `toSlug`, nếu không bìa Preview sẽ khác bìa thật.
 - `getUserSheets(userId)` dành cho trang profile của Quỳnh (bài PUBLIC của một người dùng).
+- **Profile:** `ProfileSheetList` dùng chung cho cả 3 tab, đổi phần thông tin bằng `renderMeta`, nút bằng `renderActions`. `useMySheets` tính trang *Load more* từ số bài đang có (`nextPageToLoad`): đừng đổi thành cộng dồn số trang, xoá bài xong sẽ sót bài.
+- **Ảnh hồ sơ:** Backend trả đường dẫn tương đối, hiển thị qua `toImageUrl` (`config/api.js`). `PhotoPositionDialog` cắt ảnh bằng canvas ở trình duyệt; chỉnh lại vị trí phải chọn lại ảnh vì Backend chỉ lưu bản đã cắt.
+- **`npm uninstall` / `npm install <gói>` có thể hạ `eslint` từ 10 xuống 9**, làm lint báo hàng loạt lỗi `no-unused-vars` giả. Gặp thì kiểm tra `npm ls eslint`; thêm `--legacy-peer-deps` khi gỡ gói.
 
 ## 4. Giới hạn đã biết (chưa sửa)
 
@@ -94,7 +97,7 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
 
 - Review Workspace (T-10): **pending**. Chế độ chờ nốt nay có tên **Play** và đã chạy, logic nằm trong `audio/sheetPlayer.js`.
 - **C-04** chữ thương hiệu trên Navbar mới (giữ con cáo), **C-05** tách bundle.
-- **User profile / edit profile** (Quỳnh).
+- **User profile / edit profile** (Quỳnh): còn đổi mật khẩu và các mục *Coming soon*.
 
 ## 6. Kiểm tra trước khi tạo PR
 
@@ -108,6 +111,8 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
      - nốt rơi đúng phím, tay phải cam, tay trái xanh;
      - Play: nốt chạm vạch thì dừng, nhấn đủ mới chạy tiếp; phím tắt, Octave Shift, Key labels.
    - `/upload` (đã đăng nhập): chọn một file mẫu, đổi track, sửa thông tin, *Publish* mở được bài ở Workspace; xoá bài thử khi xong.
+   - `/profile`: tab *Uploaded sheets* sửa, đổi Public/Private, xoá bài; tab *Practice history*.
+   - `/profile/edit`: đổi avatar, ảnh bìa, kéo chỉnh vị trí; Navbar hiện avatar mới.
    - `/workspace/khong-co-bai-nay`: hiện *Sheet not found* và nút về Library.
    - `/workspace` chuyển sang `/library`; `/login`, `/register`, một URL không tồn tại ra trang 404.
 3. Mở DevTools Console: không có lỗi đỏ mới (ngoài favicon và MIDI ở Home đã biết).
