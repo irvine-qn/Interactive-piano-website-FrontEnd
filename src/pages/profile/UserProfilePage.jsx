@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import Footer from "../../components/common/footer";
+import PracticeHistory from "../../features/profile/components/PracticeHistory";
 import ProfileHeader from "../../features/profile/components/ProfileHeader";
 import ProfileMusicInfo from "../../features/profile/components/ProfileMusicInfo";
 import ProfileSheetList from "../../features/profile/components/ProfileSheetList";
@@ -42,6 +43,7 @@ const UserProfilePage = () => {
               onDifficultyChange={setDifficulty}
             />
             {activeTab === "uploadedSheets" && <ProfileSheetList />}
+            {activeTab === "practiceHistory" && <PracticeHistory />}
             {activeTab === "savedCollections" && (
               <SavedSheets
                 key={`${search}|${difficulty}`}
