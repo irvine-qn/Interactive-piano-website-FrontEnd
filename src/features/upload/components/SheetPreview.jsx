@@ -1,6 +1,7 @@
 import { useId } from 'react';
 import { Check, Clock, Gauge, Music } from 'lucide-react';
 import SheetCover from '../../library/components/SheetCover';
+import UploadedBy from '../../library/components/UploadedBy';
 import { COVER_BG } from '../../library/config/cover';
 import { COVER_COLORS } from '../config/upload';
 import { cleanText, formatKey, formatTimeSignature, toSlug } from '../utils/sheetDetails';
@@ -53,7 +54,9 @@ const SheetPreview = ({ analysis, details, onChange }) => {
           className="border-2 border-solid border-[var(--color-ink)] bg-[var(--color-surface-card)] shadow-[var(--shadow-hard)]"
         >
           <div className="border-0 border-b-2 border-solid border-[var(--color-ink)]">
-            <SheetCover sheet={{ id: toSlug(details.title), coverColor: details.coverColor, difficulty: details.difficulty }} />
+            <SheetCover
+              sheet={{ id: toSlug(details.title), coverColor: details.coverColor, difficulty: details.difficulty, visibility: details.visibility }}
+            />
           </div>
           <div className="px-4 pb-4 pt-3.5">
             <h3 title={title} className="m-0 truncate text-[19px] font-bold leading-tight text-[var(--color-ink)]">
@@ -62,6 +65,7 @@ const SheetPreview = ({ analysis, details, onChange }) => {
             <p title={composer} className="m-0 mt-1 truncate text-sm text-[var(--color-neutral-450)]">
               {composer}
             </p>
+            <UploadedBy text="Uploaded by you" />
             <ul className="m-0 mt-3 flex list-none flex-wrap items-center gap-x-4 gap-y-1 p-0 text-sm font-bold text-[var(--color-neutral-600)]">
               {facts.map(({ icon: Icon, label, text, accent }) => (
                 <li key={label} aria-label={`${label}: ${text}`} className={`flex items-center gap-1.5 ${accent ? 'text-[var(--color-brand-strong)]' : ''}`}>
