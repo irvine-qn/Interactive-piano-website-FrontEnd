@@ -5,6 +5,11 @@ Mục **Cần làm sau khi pull** là các lệnh phải chạy trên máy của
 
 ---
 
+## 2026-11-06 – Lớp gọi API upload (U-FE-01, Bình)
+
+- Thêm `features/upload/api/uploadApi.js` và `features/upload/config/upload.js`: phân tích file MIDI, tạo bài, bài của tôi / của một người dùng (cho trang profile của Quỳnh), sửa, xoá. Chưa có giao diện.
+- Request bị huỷ trả mã `CANCELED` thay vì `NETWORK_ERROR` (xem `docs/NOTES.md` mục 3b).
+
 ## 2026-11-05 – Hoá biểu, dấu nối và test
 
 - Bản nhạc có hoá biểu và dấu nối (dữ liệu từ Backend).

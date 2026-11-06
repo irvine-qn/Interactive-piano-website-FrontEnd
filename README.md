@@ -135,6 +135,7 @@ frontend/
 │   │   ├── home/              # Virtual piano trang chủ
 │   │   ├── piano/audio/       # toneEngine (Tone.js Sampler) dùng chung Home + Workspace
 │   │   ├── workspace/         # Trang luyện tập: store, audio, canvas waterfall, bàn phím
+│   │   ├── upload/            # Upload sheet MIDI: api/uploadApi.js, config/upload.js (đang làm)
 │   │   └── library/           # Sheet Library
 │   │       ├── api/           # libraryApi: getSheets, getTags
 │   │       ├── components/    # LibraryBrowser, LibraryToolbar, LibraryFilters, SheetGrid, SheetCard, SheetCover, Pagination

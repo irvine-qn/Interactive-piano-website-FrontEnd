@@ -70,6 +70,13 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
 - ESLint (react-hooks v7) báo lỗi `set-state-in-effect`: trạng thái "đang tải" nên **suy ra** từ dữ liệu (vd. so `result.key` với `reloadKey`) thay vì gọi `setState` trong effect.
 - Màu và bóng dùng design token trong `index.css` (`var(--color-*)`, `var(--shadow-hard)`), kể cả trên canvas (đọc bằng `getComputedStyle`).
 
+## 3b. Upload sheet (Bình, đang làm)
+
+- Gọi API qua `features/upload/api/uploadApi.js` (`analyzeMidi`, `createSheet`, `getMySheets`, `getUserSheets`, `updateSheet`, `deleteSheet`). File gửi bằng `FormData`, **không tự đặt `Content-Type`** (axios tự thêm boundary). Mảng (tracks, tags) gửi thành nhiều trường cùng tên. Request có file dùng timeout 30 s (`config/upload.js`), dài hơn 10 s chung của `apiClient`.
+- Giới hạn file (1 MB, `.mid`/`.midi`) ở `features/upload/config/upload.js`, phải khớp Backend.
+- `lib/axios.js` (dùng chung) biến request bị huỷ (`AbortController`) thành `NETWORK_ERROR` *"Unable to connect to the server"*. Các hàm trong `uploadApi.js` trả mã riêng `CANCELED` khi request bị huỷ để giao diện bỏ qua; nơi khác dùng `signal` thì nên kiểm tra `signal.aborted` trước khi hiện lỗi.
+- `getUserSheets(userId)` dành cho trang profile của Quỳnh (bài PUBLIC của một người dùng).
+
 ## 4. Giới hạn đã biết (chưa sửa)
 
 | Vấn đề | Ghi chú |
