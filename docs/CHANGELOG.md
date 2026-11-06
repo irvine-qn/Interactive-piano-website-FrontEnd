@@ -5,6 +5,10 @@ Mục **Cần làm sau khi pull** là các lệnh phải chạy trên máy của
 
 ---
 
+## 2026-11-06 – Trang /upload (U-FE-02, Bình)
+
+- `/upload` (link *Upload* trên Navbar, cần đăng nhập) không còn là trang 404: khung trang theo thiết kế, thẻ ① File nhạc, ② Tracks, ③ Sheet details, Preview, Privacy, Copyright note. Chưa chọn được file (U-FE-03).
+
 ## 2026-11-06 – Lớp gọi API upload (U-FE-01, Bình)
 
 - Thêm `features/upload/api/uploadApi.js` và `features/upload/config/upload.js`: phân tích file MIDI, tạo bài, bài của tôi / của một người dùng (cho trang profile của Quỳnh), sửa, xoá. Chưa có giao diện.

@@ -76,6 +76,7 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
 - Giới hạn file (1 MB, `.mid`/`.midi`) ở `features/upload/config/upload.js`, phải khớp Backend.
 - `lib/axios.js` (dùng chung) biến request bị huỷ (`AbortController`) thành `NETWORK_ERROR` *"Unable to connect to the server"*. Các hàm trong `uploadApi.js` trả mã riêng `CANCELED` khi request bị huỷ để giao diện bỏ qua; nơi khác dùng `signal` thì nên kiểm tra `signal.aborted` trước khi hiện lỗi.
 - `getUserSheets(userId)` dành cho trang profile của Quỳnh (bài PUBLIC của một người dùng).
+- Trang `/upload` (`pages/UploadPage.jsx`): 1 trang 2 cột theo thiết kế (WBS D6). Thẻ dùng `features/upload/components/UploadCard.jsx` (`number` = ô số thứ tự, `locked` = chưa dùng được). **Toàn bộ state của trang nằm trong hook `useUploadForm`** (file, kết quả analyze, thông tin bài): thẻ mới chỉ đọc/ghi qua hook này, không tự giữ state riêng, để sửa thẻ này không mất dữ liệu thẻ khác. Thẻ ② ③ và Preview mở khi `isAnalyzed`.
 
 ## 4. Giới hạn đã biết (chưa sửa)
 
