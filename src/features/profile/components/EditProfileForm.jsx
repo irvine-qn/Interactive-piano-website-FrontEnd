@@ -2,6 +2,7 @@ import { CheckSquare, Plus, Upload, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import defaultAvatar from "../../../assets/virtual-piano-assets/default-avatar.jpeg";
+import { toImageUrl } from "../../../config/api";
 import { DISPLAY_NAME_MAX_LENGTH } from "../../../config/auth";
 import {
   BIO_MAX_LENGTH,
@@ -15,7 +16,7 @@ import {
 import { ROUTES } from "../../../config/routes";
 import { useAuthStore } from "../../../store/useAuthStore";
 import { FormError, inputClass } from "../../auth/components/AuthFormFields";
-import { getMe, updateProfile } from "../api/profileApi";
+import { deleteProfileImage, getMe, updateProfile, uploadProfileImage } from "../api/profileApi";
 import { BannerDecorations } from "./ProfileHeader";
 
 const EDIT_BANNER_NOTES = [
@@ -24,6 +25,9 @@ const EDIT_BANNER_NOTES = [
   { className: "left-[75.6%] top-[59.3%] text-[var(--color-decor-pink)]" },
   { className: "left-[85.4%] top-[23.3%] text-[var(--color-decor-sky)]" },
 ];
+
+const PHOTO_ACCEPT = "image/jpeg,image/png,image/webp";
+const PHOTO_MAX_BYTES = 5 * 1024 * 1024;
 
 const LABEL_CLASS = "mb-2 block text-sm font-bold text-[var(--color-ink)]";
 const DISABLED_INPUT_CLASS = `${inputClass} disabled:bg-[var(--color-surface-muted)] disabled:text-[var(--color-neutral-600)]`;
@@ -138,39 +142,108 @@ const TagField = ({ id, label, tags, onChange, tagClassName }) => {
   );
 };
 
-const ProfilePhotos = ({ user }) => (
-  <FormCard title="Profile photos">
-    <div className="relative h-36 border-2 border-[var(--color-ink)] bg-[var(--color-banner-peach)]">
-      <BannerDecorations notes={EDIT_BANNER_NOTES} showStar={false} />
-      <button
-        type="button"
-        disabled
-        className={`${SECONDARY_BUTTON_CLASS} absolute bottom-3 right-3`}
-      >
-        <Upload size={16} aria-hidden="true" />
-        Change cover
-      </button>
-    </div>
-    <div className="flex flex-wrap items-start gap-4 px-2">
-      <img
-        src={user.avatarUrl || defaultAvatar}
-        alt={`${user.username} avatar`}
-        className="avatar relative -mt-14 size-32 shrink-0 border-4 border-[var(--color-ink)] bg-[var(--color-surface-card)] object-cover"
-      />
-      <div className="flex flex-wrap gap-2 pt-4">
-        <button type="button" disabled className={PRIMARY_BUTTON_CLASS}>
-          <Upload size={16} aria-hidden="true" />
-          Change avatar
-        </button>
-        <button type="button" disabled className={SECONDARY_BUTTON_CLASS}>
-          Remove photo
-        </button>
-      </div>
-    </div>
-  </FormCard>
+const PhotoUploadButton = ({ label, disabled, onSelect, className }) => (
+  <label
+    className={`${className} has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-[var(--color-ink)] ${disabled ? "cursor-not-allowed opacity-60" : ""}`}
+  >
+    <input
+      type="file"
+      accept={PHOTO_ACCEPT}
+      disabled={disabled}
+      className="sr-only"
+      onChange={(event) => {
+        const file = event.target.files[0];
+        event.target.value = "";
+        if (file) onSelect(file);
+      }}
+    />
+    <Upload size={16} aria-hidden="true" />
+    {label}
+  </label>
 );
 
-const EditProfileFields = ({ user, onSaved }) => {
+const ProfilePhotos = ({ user, onChange }) => {
+  const [isBusy, setIsBusy] = useState(false);
+  const [error, setError] = useState(null);
+  const backgroundUrl = toImageUrl(user.backgroundUrl);
+
+  const run = async (request) => {
+    setIsBusy(true);
+    setError(null);
+    try {
+      onChange(await request());
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setIsBusy(false);
+    }
+  };
+
+  const upload = (kind) => (file) => {
+    if (file.size > PHOTO_MAX_BYTES) {
+      setError("The image must be at most 5 MB.");
+      return;
+    }
+    run(() => uploadProfileImage(kind, file));
+  };
+
+  return (
+    <FormCard title="Profile photos" hint="JPG, PNG or WebP, up to 5 MB. Saved right away.">
+      <div
+        className="relative h-36 border-2 border-[var(--color-ink)] bg-[var(--color-banner-peach)] bg-cover bg-center"
+        style={backgroundUrl ? { backgroundImage: `url("${backgroundUrl}")` } : undefined}
+      >
+        {!backgroundUrl && <BannerDecorations notes={EDIT_BANNER_NOTES} showStar={false} />}
+        <div className="absolute bottom-3 right-3 flex flex-wrap justify-end gap-2">
+          {backgroundUrl && (
+            <button
+              type="button"
+              disabled={isBusy}
+              onClick={() => run(() => deleteProfileImage("background"))}
+              className={SECONDARY_BUTTON_CLASS}
+            >
+              Remove cover
+            </button>
+          )}
+          <PhotoUploadButton
+            label="Change cover"
+            disabled={isBusy}
+            onSelect={upload("background")}
+            className={SECONDARY_BUTTON_CLASS}
+          />
+        </div>
+      </div>
+      <div className="flex flex-wrap items-start gap-4 px-2">
+        <img
+          src={toImageUrl(user.avatarUrl) || defaultAvatar}
+          alt={`${user.username} avatar`}
+          className="avatar relative -mt-14 size-32 shrink-0 border-4 border-[var(--color-ink)] bg-[var(--color-surface-card)] object-cover"
+        />
+        <div className="flex flex-wrap gap-2 pt-4">
+          <PhotoUploadButton
+            label={isBusy ? "Saving..." : "Change avatar"}
+            disabled={isBusy}
+            onSelect={upload("avatar")}
+            className={PRIMARY_BUTTON_CLASS}
+          />
+          {user.avatarUrl && (
+            <button
+              type="button"
+              disabled={isBusy}
+              onClick={() => run(() => deleteProfileImage("avatar"))}
+              className={SECONDARY_BUTTON_CLASS}
+            >
+              Remove photo
+            </button>
+          )}
+        </div>
+      </div>
+      <FormError message={error} />
+    </FormCard>
+  );
+};
+
+const EditProfileFields = ({ user, onSaved, onPhotoChange }) => {
   const [initialValues] = useState(() => toFormValues(user));
   const [values, setValues] = useState(initialValues);
   const [error, setError] = useState(null);
@@ -202,7 +275,7 @@ const EditProfileFields = ({ user, onSaved }) => {
 
   return (
     <form onSubmit={handleSubmit} className="flex min-w-0 flex-col gap-6">
-      <ProfilePhotos user={user} />
+      <ProfilePhotos user={user} onChange={onPhotoChange} />
 
       <FormCard title="Basic information">
         <div className="grid gap-5 md:grid-cols-2">
@@ -394,6 +467,11 @@ const EditProfileForm = () => {
     navigate(ROUTES.PROFILE);
   };
 
+  const handlePhotoChange = (savedUser) => {
+    setUser(savedUser);
+    updateUser(savedUser);
+  };
+
   if (loadError) {
     return (
       <div className="flex flex-col items-start gap-3">
@@ -413,7 +491,7 @@ const EditProfileForm = () => {
     );
   }
 
-  return <EditProfileFields user={user} onSaved={handleSaved} />;
+  return <EditProfileFields user={user} onSaved={handleSaved} onPhotoChange={handlePhotoChange} />;
 };
 
 export default EditProfileForm;

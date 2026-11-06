@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { toImageUrl } from "../../../config/api";
 import defaultAvatar from "../../../assets/virtual-piano-assets/default-avatar.jpeg";
 import { ROUTES } from "../../../config/routes";
 import AccountSecurityPanel from "./AccountSecurityPanel";
@@ -145,11 +146,14 @@ const ProfileSettingsMenu = ({ user }) => {
 
 const ProfileHeader = ({ user }) => (
   <header>
-    <div className="relative border-0 border-b-4 border-solid border-[var(--color-ink)] bg-[var(--color-banner-peach)]">
-      <BannerDecorations />
+    <div
+      className="relative border-0 border-b-4 border-solid border-[var(--color-ink)] bg-[var(--color-banner-peach)] bg-cover bg-center"
+      style={user.backgroundUrl ? { backgroundImage: `url("${toImageUrl(user.backgroundUrl)}")` } : undefined}
+    >
+      {!user.backgroundUrl && <BannerDecorations />}
       <div className="relative mx-auto flex h-32 w-full max-w-7xl items-end gap-4 px-4 sm:h-48 sm:gap-6">
         <img
-          src={user.avatarUrl || defaultAvatar}
+          src={toImageUrl(user.avatarUrl) || defaultAvatar}
           alt={`${user.username} avatar`}
           className="avatar relative -mb-12 size-24 shrink-0 border-4 border-[var(--color-ink)] bg-[var(--color-surface-card)] object-cover sm:-mb-20 sm:size-40"
         />

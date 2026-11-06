@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { toImageUrl } from "../../config/api";
 import defaultAvatar from "../../assets/virtual-piano-assets/default-avatar.jpeg";
 import fianoLogo from "../../assets/virtual-piano-assets/fiano-logo.png";
 import foxMascot from "../../assets/virtual-piano-assets/fox-mascot.png";
@@ -118,7 +119,7 @@ const Navbar = () => {
               className="avatar flex"
             >
               <img
-                src={defaultAvatar}
+                src={toImageUrl(user?.avatarUrl) || defaultAvatar}
                 alt=""
                 className="avatar h-12 w-12 border-[2.5px] border-[var(--color-ink)] object-cover"
               />
