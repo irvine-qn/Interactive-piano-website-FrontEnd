@@ -17,6 +17,7 @@ import { ROUTES } from "../../../config/routes";
 import { useAuthStore } from "../../../store/useAuthStore";
 import { FormError, inputClass } from "../../auth/components/AuthFormFields";
 import { deleteProfileImage, getMe, updateProfile, uploadProfileImage } from "../api/profileApi";
+import PhotoPositionDialog from "./PhotoPositionDialog";
 import { BannerDecorations } from "./ProfileHeader";
 
 const EDIT_BANNER_NOTES = [
@@ -165,6 +166,7 @@ const PhotoUploadButton = ({ label, disabled, onSelect, className }) => (
 const ProfilePhotos = ({ user, onChange }) => {
   const [isBusy, setIsBusy] = useState(false);
   const [error, setError] = useState(null);
+  const [pendingPhoto, setPendingPhoto] = useState(null);
   const backgroundUrl = toImageUrl(user.backgroundUrl);
 
   const run = async (request) => {
@@ -184,11 +186,28 @@ const ProfilePhotos = ({ user, onChange }) => {
       setError("The image must be at most 5 MB.");
       return;
     }
-    run(() => uploadProfileImage(kind, file));
+    setError(null);
+    setPendingPhoto({ kind, url: URL.createObjectURL(file) });
+  };
+
+  const closePendingPhoto = () => {
+    URL.revokeObjectURL(pendingPhoto.url);
+    setPendingPhoto(null);
+  };
+
+  const handlePhotoConfirm = (blob) => {
+    const { kind } = pendingPhoto;
+    closePendingPhoto();
+    run(() => uploadProfileImage(kind, blob));
+  };
+
+  const handlePhotoError = (message) => {
+    closePendingPhoto();
+    setError(message);
   };
 
   return (
-    <FormCard title="Profile photos" hint="JPG, PNG or WebP, up to 5 MB. Saved right away.">
+    <FormCard title="Profile photos" hint="JPG, PNG or WebP, up to 5 MB.">
       <div
         className="relative h-36 border-2 border-[var(--color-ink)] bg-[var(--color-banner-peach)] bg-cover bg-center"
         style={backgroundUrl ? { backgroundImage: `url("${backgroundUrl}")` } : undefined}
@@ -239,6 +258,15 @@ const ProfilePhotos = ({ user, onChange }) => {
         </div>
       </div>
       <FormError message={error} />
+      {pendingPhoto && (
+        <PhotoPositionDialog
+          kind={pendingPhoto.kind}
+          url={pendingPhoto.url}
+          onConfirm={handlePhotoConfirm}
+          onCancel={closePendingPhoto}
+          onError={handlePhotoError}
+        />
+      )}
     </FormCard>
   );
 };

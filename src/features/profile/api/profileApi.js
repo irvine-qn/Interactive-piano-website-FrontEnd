@@ -11,7 +11,7 @@ export const updateProfile = (data) =>
 
 export const uploadProfileImage = (kind, file) => {
   const form = new FormData();
-  form.append("file", file);
+  form.append("file", file, "photo.webp");
   return apiClient.put(`/users/profile/images/${kind}`, form, { timeout: 30000 }).then((res) => res.data);
 };
 

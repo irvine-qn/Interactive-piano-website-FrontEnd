@@ -60,7 +60,7 @@
 
 | Sub-Task | Component | Contract & Constraints | Status |
 | :--- | :--- | :--- | :--- |
-| **UE-IMG** `[BE+FE]` | Tải / xoá avatar và ảnh bìa | Nhận file bằng `multer` (RAM, tối đa 5 MB), `sharp` kiểm tra và đổi sang WebP, tạm lưu trong PostgreSQL (bảng `user_images`). API: `PUT` / `DELETE /users/profile/images/:kind`, `GET /users/:id/images/:kind`. Trang sửa profile lưu ảnh ngay khi chọn; profile và Navbar hiện ảnh mới. Sau này chuyển sang Cloudinary. | Done |
+| **UE-IMG** `[BE+FE]` | Tải / xoá avatar và ảnh bìa | Nhận file bằng `multer` (RAM, tối đa 5 MB), `sharp` kiểm tra và đổi sang WebP, tạm lưu trong PostgreSQL (bảng `user_images`). API: `PUT` / `DELETE /users/profile/images/:kind`, `GET /users/:id/images/:kind`. Chọn ảnh xong kéo để chỉnh vị trí trong hộp thoại, trình duyệt cắt đúng vùng đó rồi mới tải lên; profile và Navbar hiện ảnh mới. Sau này chuyển sang Cloudinary. | Done |
 
 ## Feature: Piano Workspace 
 
