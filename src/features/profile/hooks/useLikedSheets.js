@@ -4,7 +4,7 @@ import { getLikedSheets } from "../api/profileApi";
 
 const LIKED_SHEETS_SORT = "newest";
 
-export const useLikedSheets = () => {
+export const useLikedSheets = ({ q, difficulty } = {}) => {
   const [page, setPage] = useState(1);
   const [reloadKey, setReloadKey] = useState(0);
   const [sheets, setSheets] = useState([]);
@@ -14,7 +14,10 @@ export const useLikedSheets = () => {
   useEffect(() => {
     const controller = new AbortController();
 
-    getLikedSheets({ sort: LIKED_SHEETS_SORT, page }, { signal: controller.signal })
+    getLikedSheets(
+      { sort: LIKED_SHEETS_SORT, page, q: q || undefined, difficulty },
+      { signal: controller.signal },
+    )
       .then(({ data, meta }) => {
         setSheets((current) => {
           if (page === 1) return data;
@@ -29,7 +32,7 @@ export const useLikedSheets = () => {
       });
 
     return () => controller.abort();
-  }, [page, reloadKey]);
+  }, [page, reloadKey, q, difficulty]);
 
   const retry = useCallback(() => {
     setStatus("loading");

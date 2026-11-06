@@ -139,9 +139,6 @@ const ProfileSheetList = ({
       <p className="m-0 text-sm font-semibold text-[var(--color-neutral-400)]">
         Newest first
       </p>
-      <p className="m-0 text-sm font-semibold text-[var(--color-neutral-500)] sm:ml-auto">
-        Difficulty, plays, MIDI format
-      </p>
     </header>
     {sheets.length === 0 ? (
       <p className="m-0 border-2 border-dashed border-[var(--color-ink)] bg-[var(--color-surface-card)] p-8 text-center text-sm font-semibold text-[var(--color-neutral-600)]">

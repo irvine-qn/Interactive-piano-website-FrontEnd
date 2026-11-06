@@ -49,8 +49,8 @@ const SavedSheetActions = ({ sheet, onUnlike }) => {
   );
 };
 
-const SavedSheets = () => {
-  const { sheets, total, status, retry, loadMore, unlike } = useLikedSheets();
+const SavedSheets = ({ q, difficulty }) => {
+  const { sheets, total, status, retry, loadMore, unlike } = useLikedSheets({ q, difficulty });
 
   if (status === "loading") {
     return (
@@ -78,7 +78,7 @@ const SavedSheets = () => {
   return (
     <ProfileSheetList
       ariaLabel="Saved collections"
-      emptyMessage="No liked sheets yet."
+      emptyMessage={q || difficulty ? "No sheets match your search." : "No liked sheets yet."}
       sheets={sheets}
       total={total}
       onLoadMore={loadMore}

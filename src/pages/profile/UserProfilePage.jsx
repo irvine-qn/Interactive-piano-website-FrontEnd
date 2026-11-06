@@ -12,6 +12,8 @@ const UserProfilePage = () => {
   const location = useLocation();
   const user = useAuthStore((state) => state.user);
   const [activeTab, setActiveTab] = useState("uploadedSheets");
+  const [search, setSearch] = useState("");
+  const [difficulty, setDifficulty] = useState();
 
   return (
     <div className="flex flex-1 flex-col">
@@ -29,9 +31,22 @@ const UserProfilePage = () => {
           )}
           <ProfileStats />
           <div className="mt-6">
-            <ProfileTabs activeTab={activeTab} onTabChange={setActiveTab} />
+            <ProfileTabs
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              search={search}
+              onSearchChange={setSearch}
+              difficulty={difficulty}
+              onDifficultyChange={setDifficulty}
+            />
             {activeTab === "uploadedSheets" && <ProfileSheetList />}
-            {activeTab === "savedCollections" && <SavedSheets />}
+            {activeTab === "savedCollections" && (
+              <SavedSheets
+                key={`${search}|${difficulty}`}
+                q={search}
+                difficulty={difficulty}
+              />
+            )}
           </div>
         </div>
       </main>

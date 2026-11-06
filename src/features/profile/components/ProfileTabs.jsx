@@ -5,6 +5,10 @@ import {
   ListFilter,
   Search,
 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { DIFFICULTY_META } from "../../library/config/difficulty";
+
+const SEARCH_DEBOUNCE_MS = 300;
 
 const TAB_ITEMS = [
   { key: "uploadedSheets", label: "Uploaded sheets", Icon: FileMusic },
@@ -12,7 +16,89 @@ const TAB_ITEMS = [
   { key: "practiceHistory", label: "Practice history", Icon: BarChart3 },
 ];
 
-const ProfileTabs = ({ counts = {}, activeTab = TAB_ITEMS[0].key, onTabChange }) => (
+const TABS_WITH_SEARCH = ["uploadedSheets", "savedCollections"];
+
+const DIFFICULTY_OPTIONS = [
+  { value: undefined, label: "All" },
+  ...Object.entries(DIFFICULTY_META).map(([value, { label }]) => ({ value, label })),
+];
+
+const SheetSearchControls = ({ search, onSearchChange, difficulty, onDifficultyChange }) => {
+  const [draft, setDraft] = useState(search);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const onSearchChangeRef = useRef(onSearchChange);
+
+  useEffect(() => {
+    onSearchChangeRef.current = onSearchChange;
+  }, [onSearchChange]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => onSearchChangeRef.current?.(draft.trim()), SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [draft]);
+
+  return (
+    <>
+      <div className="flex gap-2">
+        <div className="flex h-10 min-w-0 flex-1 items-center gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-3 text-[var(--color-neutral-350)]">
+          <Search size={16} aria-hidden="true" />
+          <input
+            type="search"
+            value={draft}
+            onChange={(event) => setDraft(event.target.value)}
+            placeholder="Search sheets..."
+            aria-label="Search sheets"
+            className="min-w-0 flex-1 border-0 bg-transparent font-[inherit] text-sm text-[var(--color-ink)] outline-none placeholder:text-[var(--color-neutral-350)]"
+          />
+        </div>
+        <button
+          type="button"
+          aria-label="Filter sheets"
+          aria-expanded={isFilterOpen}
+          onClick={() => setIsFilterOpen((open) => !open)}
+          className={`flex size-10 shrink-0 cursor-pointer items-center justify-center border-2 border-[var(--color-ink)] text-[var(--color-ink)] transition-colors hover:bg-[var(--color-brand-tint)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-brand)] ${
+            difficulty ? "bg-[var(--color-brand-tint)]" : "bg-[var(--color-surface-soft)]"
+          }`}
+        >
+          <ListFilter size={16} aria-hidden="true" />
+        </button>
+      </div>
+      {isFilterOpen && (
+        <div role="group" aria-label="Filter by difficulty" className="flex flex-wrap gap-2">
+          {DIFFICULTY_OPTIONS.map(({ value, label }) => {
+            const isSelected = value === difficulty;
+
+            return (
+              <button
+                key={label}
+                type="button"
+                aria-pressed={isSelected}
+                onClick={() => onDifficultyChange?.(value)}
+                className={`h-8 cursor-pointer border-2 border-[var(--color-ink)] px-3 font-[inherit] text-[13px] font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-brand)] ${
+                  isSelected
+                    ? "bg-[var(--color-brand)] text-[var(--color-neutral-white)]"
+                    : "bg-[var(--color-surface-card)] text-[var(--color-ink)] hover:bg-[var(--color-surface-soft)]"
+                }`}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </>
+  );
+};
+
+const ProfileTabs = ({
+  counts = {},
+  activeTab = TAB_ITEMS[0].key,
+  onTabChange,
+  search = "",
+  onSearchChange,
+  difficulty,
+  onDifficultyChange,
+}) => (
   <section
     aria-label="Profile content"
     className="flex flex-col gap-3 border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] p-4"
@@ -44,24 +130,14 @@ const ProfileTabs = ({ counts = {}, activeTab = TAB_ITEMS[0].key, onTabChange })
         );
       })}
     </nav>
-    <div className="flex gap-2">
-      <div className="flex h-10 min-w-0 flex-1 items-center gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-3 text-[var(--color-neutral-350)]">
-        <Search size={16} aria-hidden="true" />
-        <input
-          type="search"
-          placeholder="Search sheets..."
-          aria-label="Search sheets"
-          className="min-w-0 flex-1 border-0 bg-transparent font-[inherit] text-sm text-[var(--color-ink)] outline-none placeholder:text-[var(--color-neutral-350)]"
-        />
-      </div>
-      <button
-        type="button"
-        aria-label="Filter sheets"
-        className="flex size-10 shrink-0 cursor-pointer items-center justify-center border-2 border-[var(--color-ink)] bg-[var(--color-surface-soft)] text-[var(--color-ink)] transition-colors hover:bg-[var(--color-brand-tint)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-brand)]"
-      >
-        <ListFilter size={16} aria-hidden="true" />
-      </button>
-    </div>
+    {TABS_WITH_SEARCH.includes(activeTab) && (
+      <SheetSearchControls
+        search={search}
+        onSearchChange={onSearchChange}
+        difficulty={difficulty}
+        onDifficultyChange={onDifficultyChange}
+      />
+    )}
   </section>
 );
 

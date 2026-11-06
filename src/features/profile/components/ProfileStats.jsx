@@ -19,7 +19,7 @@ const ProfileStats = ({ stats = {} }) => (
         </span>
         <div>
           <p className="m-0 text-3xl font-extrabold text-[var(--color-ink)]">
-            {stats[key] ?? "-"}
+            {stats[key] ?? 0}
           </p>
           <p className="m-0 mt-1 text-xs font-bold uppercase text-[var(--color-neutral-600)]">
             {label}
