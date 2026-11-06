@@ -6,7 +6,7 @@
 | :--- | :--- | :--- | :--- |
 
 > **Quy ước chung**
-> - **Phân công:** các task trong file này (Hạ tầng chung, Piano Workspace, Sheet Library, **User upload sheet (MIDI)**, Handle Error page) là của **Bình** (Nguyễn Thanh Bình). **Quỳnh** (Nguyễn Thị Ngọc Quỳnh) phụ trách Feature **HomePage**, **Auth**, **User profile** và **User edit profile** (các mục đó để trống ở đây, Quỳnh tự quản lý). Ai đọc file này để làm việc thì chỉ làm task của người đang được giao.
+> - **Phân công:** các task trong file này (Hạ tầng chung, Piano Workspace, Sheet Library, **User upload sheet (MIDI)**, Handle Error page) là của **Bình** (Nguyễn Thanh Bình). **Quỳnh** (Nguyễn Thị Ngọc Quỳnh) phụ trách Feature **HomePage**, **Auth**, **User profile** và **User edit profile** (Quỳnh tự quản lý; HomePage để trống ở đây). Ai đọc file này để làm việc thì chỉ làm task của người đang được giao.
 > - Mã task có tiền tố repo: `[BE]` = `Interactive-piano-website-Backend`, `[FE]` = `Interactive-piano-website-FrontEnd`. File WBS duy nhất nằm ở repo FE.
 > - Mỗi sub-task chỉ đụng vài file, có thể review/commit độc lập. Cột Contract ghi rõ file bị ảnh hưởng và task phụ thuộc (`Phụ thuộc:`).
 > - Không sửa code của Feature HomePage (`pages/HomePage.jsx`, `features/home/*`). Code dùng chung với Home (`features/piano/audio/toneEngine.js`, `components/common/*`, `index.css`, BE `/piano`, `/frequencies`) chỉ được sửa nếu không đổi hành vi của Home.
@@ -198,13 +198,32 @@ Ghi lại để biết code hiện tại khác gì so với các task ở trên.
 
 ### Sub feature: User profile (Quỳnh)
 
+> **Hiện trạng:** `pages/profile/UserProfilePage.jsx` mới có banner chào mừng, tên hiển thị và `@username`, đọc từ `useAuthStore`. Backend chưa có API người dùng.
+> **Contract API theo `README_main.md` mục 6.2.** Task `[BE]` đổi API thì cập nhật `docs/api.md` + README của BE.
+
 | Sub-Task | Component | Contract & Constraints | Status |
 | :--- | :--- | :--- | :--- |
+| **UP-01** `[BE]` | `GET /api/v1/users/me` | Tạo `src/features/users/users.routes.js`, `users.controller.js`, `users.service.js`; mount trong `app.js`. Dùng `requireAuth`, thêm `findById` vào `users.repository.js`. Trả về user công khai, cùng dạng `user` của login, **không có `password_hash`**. Token hợp lệ nhưng tài khoản không còn tồn tại: `401 UNAUTHORIZED` (theo `docs/api.md`). | Done |
+| **UP-02** `[FE]` | API layer + đồng bộ store | Tạo `features/profile/api/profileApi.js` dùng `lib/axios.js` (tự gắn token, 401 tự `clearAuth`): `getMe({ signal })`. Thêm action `updateUser(user)` vào `useAuthStore.js`, giữ nguyên `accessToken`. Hook `features/profile/hooks/useProfile.js`: gọi `getMe` khi vào trang và ghi đè `user` đã persist (dữ liệu trong localStorage có thể cũ), huỷ request khi unmount. Phụ thuộc: UP-01. | To Do |
+| **UP-03** `[FE]` | Giao diện trang profile | `UserProfilePage.jsx` chỉ ghép component trong `features/profile/components/`: avatar (dùng `default-avatar.jpeg` khi chưa có ảnh), tên hiển thị, `@username`, email, ngày tham gia, nút *Edit profile*. Có trạng thái loading/lỗi/thử lại, dùng design token. `displayName` có thể `null` trong DB nên fallback về `username`. Giữ banner chào mừng sau đăng ký, xử lý để F5 không hiện lại (hiện `location.state` còn nguyên sau khi tải lại trang). Phụ thuộc: UP-02. | To Do |
+| **UP-04** `[BE+FE]` | Danh sách bài đã upload | Mục *My uploads* trên trang profile. Cần `sheets.uploaderId` từ *User upload sheet* (Bình), **thống nhất API với Bình trước khi làm**. Phụ thuộc: UP-03, Feature upload MIDI. | To Do |
+| **UP-05** `[FE]` | Review profile | `lint` + `build`. Test thủ công: F5 giữ đăng nhập, token hết hạn thì về `/login`, BE tắt thì hiện lỗi, tài khoản `displayName` rỗng, responsive. Cập nhật README FE. Phụ thuộc: UP-03. | To Do |
 
 ### Sub feature: User edit profile (Quỳnh)
 
+> **Phạm vi (`README_main.md` mục 3.4):** sửa Display Name, Bio, Avatar, Background Banner và đổi mật khẩu. `username`, `email` chỉ hiển thị.
+> **Lưu ảnh (đã chốt):** tạm lưu trong database để chạy local, sau này chuyển sang Cloudinary. Ảnh nằm ở bảng riêng và client chỉ dùng URL, để khi chuyển chỉ phải đổi phần lưu và phục vụ ảnh.
+
 | Sub-Task | Component | Contract & Constraints | Status |
 | :--- | :--- | :--- | :--- |
+| **UE-01** `[BE]` | Bio, URL ảnh + bảng ảnh tạm | `model User` thêm `bio`, `avatarUrl`, `backgroundUrl` (đều nullable). Thêm model `UserImage` (`userId`, `kind` là avatar/background, `data Bytes`, `mimeType`, khoá chính `userId + kind`), migration `add_user_profile`. Thêm field vào `toRow`, `toPublicUser`. Response login/register có thêm field nên phải chụp lại baseline `scripts/auth-regression.mjs` và xác nhận chỉ khác các field này. Báo Bình chạy migration. | To Do |
+| **UE-02** `[BE]` | `PUT /api/v1/users/profile` (chữ) | Dùng `requireAuth`. Body `{ displayName, bio }`: trim, `displayName` bắt buộc, tối đa `DISPLAY_NAME_MAX_LENGTH`, `bio` có giới hạn độ dài trong `auth.constants.js`; sai thì `422 VALIDATION_FAILED`. Chỉ nhận field trong danh sách cho phép, **bỏ qua `role`, `isVerified`, `email`, `username`, `passwordHash`**. Lấy id từ `req.userId`, không nhận id từ client. Trả về user công khai. Có unit test cho schema. Phụ thuộc: UP-01, UE-01. | To Do |
+| **UE-03** `[FE]` | Trang + form chỉnh sửa | Thêm `ROUTES.PROFILE_EDIT` (`/profile/edit`) trong `ProtectedRoute`. Tạo `pages/profile/EditProfilePage.jsx` + `features/profile/components/EditProfileForm.jsx`, tái dùng `FieldLabel`, `FormError`, `inputClass`. Điền sẵn dữ liệu hiện tại; validate giống BE; nút *Save* disable khi đang gửi hoặc chưa có thay đổi; *Cancel* về profile. Thành công thì `updateUser` để Navbar đổi tên ngay, rồi về profile. Phụ thuộc: UE-02, UP-02. | To Do |
+| **UE-04** `[BE]` | `PUT /api/v1/users/profile` (ảnh) | Cùng endpoint UE-02, nhận thêm `multipart/form-data` với file `avatar`, `background` (không bắt buộc), chỉ JPEG/PNG/WebP, giới hạn dung lượng (đề xuất 2 MB). **Kiểm tra định dạng theo nội dung file**, không tin đuôi file hay `Content-Type` của client. Sai định dạng/quá dung lượng: `422 VALIDATION_FAILED`. Lưu vào `UserImage` (ảnh mới ghi đè ảnh cũ), cập nhật `avatarUrl`/`backgroundUrl`. Thêm `GET /api/v1/users/:username/avatar` và `/background` để trả ảnh; 2 route này là tạm thời, bỏ khi chuyển Cloudinary. Không select `data` ở các truy vấn user. Phụ thuộc: UE-01, UE-02. | To Do |
+| **UE-05** `[FE]` | Chọn và tải ảnh | Thêm vào form: chọn avatar và banner, xem trước (thu hồi object URL khi đổi ảnh/unmount), báo lỗi sai định dạng/quá dung lượng ngay ở client, trạng thái đang tải. Axios đang có `timeout` 10s nên cần tăng riêng cho request có file. Phụ thuộc: UE-03, UE-04. | To Do |
+| **UE-06** `[FE]` | Hiện ảnh toàn site | `navbar.jsx` và trang profile dùng `user.avatarUrl`, không có hoặc ảnh lỗi thì về `default-avatar.jpeg`; trang profile dùng thêm `user.backgroundUrl`. Chỉ sửa phần avatar của Navbar. Ảnh banner mặc định: báo Quỳnh cung cấp, không tự tạo. Phụ thuộc: UE-05. | To Do |
+| **UE-07** `[BE+FE]` | Đổi mật khẩu | `PUT /api/v1/users/change-password` (`requireAuth`, body `{ currentPassword, newPassword }`, cùng quy tắc mật khẩu với đăng ký, sai mật khẩu hiện tại thì báo lỗi). FE: khu vực bảo mật riêng, nối vào nút *Change password* của `AccountSecurityPanel`. Phụ thuộc: UP-01. | To Do |
+| **UE-08** `[BE+FE]` | Review edit profile | `lint` + `build` + test BE + `auth-regression --compare`. Test thủ công: tên rỗng, quá dài, bio quá dài, file sai định dạng đổi đuôi, ảnh quá lớn, F5 sau khi lưu, gửi kèm `role` không có tác dụng, đổi mật khẩu rồi đăng nhập lại. Cập nhật `docs/api.md`, README, `docs/CHANGELOG.md` cả 2 repo. Phụ thuộc: UE-06, UE-07. | To Do |
 
 ### Sub feature: User upload sheet (Bình)
 
@@ -264,20 +283,38 @@ Ghi lại để biết code hiện tại khác gì so với các task ở trên.
 > **Thứ tự đề xuất:** U-BE-01 → U-BE-02 → (U-BE-03 tuỳ chọn) → U-BE-04 → U-BE-05 → U-BE-06 → U-FE-01 → U-FE-02 → U-FE-03 → U-FE-04 → U-FE-05 → U-FE-06 → U-BE-07 → U-FE-07 → U-BE-08 → U-FE-10 → U-BE-09 → U-BE-10 → (U-FE-09 hoãn, chờ profile của Quỳnh) → (U-FE-08 tuỳ chọn) → U-BE-11 → U-FE-11. U-BE-12 làm khi deploy. Làm xong luồng chính (upload được và chơi được) trước, quyền xem và quản lý bài sau.
 
 ## Feature: Auth
+
+> Việc chuyển Auth từ `pg` sang Prisma do Bình làm, xem C-07A → C-07D.
+
 ### Sub feature: Login
 
 | Sub-Task | Component | Contract & Constraints | Status |
 | :--- | :--- | :--- | :--- |
+| **A-L01** `[BE]` | `POST /api/v1/auth/login` | Body `{ identifier, password }`, `identifier` là username hoặc email (trim, chữ thường). So khớp mật khẩu bằng `bcrypt`, trả `{ accessToken, user }` (JWT chứa `sub`, `username`, `role`). Sai tài khoản hoặc mật khẩu đều trả `401 INVALID_CREDENTIALS`. Thiếu trường: `422 VALIDATION_FAILED`. File: `features/auth/auth.{routes,controller,service,schema}.js`. | Done |
+| **A-L02** `[FE]` | Trang + form đăng nhập | `pages/auth/LoginPage.jsx`, `features/auth/components/{AuthLayout,AuthFormFields,LoginForm}.jsx`, `features/auth/api/authApi.js` (ánh xạ mã lỗi sang câu tiếng Anh). Có validate rỗng, ẩn/hiện mật khẩu, trạng thái đang gửi, link *Forgot password* và *Sign up*. Thành công thì quay lại trang trước đó (`location.state.from`), mặc định về Home. | Done |
+| **A-L03** `[FE]` | Lưu phiên đăng nhập | `store/useAuthStore.js`: Zustand `persist` (key `fiano-auth`), `setAuth`, `clearAuth`; khi tải lại trang, token hết hạn thì tự xoá. `lib/axios.js`: tự gắn `Authorization: Bearer`, gặp 401 thì `clearAuth`. | Done |
+| **A-L04** `[FE]` | Bảo vệ route | `routes/RouteGuards.jsx`: `ProtectedRoute` (chưa đăng nhập thì về `/login`, nhớ `from`), `GuestRoute` (đã đăng nhập thì không vào được login/register/forgot). `config/routes.js`, `AppRoutes.jsx`, trang `pages/NotFoundPage.jsx` + route `*`. | Done |
+| **A-L05** `[FE]` | Navbar theo trạng thái đăng nhập | `components/common/navbar.jsx`: khách thấy *Log in* / *Sign up*; đã đăng nhập thấy *Upload*, avatar, menu *Profile* / *Log out*. Đăng xuất thì `clearAuth` và về Home. Có menu mobile. | Done |
+| **A-L06** `[BE+FE]` | Đăng nhập bằng Google | Nút *Continue with Google (coming soon)* đang bị disable trong `LoginForm.jsx`, chưa có logic. `POST /api/v1/auth/google` (`README_main.md` mục 6.1), chưa chọn thư viện. | To Do |
 
 ### Sub feature: Forgot password
 
+> **Chưa dùng được:** FE đã gọi `POST /auth/forgot-password` nhưng Backend chưa có route này nên hiện nhận 404 và form báo lỗi. Chưa có dịch vụ gửi email.
+
 | Sub-Task | Component | Contract & Constraints | Status |
 | :--- | :--- | :--- | :--- |
+| **A-F01** `[FE]` | Trang + form quên mật khẩu | `pages/auth/ForgotPasswordPage.jsx`, `features/auth/components/ForgotPasswordForm.jsx`, hàm `forgotPassword` trong `authApi.js`. Validate email, trạng thái đang gửi, màn hình *Check your inbox*, link về đăng nhập. | Done |
+| **A-F02** `[BE]` | `POST /api/v1/auth/forgot-password` | Tạo token/OTP ngẫu nhiên dùng một lần, có hạn; chỉ lưu bản hash trong DB (migration riêng); gửi qua email bằng Nodemailer. **Chỉ gửi nếu tài khoản đã xác thực email, ngược lại báo lỗi** (`README_main.md` mục 3.5). Có giới hạn tần suất. Phụ thuộc: A-R04. | To Do |
+| **A-F03** `[BE+FE]` | Đặt lại mật khẩu | `POST /api/v1/auth/reset-password` (`{ token, password }`, cùng quy tắc mật khẩu với đăng ký, token dùng xong thì vô hiệu) + trang `/reset-password` mở từ link trong email. Phụ thuộc: A-F02. | To Do |
 
 ### Sub feature: Register
 
 | Sub-Task | Component | Contract & Constraints | Status |
 | :--- | :--- | :--- | :--- |
+| **A-R01** `[BE]` | `POST /api/v1/auth/register` | Body `{ displayName, username, email, password }`. Username chỉ gồm chữ thường và số; email chuyển về chữ thường; mật khẩu tối thiểu 8 ký tự, có ít nhất 1 chữ hoa và 1 chữ số; hash bằng `bcrypt`. Trả `201 { accessToken, user }`. Lỗi: `409 USERNAME_TAKEN`, `409 EMAIL_TAKEN`, `422 VALIDATION_FAILED`. Giới hạn độ dài trong `auth.constants.js`. | Done |
+| **A-R02** `[BE]` | Test Auth | `auth.schema.test.js`: unit test validate đăng ký/đăng nhập. Test hồi quy qua API: `scripts/auth-regression.mjs` (C-07B). | Done |
+| **A-R03** `[FE]` | Trang + form đăng ký | `pages/auth/RegisterPage.jsx`, `features/auth/components/RegisterForm.jsx`, `config/auth.js`. Validate khớp BE, thanh độ mạnh mật khẩu, nhập lại mật khẩu, trạng thái đang gửi. Thành công thì tự đăng nhập và sang `/profile` kèm banner chào mừng. | Done |
+| **A-R04** `[BE+FE]` | Xác minh email | Cột `isVerified` đã có (mặc định `false`) nhưng chưa có luồng xác minh. `POST /api/v1/auth/verify-email`, gửi email bằng Nodemailer. | To Do |
 
 ## Feature: Handle Error page
 
@@ -293,7 +330,7 @@ Ghi lại để biết code hiện tại khác gì so với các task ở trên.
 
 - **Navbar – ô search:** gõ + Enter thì chuyển sang `/library?q=...`.
 - ~~**Navbar – menu**~~ và ~~**Pages** (tách Login/Register/Forgot)~~: Quỳnh đã làm trong Feature Auth.
-- **Database:** PostgreSQL + Prisma, migration theo feature. Bảng `users` đưa vào Prisma ở C-07; Feature User sẽ thêm migration gắn `sheets.uploaderId` → `users.id`. File MIDI (Bình, upload sheet) và ảnh avatar (Quỳnh, edit profile) lưu trên cloud: nên dùng chung một dịch vụ lưu trữ, thống nhất trước khi làm.
+- **Database:** PostgreSQL + Prisma, migration theo feature. Bảng `users` đưa vào Prisma ở C-07; Feature User sẽ thêm migration gắn `sheets.uploaderId` → `users.id`. Dịch vụ lưu trữ đã chốt là Cloudinary (`README_main.md`). Ảnh của edit profile tạm lưu trong database để chạy local, chuyển lên Cloudinary sau; file MIDI (Bình) cần thống nhất có làm tương tự không.
 - `index.html` chưa có favicon (trình duyệt báo 404 `/favicon.ico` ở mọi trang).
 - HomePage hiện lỗi đỏ "Unable to access MIDI devices…" khi người dùng không cấp quyền Web MIDI; nên ẩn hoặc diễn đạt nhẹ hơn.
 - **Upload:** chỉ nhận file MIDI. Engine: `src/features/uploads/midiToSheet.js` (BE), xem mục *User upload sheet (Bình)*.

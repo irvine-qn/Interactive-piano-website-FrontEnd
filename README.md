@@ -99,13 +99,17 @@ Lệnh này sẽ đọc file `package.json` và tự động cài toàn bộ th�
 ## 4. Chạy Frontend
 
 > Frontend lấy dữ liệu từ Backend (cấu hình piano ở Home, danh sách bài ở Sheet Library, nốt nhạc ở Workspace).
-> Hãy chạy Backend trước theo README của repo `Interactive-piano-website-Backend`: bật PostgreSQL (`docker compose up -d`), `npm run db:migrate`, `npm run db:seed`, rồi `npm start` (mặc định `http://localhost:5000`).
+> Hãy chạy Backend trước theo mục *Useful Commands* trong README của repo `Interactive-piano-website-Backend` (mặc định `http://localhost:5000`).
 
-Sau khi cài dependencies:
+Chạy lần đầu:
 
 ```bash
+npm install
+cp .env.example .env
 npm run dev
 ```
+
+Những lần sau chỉ cần `npm run dev`. Sau khi pull code mới, chạy `npm install` trước.
 
 Terminal sẽ hiển thị URL tương tự:
 
