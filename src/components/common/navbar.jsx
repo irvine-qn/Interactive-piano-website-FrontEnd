@@ -78,7 +78,11 @@ const Navbar = () => {
             className="ml-[120px] h-[46px] w-[95px]"
           />
         </NavLink>
-        <label className="ml-10 hidden h-10 w-[380px] shrink items-center border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-4 md:flex">
+        <label
+          className={`ml-10 hidden h-10 w-[380px] shrink items-center border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-4 md:flex ${
+            location.pathname === ROUTES.LIBRARY ? "invisible" : ""
+          }`}
+        >
           <input
             type="search"
             placeholder="Find some music?"
