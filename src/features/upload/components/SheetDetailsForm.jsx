@@ -23,7 +23,7 @@ const FieldMessage = ({ id, error, hint }) =>
     )
   );
 
-const TextField = ({ label, required, value, onChange, error, hint, maxLength, placeholder, autoComplete = 'off' }) => {
+export const TextField = ({ label, required, value, onChange, error, hint, maxLength, placeholder, autoComplete = 'off' }) => {
   const id = useId();
   return (
     <div className="min-w-0">
@@ -49,7 +49,7 @@ const TextField = ({ label, required, value, onChange, error, hint, maxLength, p
 };
 
 // Độ khó: 4 nút liền nhau (radio), chọn sẵn mức Backend gợi ý
-const DifficultyPicker = ({ value, suggested, onChange, error }) => {
+export const DifficultyPicker = ({ value, suggested, onChange, error }) => {
   const name = useId();
   const suggestedLabel = DIFFICULTY_META[suggested]?.label;
   return (

@@ -8,7 +8,7 @@ import { cleanText, formatKey, formatTimeSignature, toSlug } from '../utils/shee
 import { formatDuration } from '../../../utils/format';
 
 // Ô chọn màu bìa: 4 ô vuông (radio)
-const CoverColorPicker = ({ value, onChange }) => {
+export const CoverColorPicker = ({ value, onChange }) => {
   const name = useId();
   return (
     <fieldset className="m-0 border-0 p-0">

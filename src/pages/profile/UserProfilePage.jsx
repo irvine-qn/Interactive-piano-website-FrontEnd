@@ -4,15 +4,17 @@ import Footer from "../../components/common/footer";
 import PracticeHistory from "../../features/profile/components/PracticeHistory";
 import ProfileHeader from "../../features/profile/components/ProfileHeader";
 import ProfileMusicInfo from "../../features/profile/components/ProfileMusicInfo";
-import ProfileSheetList from "../../features/profile/components/ProfileSheetList";
 import ProfileStats from "../../features/profile/components/ProfileStats";
 import ProfileTabs from "../../features/profile/components/ProfileTabs";
 import SavedSheets from "../../features/profile/components/SavedSheets";
+import UploadedSheets from "../../features/profile/components/UploadedSheets";
+import { useUploadedCount } from "../../features/profile/hooks/useMySheets";
 import { useProfile } from "../../features/profile/hooks/useProfile";
 
 const UserProfilePage = () => {
   const location = useLocation();
   const user = useProfile();
+  const { count: uploadedCount, decrement: decrementUploaded } = useUploadedCount();
   const [activeTab, setActiveTab] = useState("uploadedSheets");
   const [search, setSearch] = useState("");
   const [difficulty, setDifficulty] = useState();
@@ -31,7 +33,7 @@ const UserProfilePage = () => {
               created.
             </p>
           )}
-          <ProfileStats />
+          <ProfileStats stats={{ uploadedSheets: uploadedCount }} />
           <ProfileMusicInfo user={user} />
           <div className="mt-6">
             <ProfileTabs
@@ -42,7 +44,14 @@ const UserProfilePage = () => {
               difficulty={difficulty}
               onDifficultyChange={setDifficulty}
             />
-            {activeTab === "uploadedSheets" && <ProfileSheetList />}
+            {activeTab === "uploadedSheets" && (
+              <UploadedSheets
+                key={`${search}|${difficulty}`}
+                q={search}
+                difficulty={difficulty}
+                onDeleted={decrementUploaded}
+              />
+            )}
             {activeTab === "practiceHistory" && <PracticeHistory />}
             {activeTab === "savedCollections" && (
               <SavedSheets
