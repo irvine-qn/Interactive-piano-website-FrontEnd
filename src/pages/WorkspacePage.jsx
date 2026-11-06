@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { ROUTES } from "../config/routes";
 import { useShallow } from "zustand/react/shallow";
 import { useWorkspaceStore } from "../features/workspace/store/useWorkspaceStore";
 import PianoKeyboard from "../features/workspace/components/PianoKeyboard";
@@ -45,7 +46,7 @@ const WorkspacePage = () => {
     <div className="flex flex-1 flex-col">
       <main className="mx-auto flex w-full max-w-[1600px] flex-1 flex-col gap-6 px-4 pb-14 pt-10">
         <section aria-label="Sheet information" className={`${CARD_CLASS} px-5 py-4`}>
-          <SheetInfoPanel sheet={sheet} status={sheetStatus} />
+          <SheetInfoPanel sheet={sheet} status={sheetStatus} notFound={sheetError?.code === "SHEET_NOT_FOUND"} />
         </section>
 
         <section aria-label="Playback controls" className={CARD_CLASS}>
@@ -79,7 +80,22 @@ const WorkspacePage = () => {
                   Loading sheet...
                 </div>
               )}
-              {sheetStatus === "error" && (
+              {sheetStatus === "error" && sheetError?.code === "SHEET_NOT_FOUND" && (
+                // E-02: bài không tồn tại hoặc là bài PRIVATE của người khác (BE trả 404 giống nhau). Thử lại cũng vô ích.
+                <div role="alert" className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-4 text-center">
+                  <p className="m-0 text-base font-bold text-[var(--color-ink)]">We couldn&apos;t find this sheet.</p>
+                  <p className="m-0 max-w-md text-sm font-medium text-[var(--color-neutral-600)]">
+                    The link may be wrong, the sheet may have been deleted, or it is a private sheet that only its uploader can see.
+                  </p>
+                  <Link
+                    to={ROUTES.LIBRARY}
+                    className="flex h-10 items-center border-2 border-[var(--color-ink)] bg-[var(--color-brand)] px-5 text-sm font-bold text-[var(--color-neutral-white)] no-underline shadow-[var(--shadow-hard-sm)] hover:bg-[var(--color-brand-strong)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+                  >
+                    Back to Sheet Library
+                  </Link>
+                </div>
+              )}
+              {sheetStatus === "error" && sheetError?.code !== "SHEET_NOT_FOUND" && (
                 <div role="alert" className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-4 text-center">
                   <p className="m-0 text-sm font-bold text-[var(--color-danger)]">{sheetError?.message}</p>
                   <button

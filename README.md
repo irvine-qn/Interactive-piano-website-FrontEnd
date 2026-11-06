@@ -139,6 +139,7 @@ frontend/
 │   │   ├── home/              # Virtual piano trang chủ
 │   │   ├── piano/audio/       # toneEngine (Tone.js Sampler) dùng chung Home + Workspace
 │   │   ├── workspace/         # Trang luyện tập: store, audio, canvas waterfall, bàn phím
+│   │   ├── upload/            # Upload sheet MIDI: api, config, hooks/useUploadForm, components (thẻ của trang /upload), utils
 │   │   └── library/           # Sheet Library
 │   │       ├── api/           # libraryApi: getSheets, getTags
 │   │       ├── components/    # LibraryBrowser, LibraryToolbar, LibraryFilters, SheetGrid, SheetCard, SheetCover, Pagination
@@ -146,7 +147,7 @@ frontend/
 │   │       ├── hooks/         # useLibraryQuery (bộ lọc theo URL), useTags
 │   │       └── utils/         # pagination (dãy số trang)
 │   ├── lib/axios.js           # apiClient: baseURL `${VITE_API_URL}/api/v1`, chuẩn hoá lỗi
-│   ├── pages/                 # HomePage, LibraryPage, WorkspacePage, NotFoundPage, auth/, profile/
+│   ├── pages/                 # HomePage, LibraryPage, WorkspacePage, UploadPage, NotFoundPage, auth/, profile/
 │   ├── routes/AppRoutes.jsx
 │   ├── utils/format.js        # formatCount (45.2K), formatDuration (03:45)
 │   ├── App.jsx
@@ -173,7 +174,8 @@ frontend/
 | `/workspace/:sheetId` | `WorkspacePage` | Luyện tập một bài, ví dụ `/workspace/canon-in-d` |
 | `/workspace` | → `/library` | Chưa chọn bài (vd. nút *Practice* trên Navbar) thì chuyển sang Library để chọn |
 | `/login`, `/register`, `/forgot-password` | `pages/auth/*` | Chỉ dành cho khách (`GuestRoute`), đã đăng nhập thì chuyển đi |
-| `/profile`, `/upload` | `pages/profile/*`, … | Cần đăng nhập (`ProtectedRoute`), chưa đăng nhập thì về `/login` |
+| `/profile` | `pages/profile/*` | Cần đăng nhập (`ProtectedRoute`), chưa đăng nhập thì về `/login` |
+| `/upload` | `UploadPage` | Tải file MIDI lên thành bài nhạc (cần đăng nhập). 1 trang 2 cột theo thiết kế `User_Upload_Sheet_Cartoon` |
 | `*` | `NotFoundPage` | Trang 404 |
 
 Đường dẫn được khai báo tập trung trong `src/config/routes.js` (`ROUTES`). Chữ hiển thị trên giao diện dùng **tiếng Anh**.

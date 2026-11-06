@@ -16,7 +16,7 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
 | Sheet Library (`features/library/*`, `pages/LibraryPage.jsx`) | **Bình** (nhánh `sheet-library`) | Quỳnh **không sửa** |
 | Piano Workspace (`features/workspace/*`, `pages/WorkspacePage.jsx`) | **Bình** (nhánh `sheet-library`) | Quỳnh **không sửa**, kể cả Wait Mode (T-09) đang pending |
 | User profile + User edit profile (`pages/profile/*`: trang profile, trang chỉnh sửa profile, ảnh avatar) | **Quỳnh** | Bình **không sửa** |
-| User upload sheet (upload file MIDI, trang `/upload`) | **Bình** (sắp làm) | Quỳnh **không sửa**. Route `ROUTES.UPLOAD` (đã có trong `AppRoutes.jsx`, nằm trong `ProtectedRoute`) hiện trỏ tạm tới `NotFoundPage`; Bình sẽ thay bằng trang upload. Trang profile cần danh sách bài đã upload thì thống nhất API trước |
+| User upload sheet (`features/upload/*`, `pages/UploadPage.jsx`, nhãn *Private* / *Uploaded by* trong `features/library/*`) | **Bình** | Quỳnh **không sửa**. Trang profile lấy bài của một người qua `getUserSheets(userId)` (`features/upload/api/uploadApi.js`, đã có) |
 | Bài đã lưu của người dùng | Chưa phân công | |
 | Code dùng chung: `features/piano/audio/toneEngine.js`, `components/common/*`, `index.css`, `lib/axios.js` | Cả hai | Chỉ sửa nếu **không đổi hành vi** của phần người kia. Sửa xong mở thử Home, Library, Workspace |
 
@@ -70,21 +70,31 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
 - ESLint (react-hooks v7) báo lỗi `set-state-in-effect`: trạng thái "đang tải" nên **suy ra** từ dữ liệu (vd. so `result.key` với `reloadKey`) thay vì gọi `setState` trong effect.
 - Màu và bóng dùng design token trong `index.css` (`var(--color-*)`, `var(--shadow-hard)`), kể cả trên canvas (đọc bằng `getComputedStyle`).
 
+## 3b. Upload sheet (Bình)
+
+- Gửi file bằng `FormData` thì **không tự đặt `Content-Type`** (axios tự thêm boundary). Mảng (tracks, tags) gửi thành nhiều trường cùng tên.
+- Giới hạn file (1 MB, `.mid`/`.midi`, timeout 30 s) và thông tin bài (độ dài title, composer, số tag) ở `features/upload/config/upload.js`, **phải khớp Backend**.
+- `lib/axios.js` (dùng chung) biến request bị huỷ thành `NETWORK_ERROR` *"Unable to connect to the server"*. `uploadApi.js` trả mã `CANCELED` để giao diện bỏ qua; nơi khác dùng `signal` thì kiểm tra `signal.aborted` trước khi hiện lỗi. Lỗi có thêm `details` nếu Backend gửi (vd `{ field: 'title' }`).
+- **Mọi state của trang `/upload` nằm trong `useUploadForm`**: thẻ mới chỉ đọc/ghi qua hook, không tự giữ state riêng. Muốn lấy title / độ khó thì đọc `details`, không đọc `fields`: trong `fields` giá trị `null` nghĩa là chưa sửa, dùng gợi ý của Backend. Không gộp trạng thái đổi track vào trạng thái file (dòng file sẽ nhảy về *Analyzing*/*Failed* khi chỉ đổi track).
+- Đừng bỏ đoạn chặn thả file toàn trang trong `FileDropzone`: lỡ thả ra ngoài thì trình duyệt mở file, rời trang, mất dữ liệu đang nhập.
+- Bìa bài vẽ theo `id`. Preview ở `/upload` đoán id bằng `toSlug(title)` (`utils/sheetDetails.js`): đổi cách Backend tạo id thì sửa cả `toSlug`, nếu không bìa Preview sẽ khác bìa thật.
+- `getUserSheets(userId)` dành cho trang profile của Quỳnh (bài PUBLIC của một người dùng).
+
 ## 4. Giới hạn đã biết (chưa sửa)
 
 | Vấn đề | Ghi chú |
 | --- | --- |
 | Đổi tốc độ đúng lúc một nốt đang ngân thì nốt đó vẫn ngân theo tốc độ cũ | Các nốt sau đúng tốc độ mới. Muốn chính xác thì tua lại tại chỗ khi đổi tốc độ, nhưng sẽ cắt các nốt đang ngân |
 | Tua vào giữa một nốt thì nốt đó không phát lại | Hành vi của `Tone.Part` |
-| Mở bài không tồn tại: timeline vẫn hiện độ dài của bài trước | Sẽ sửa ở E-02 (trang báo bài không tồn tại) |
+| Trang *Sheet not found* (và lúc đang tải bài): timeline vẫn hiện độ dài của bài trước, hoặc 4:10 nếu chưa mở bài nào | `duration` của `useWorkspaceStore` (mặc định 250 giây) không đặt lại khi tải bài lỗi |
 | Bundle JS lớn hơn 500 kB (Vite cảnh báo khi build) | Sẽ tách theo route ở C-05 |
 | `/favicon.ico` báo 404 ở mọi trang | `index.html` chưa có favicon |
 
 ## 5. Việc đang chờ
 
 - Review Workspace (T-10): **pending**. Chế độ chờ nốt nay có tên **Play** và đã chạy, logic nằm trong `audio/sheetPlayer.js`.
-- **C-04** chữ thương hiệu trên Navbar mới (giữ con cáo), **C-05** tách bundle, **E-02** trang bài không tồn tại.
-- **Upload sheet MIDI** (Bình): việc tiếp theo, sau đó mới làm lại Wait Mode.
+- **C-04** chữ thương hiệu trên Navbar mới (giữ con cáo), **C-05** tách bundle.
+- **My uploads** (U-FE-09, Bình): chờ trang profile của Quỳnh rồi thống nhất chỗ đặt. **Không** thêm link vào Navbar.
 - **User profile / edit profile** (Quỳnh).
 
 ## 6. Kiểm tra trước khi tạo PR
@@ -98,5 +108,7 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
      - đổi tốc độ 0.5x–1.5x, âm lượng (rời sang Home thì âm lượng Home vẫn như cũ);
      - nốt rơi đúng phím, tay phải cam, tay trái xanh;
      - Play: nốt chạm vạch thì dừng, nhấn đủ mới chạy tiếp; phím tắt, Octave Shift, Key labels.
+   - `/upload` (đã đăng nhập): chọn một file mẫu, đổi track, sửa thông tin, *Publish* mở được bài ở Workspace; xoá bài thử khi xong.
+   - `/workspace/khong-co-bai-nay`: hiện *Sheet not found* và nút về Library.
    - `/workspace` chuyển sang `/library`; `/login`, `/register`, một URL không tồn tại ra trang 404.
 3. Mở DevTools Console: không có lỗi đỏ mới (ngoài favicon và MIDI ở Home đã biết).

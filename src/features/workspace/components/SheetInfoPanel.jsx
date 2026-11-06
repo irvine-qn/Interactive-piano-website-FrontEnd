@@ -1,6 +1,8 @@
-import { Eye } from 'lucide-react';
+import { CircleUserRound, Eye } from 'lucide-react';
 import PianoKeysIcon from '../../../components/icons/PianoKeysIcon';
 import LikeButton from '../../library/components/LikeButton';
+import PrivateBadge from '../../library/components/PrivateBadge';
+import { uploaderLabel } from '../../library/utils/uploader';
 import { DIFFICULTY_META } from '../../library/config/difficulty';
 import { formatCount } from '../../../utils/format';
 
@@ -16,7 +18,7 @@ const SkeletonInfo = () => (
   </div>
 );
 
-const SheetInfoPanel = ({ sheet, status }) => {
+const SheetInfoPanel = ({ sheet, status, notFound = false }) => {
   const difficulty = sheet ? DIFFICULTY_META[sheet.difficulty] : null;
 
   return (
@@ -30,7 +32,7 @@ const SheetInfoPanel = ({ sheet, status }) => {
 
       {!sheet && status !== 'error' && <SkeletonInfo />}
       {!sheet && status === 'error' && (
-        <h1 className="m-0 text-[26px] font-bold leading-tight text-[var(--color-ink)]">Sheet unavailable</h1>
+        <h1 className="m-0 text-[26px] font-bold leading-tight text-[var(--color-ink)]">{notFound ? 'Sheet not found' : 'Sheet unavailable'}</h1>
       )}
 
       {sheet && (
@@ -47,6 +49,11 @@ const SheetInfoPanel = ({ sheet, status }) => {
           )}
 
           <ul className="m-0 flex list-none flex-wrap items-center gap-x-3 gap-y-2 p-0 text-sm font-bold text-[var(--color-neutral-600)]">
+            {sheet.visibility === 'PRIVATE' && (
+              <li>
+                <PrivateBadge className="text-xs" />
+              </li>
+            )}
             {difficulty && (
               <li>
                 <span className={`flex items-center gap-1.5 border-[1.5px] border-[var(--color-ink)] px-2 py-0.5 text-xs ${difficulty.badgeClass}`}>
@@ -69,6 +76,15 @@ const SheetInfoPanel = ({ sheet, status }) => {
             <li>
               <LikeButton sheetId={sheet.id} liked={sheet.likedByMe} likes={sheet.likes} suffix=" likes" />
             </li>
+            {uploaderLabel(sheet) && (
+              <>
+                <li aria-hidden="true"><Dot /></li>
+                <li className="flex min-w-0 items-center gap-1.5">
+                  <CircleUserRound aria-hidden="true" className="h-4 w-4 shrink-0" />
+                  <span className="truncate">{uploaderLabel(sheet)}</span>
+                </li>
+              </>
+            )}
           </ul>
         </div>
       )}
