@@ -50,7 +50,11 @@ const Navbar = () => {
       <NavLink
         key={item.to}
         to={item.to}
-        state={item.to === ROUTES.LOGIN || item.to === ROUTES.REGISTER ? { from } : undefined}
+        state={
+          item.to === ROUTES.LOGIN || item.to === ROUTES.REGISTER
+            ? { from }
+            : undefined
+        }
         end
         onClick={onItemClick}
         className={navLinkClass}
