@@ -63,6 +63,47 @@
 | **UE-IMG** `[BE+FE]` | Tải / xoá avatar và ảnh bìa | Nhận file bằng `multer` (RAM, tối đa 5 MB), `sharp` kiểm tra và đổi sang WebP, tạm lưu trong PostgreSQL (bảng `user_images`). API: `PUT` / `DELETE /users/profile/images/:kind`, `GET /users/:id/images/:kind`. Chọn ảnh xong kéo để chỉnh vị trí trong hộp thoại, trình duyệt cắt đúng vùng đó rồi mới tải lên; profile và Navbar hiện ảnh mới. Sau này chuyển sang Cloudinary. | Done |
 | **UP-06** `[BE+FE]` | Practice history giống Saved collections | Dùng chung `ProfileSheetList` (thêm `renderMeta`, `itemName`). `GET /sheets/practice-history` trả thêm `composer`, `coverColor`. Chưa có tìm kiếm / lọc vì API chưa hỗ trợ. | Done |
 
+### Đánh giá code (2026-11-07)
+
+> Kết quả đọc code, dò bằng script và `npm audit`, chưa chạy load test nên phần scale là dự đoán. Export "có thể thừa" chỉ nghĩa là không file nào khác dùng; có thể vẫn dùng trong chính file đó.
+> **Đã tốt:** `.env` không vào git; không có `dangerouslySetInnerHTML` hay raw SQL kiểu Unsafe; mật khẩu hash bằng bcrypt; điều kiện chủ sở hữu nằm trong câu UPDATE / DELETE; file upload kiểm tra theo nội dung; không có file mồ côi. `npm audit`: BE 0 lỗi, FE 3 lỗi moderate trong chuỗi `eslint` (chỉ lúc dev).
+
+#### Nhóm 1: Trước khi deploy
+
+| Sub-Task | Component | Contract & Constraints | Status |
+| :--- | :--- | :--- | :--- |
+| **AU-01** `[BE+FE]` | Quên mật khẩu | FE gọi `POST /auth/forgot-password` nhưng BE trả 404. Làm API (cần dịch vụ gửi email), trước mắt có thể ẩn link. | To Do |
+| **AU-02** `[BE+FE]` | Đổi mật khẩu, 2FA, Device log | Các nút trong `AccountSecurityPanel` chưa làm gì. Làm tính năng hoặc ẩn đi. | To Do |
+| **AU-03** `[BE]` | Rate limit | Giới hạn `login`, `register`, upload; cả `POST /sheets/:id/view` và `practice-sessions` để số liệu không bị thổi phồng. | To Do |
+| **AU-04** `[BE]` | Hạn mức upload | Giới hạn số bài / dung lượng mỗi tài khoản. Hiện đăng ký không cần xác minh email nên DB có thể bị làm đầy. | To Do |
+| **AU-05** `[BE]` | Cấu hình bảo mật | Giới hạn CORS theo domain FE, thêm `helmet`, dừng server khi thiếu `JWT_SECRET`, giới hạn mật khẩu 72 byte (bcrypt chỉ dùng 72 byte đầu). | To Do |
+| **AU-06** `[BE+FE]` | Thu hồi token | JWT nằm trong `localStorage`, sống 7 ngày, không thu hồi được. Cân nhắc token ngắn hạn + refresh token. | To Do |
+| **AU-07** `[BE+FE]` | Xác minh email | Có cột `isVerified` và giao diện *Not verified* nhưng chưa có API. | To Do |
+
+#### Nhóm 2: Chất lượng
+
+| Sub-Task | Component | Contract & Constraints | Status |
+| :--- | :--- | :--- | :--- |
+| **AU-08** `[BE+FE]` | CI + E2E | CI chạy lint / test / build; vài test E2E cho đăng nhập, upload, sửa bài, đổi ảnh. FE chưa có test component. | To Do |
+| **AU-09** `[BE]` | Vận hành | Dockerfile cho app, health check có kiểm tra DB, log có cấu trúc. | To Do |
+| **AU-10** `[BE+FE]` | Dọn code thừa | Gỡ `file-type` (BE); xoá `features/collections` trống; xoá `package.json` + `node_modules` ở thư mục gốc; xoá `console.log` ở `toneEngine.js`. Xem từng export có thể thừa. FE: `playNote`, `stopAllNotes`, `getBaseBpm`, `volumeToDb`, `DEFAULT_SORT`, `SORT_OPTIONS`, `INITIAL_FIELDS`, `BLACK_KEY_RATIO`, `PRACTICE_MIN_NOTES`, `PRACTICE_IDLE_GAP_MS`. BE: `measureDifficulty`, `RESERVED_IDS`. **Giữ** `pg` (Prisma adapter cần) và `getUserSheets` nếu sắp làm profile công khai. | To Do |
+| **AU-11** `[BE+FE]` | Tính năng chưa có trong `README_main.md` | Theo dõi người dùng, bộ sưu tập / danh sách phát, nhãn định danh. Cần chốt phạm vi. | To Do |
+
+#### Nhóm 3: Khi có người dùng thật (scale)
+
+Backend gần như không giữ trạng thái (JWT, không session) nên chạy thêm instance khá dễ. Các điểm nghẽn, theo thứ tự dự đoán sẽ gặp trước:
+
+| Sub-Task | Component | Contract & Constraints | Status |
+| :--- | :--- | :--- | :--- |
+| **AU-12** `[BE]` | Chuyển file khỏi PostgreSQL | MIDI và ảnh chuyển lên Cloud (cùng U-BE-12). Xem xét cả `notes` JSON. | To Do |
+| **AU-13** `[BE]` | Index cho `sheets` | Lọc theo `visibility`, sắp theo `views`, `likes`, `createdAt`; GIN cho `tags`; `pg_trgm` cho tìm kiếm `ILIKE`. | To Do |
+| **AU-14** `[BE]` | Xử lý MIDI bằng worker | Phân tích file đang chạy đồng bộ, chặn request khác. Chuyển sang `worker_threads`. | To Do |
+| **AU-15** `[BE]` | Cache kết quả tính | `GET /sheets/:id` tính `chords`, `/score` tính bản nhạc mỗi lần; `/sheets/tags` quét cả bảng. | To Do |
+| **AU-16** `[BE]` | Ghi `views` theo đợt | Bài nhiều lượt xem sẽ tranh khoá cùng một dòng. | To Do |
+| **AU-17** `[BE]` | Dọn `practice_sessions` | Bảng tăng mãi, cần chính sách dọn hoặc gộp dữ liệu cũ. | To Do |
+
+Tách bundle FE (khoảng 907 KB và 984 KB) đã có ở **C-05**.
+
 ## Feature: Piano Workspace 
 
 | Sub-Task | Component | Contract & Constraints | Status |
