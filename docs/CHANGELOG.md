@@ -7,7 +7,7 @@ Mục **Cần làm sau khi pull** là các lệnh phải chạy trên máy của
 
 ## 2026-11-06 – Upload MIDI (Bình, đang làm)
 
-- Trang `/upload` (link *Upload* trên Navbar, cần đăng nhập) không còn là 404: đã chọn được file MIDI và track, chưa đăng được bài.
+- Trang `/upload` (link *Upload* trên Navbar, cần đăng nhập) không còn là 404: đã chọn được file MIDI, track và nhập thông tin bài, chưa đăng được bài.
 - Cần Backend nhánh `upload-midi` (xem CHANGELOG của Backend). Phía FE không cần chạy lệnh gì thêm.
 
 ## 2026-11-05 – Hoá biểu, dấu nối và test

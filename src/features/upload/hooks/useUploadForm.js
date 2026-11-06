@@ -1,13 +1,16 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { analyzeMidi, CANCELED } from '../api/uploadApi';
 import { validateMidiFile } from '../utils/midiFile';
+import { validateDetails } from '../utils/sheetDetails';
 
 // State chung của trang /upload, gom một chỗ để các thẻ (File, Tracks, Details, Preview, Privacy) dùng chung:
 // sửa thẻ này không làm mất dữ liệu thẻ khác. Logic từng thẻ thêm dần ở U-FE-03 → U-FE-07.
+// title / difficulty = null: người dùng chưa sửa -> dùng gợi ý của Backend (đổi file / track thì gợi ý mới tự áp vào).
+// Đã sửa thì giữ nguyên, phân tích lại không ghi đè. Giá trị thật dùng để hiển thị / gửi: `details`.
 export const INITIAL_FIELDS = {
-  title: '',
+  title: null,
   composer: '',
-  difficulty: null, // null = chưa chọn, dùng mức gợi ý của Backend
+  difficulty: null,
   tags: [],
   coverColor: null, // null = chọn khi có file (U-FE-06)
   visibility: 'PRIVATE', // bài upload mặc định chỉ mình thấy (WBS D3)
@@ -122,6 +125,16 @@ export const useUploadForm = () => {
 
   const updateField = useCallback((name, value) => setFields((current) => ({ ...current, [name]: value })), []);
 
+  const details = useMemo(
+    () => ({
+      ...fields,
+      title: fields.title ?? analysis?.suggestedTitle ?? '',
+      difficulty: fields.difficulty ?? analysis?.suggestedDifficulty ?? null,
+    }),
+    [fields, analysis],
+  );
+  const detailErrors = useMemo(() => validateDetails(details), [details]);
+
   return {
     file,
     analysis,
@@ -135,6 +148,9 @@ export const useUploadForm = () => {
     isUpdatingTracks: pendingTracks !== null,
     trackError,
     updateField,
+    details,
+    detailErrors,
+    isDetailsValid: Object.keys(detailErrors).length === 0,
     // Thẻ Tracks / Details / Preview và nút Publish chỉ mở khi đã phân tích xong file
     isAnalyzed: analysis !== null,
   };

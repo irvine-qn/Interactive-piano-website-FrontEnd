@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowUpFromLine } from 'lucide-react';
 import Footer from '../components/common/footer';
@@ -7,6 +8,8 @@ import CopyrightNote from '../features/upload/components/CopyrightNote';
 import FileDropzone from '../features/upload/components/FileDropzone';
 import FileRow from '../features/upload/components/FileRow';
 import TrackTable from '../features/upload/components/TrackTable';
+import SheetDetailsForm from '../features/upload/components/SheetDetailsForm';
+import { useTags } from '../features/library/hooks/useTags';
 import { useUploadForm } from '../features/upload/hooks/useUploadForm';
 
 const LOCKED_MESSAGE = 'Add a MIDI file first.';
@@ -25,8 +28,14 @@ const UploadPage = () => {
     selectedTracks,
     isUpdatingTracks,
     trackError,
+    details,
+    detailErrors,
+    updateField,
     isAnalyzed,
   } = useUploadForm();
+  // Tag có sẵn trong Library (nhiều bài nhất trước) để gợi ý ở thẻ ③
+  const tags = useTags();
+  const knownTags = useMemo(() => tags.map((tag) => tag.name), [tags]);
 
   return (
     <div className="flex flex-1 flex-col">
@@ -87,7 +96,17 @@ const UploadPage = () => {
               title="Sheet details"
               locked={!isAnalyzed}
               lockedMessage={`${LOCKED_MESSAGE} The title, tempo and key are read from the file.`}
-            />
+            >
+              {isAnalyzed && (
+                <SheetDetailsForm
+                  analysis={analysis}
+                  details={details}
+                  errors={detailErrors}
+                  knownTags={knownTags}
+                  onChange={updateField}
+                />
+              )}
+            </UploadCard>
           </div>
 
           <aside aria-label="Preview and privacy" className="flex min-w-0 flex-col gap-6">

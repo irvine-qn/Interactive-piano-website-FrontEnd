@@ -73,9 +73,9 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
 ## 3b. Upload sheet (Bình, đang làm)
 
 - Gửi file bằng `FormData` thì **không tự đặt `Content-Type`** (axios tự thêm boundary). Mảng (tracks, tags) gửi thành nhiều trường cùng tên.
-- Giới hạn file (1 MB, `.mid`/`.midi`, timeout 30 s) ở `features/upload/config/upload.js`, **phải khớp Backend**.
+- Giới hạn file (1 MB, `.mid`/`.midi`, timeout 30 s) và thông tin bài (độ dài title, composer, số tag) ở `features/upload/config/upload.js`, **phải khớp Backend**.
 - `lib/axios.js` (dùng chung) biến request bị huỷ thành `NETWORK_ERROR` *"Unable to connect to the server"*. `uploadApi.js` trả mã `CANCELED` để giao diện bỏ qua; nơi khác dùng `signal` thì kiểm tra `signal.aborted` trước khi hiện lỗi.
-- **Mọi state của trang `/upload` nằm trong `useUploadForm`**: thẻ mới chỉ đọc/ghi qua hook, không tự giữ state riêng. Không gộp trạng thái đổi track vào trạng thái file (dòng file sẽ nhảy về *Analyzing*/*Failed* khi chỉ đổi track).
+- **Mọi state của trang `/upload` nằm trong `useUploadForm`**: thẻ mới chỉ đọc/ghi qua hook, không tự giữ state riêng. Muốn lấy title / độ khó thì đọc `details`, không đọc `fields`: trong `fields` giá trị `null` nghĩa là chưa sửa, dùng gợi ý của Backend. Không gộp trạng thái đổi track vào trạng thái file (dòng file sẽ nhảy về *Analyzing*/*Failed* khi chỉ đổi track).
 - Đừng bỏ đoạn chặn thả file toàn trang trong `FileDropzone`: lỡ thả ra ngoài thì trình duyệt mở file, rời trang, mất dữ liệu đang nhập.
 - `getUserSheets(userId)` dành cho trang profile của Quỳnh (bài PUBLIC của một người dùng).
 
