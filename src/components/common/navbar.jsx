@@ -32,12 +32,23 @@ const Navbar = () => {
   const user = useAuthStore((state) => state.user);
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchText, setSearchText] = useState("");
   const navItems = NAV_ITEMS.filter((item) =>
     user ? !item.guestOnly : !item.authOnly,
   );
   const from = AUTH_PATHS.includes(location.pathname)
     ? location.state?.from
     : `${location.pathname}${location.search}`;
+
+  const handleSearch = (event) => {
+    event.preventDefault();
+    const q = searchText.trim();
+    setSearchText("");
+    closeFocusedMenu();
+    navigate(
+      q ? `${ROUTES.LIBRARY}?q=${encodeURIComponent(q)}` : ROUTES.LIBRARY,
+    );
+  };
 
   const handleLogout = () => {
     closeFocusedMenu();
@@ -82,21 +93,32 @@ const Navbar = () => {
             className="ml-[120px] h-[46px] w-[95px]"
           />
         </NavLink>
-        <label
+        <form
+          role="search"
+          onSubmit={handleSearch}
           className={`ml-10 hidden h-10 w-[380px] shrink items-center border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-4 md:flex ${
             location.pathname === ROUTES.LIBRARY ? "invisible" : ""
           }`}
         >
           <input
             type="search"
+            value={searchText}
+            onChange={(event) => setSearchText(event.target.value)}
             placeholder="Find some music?"
+            aria-label="Search sheets"
             className="min-w-0 flex-1 appearance-none border-0 bg-transparent p-0 font-[inherit] text-sm text-[var(--color-ink)] outline-none placeholder:text-[var(--color-neutral-350)]"
           />
-          <Search
-            aria-hidden="true"
-            className="h-[26px] w-7 text-[var(--color-brand)]"
-          />
-        </label>
+          <button
+            type="submit"
+            aria-label="Search"
+            className="flex cursor-pointer border-0 bg-transparent p-0"
+          >
+            <Search
+              aria-hidden="true"
+              className="h-[26px] w-7 text-[var(--color-brand)]"
+            />
+          </button>
+        </form>
         <nav
           aria-label="Main navigation"
           className="ml-12 hidden items-center gap-[14px] lg:flex"
