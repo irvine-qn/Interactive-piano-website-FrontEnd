@@ -5,10 +5,15 @@ Mục **Cần làm sau khi pull** là các lệnh phải chạy trên máy của
 
 ---
 
-## 2026-11-06 – Upload MIDI (Bình, đang làm)
+## 2026-11-06 – Upload MIDI (Bình)
 
-- Trang `/upload` (link *Upload* trên Navbar, cần đăng nhập) không còn là 404: chọn file MIDI và track, nhập thông tin bài, xem trước rồi *Publish*: bài được lưu và mở ngay ở Workspace. Bài *Private* chỉ người upload thấy.
-- Cần Backend nhánh `upload-midi` (xem CHANGELOG của Backend). Phía FE không cần chạy lệnh gì thêm.
+- **Trang `/upload`** (link *Upload* trên Navbar, cần đăng nhập): chọn file MIDI, chọn track, nhập thông tin bài, xem trước, chọn *Public* / *Private* rồi *Publish*; bài được lưu và mở ngay ở Workspace.
+- **Library / Workspace:** bài người dùng upload có dòng *Uploaded by …*; bài *Private* có nhãn khoá và chỉ người upload thấy.
+- **Workspace:** mở bài không tồn tại (hoặc bài *Private* của người khác) hiện *Sheet not found* kèm nút về Library (E-02).
+- **`lib/axios.js`** (dùng chung): lỗi có thêm `details` nếu Backend gửi. Chỉ thêm trường, hành vi cũ giữ nguyên.
+- Chưa có: danh sách *My uploads* để sửa / xoá bài trên giao diện (U-FE-09, chờ trang profile của Quỳnh; API đã có).
+
+**Cần làm sau khi pull:** cập nhật Backend theo CHANGELOG của Backend (`npm install`, `npm run db:deploy`, `npm run db:seed`). Phía FE không cần chạy lệnh gì thêm.
 
 ## 2026-11-05 – Hoá biểu, dấu nối và test
 
