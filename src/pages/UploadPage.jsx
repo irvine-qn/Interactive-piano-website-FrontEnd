@@ -9,6 +9,8 @@ import FileDropzone from '../features/upload/components/FileDropzone';
 import FileRow from '../features/upload/components/FileRow';
 import TrackTable from '../features/upload/components/TrackTable';
 import SheetDetailsForm from '../features/upload/components/SheetDetailsForm';
+import SheetPreview from '../features/upload/components/SheetPreview';
+import PrivacyOptions from '../features/upload/components/PrivacyOptions';
 import { useTags } from '../features/library/hooks/useTags';
 import { useUploadForm } from '../features/upload/hooks/useUploadForm';
 
@@ -110,12 +112,11 @@ const UploadPage = () => {
           </div>
 
           <aside aria-label="Preview and privacy" className="flex min-w-0 flex-col gap-6">
-            <UploadCard title="Preview" locked={!isAnalyzed} lockedMessage="Your sheet card will appear here, as it will look in the Sheet Library." />
-            {/* Chọn Public / Private làm ở U-FE-06 */}
+            <UploadCard title="Preview" locked={!isAnalyzed} lockedMessage="Your sheet card will appear here, as it will look in the Sheet Library.">
+              {isAnalyzed && <SheetPreview analysis={analysis} details={details} onChange={updateField} />}
+            </UploadCard>
             <UploadCard title="Privacy">
-              <p className="m-0 text-sm font-medium text-[var(--color-neutral-600)]">
-                New sheets are private: only you can see them until you make them public.
-              </p>
+              <PrivacyOptions value={details.visibility} onChange={updateField} />
             </UploadCard>
             <CopyrightNote />
           </aside>

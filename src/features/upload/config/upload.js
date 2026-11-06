@@ -13,3 +13,11 @@ export const COMPOSER_MAX = 100;
 export const MAX_TAGS = 3;
 export const TAG_MAX = 30;
 export const DIFFICULTIES = ['EASY', 'MEDIUM', 'HARD', 'EXPERT'];
+
+// Màu bìa giống bài mẫu (sheets.coverColor), tên màu hiện cho trình đọc màn hình
+export const COVER_COLORS = { yellow: 'Yellow', pink: 'Pink', mint: 'Mint', lavender: 'Lavender' };
+// Khớp enum Visibility của Backend. Bài upload mặc định PRIVATE (WBS D3)
+export const VISIBILITY_OPTIONS = [
+  { value: 'PUBLIC', label: 'Public', description: 'Anyone can find it in the Sheet Library and practice it.' },
+  { value: 'PRIVATE', label: 'Private', description: 'Only you can see it. You can make it public later.' },
+];

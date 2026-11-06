@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { analyzeMidi, CANCELED } from '../api/uploadApi';
 import { validateMidiFile } from '../utils/midiFile';
 import { validateDetails } from '../utils/sheetDetails';
+import { COVER_COLORS } from '../config/upload';
 
 // State chung của trang /upload, gom một chỗ để các thẻ (File, Tracks, Details, Preview, Privacy) dùng chung:
 // sửa thẻ này không làm mất dữ liệu thẻ khác. Logic từng thẻ thêm dần ở U-FE-03 → U-FE-07.
@@ -12,8 +13,13 @@ export const INITIAL_FIELDS = {
   composer: '',
   difficulty: null,
   tags: [],
-  coverColor: null, // null = chọn khi có file (U-FE-06)
+  coverColor: null, // mỗi lần mở trang chọn ngẫu nhiên 1 màu (initFields)
   visibility: 'PRIVATE', // bài upload mặc định chỉ mình thấy (WBS D3)
+};
+
+const initFields = () => {
+  const colors = Object.keys(COVER_COLORS);
+  return { ...INITIAL_FIELDS, coverColor: colors[Math.floor(Math.random() * colors.length)] };
 };
 
 // Trạng thái gửi + phân tích file:
@@ -29,7 +35,7 @@ export const useUploadForm = () => {
   // Tách khỏi `upload` để dòng file không nhảy về "Analyzing" / "Failed" khi chỉ đổi track.
   const [pendingTracks, setPendingTracks] = useState(null);
   const [trackError, setTrackError] = useState(null);
-  const [fields, setFields] = useState(INITIAL_FIELDS);
+  const [fields, setFields] = useState(initFields);
   // Lần phân tích đang chạy: chọn file khác / đổi track / rời trang thì huỷ, kết quả cũ không ghi đè kết quả mới
   const requestRef = useRef(null);
 

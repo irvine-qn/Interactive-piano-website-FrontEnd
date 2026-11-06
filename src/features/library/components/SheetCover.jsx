@@ -1,12 +1,7 @@
 import sheetCoverDots from '../../../assets/virtual-piano-assets/sheet-cover-dots.svg';
 import { DIFFICULTY_META } from '../config/difficulty';
+import { COVER_BG } from '../config/cover';
 
-const COVER_BG = {
-  yellow: 'bg-[var(--color-pastel-yellow)]',
-  pink: 'bg-[var(--color-pastel-pink)]',
-  mint: 'bg-[var(--color-pastel-mint)]',
-  lavender: 'bg-[var(--color-pastel-lavender)]',
-};
 
 const createRandom = (seedText) => {
   let seed = [...seedText].reduce((hash, char) => (hash * 31 + char.charCodeAt(0)) | 0, 7);

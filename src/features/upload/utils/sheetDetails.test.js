@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addTag, cleanText, validateDetails } from './sheetDetails';
+import { addTag, cleanText, formatKey, formatTimeSignature, toSlug, validateDetails } from './sheetDetails';
 import { MAX_TAGS, TAG_MAX, TITLE_MAX } from '../config/upload';
 
 const VALID = { title: 'Clair de Lune', composer: '', difficulty: 'HARD', tags: [] };
@@ -8,6 +8,21 @@ describe('cleanText', () => {
   it('gộp khoảng trắng thừa', () => {
     expect(cleanText('  Lo   fi \n')).toBe('Lo fi');
     expect(cleanText(null)).toBe('');
+  });
+});
+
+describe('toSlug / formatKey / formatTimeSignature', () => {
+  it('tạo id từ tên bài, bỏ dấu tiếng Việt', () => {
+    expect(toSlug('  Đêm Lao Xao (Piano)! ')).toBe('dem-lao-xao-piano');
+    expect(toSlug('Für Elise')).toBe('fur-elise');
+    expect(toSlug('あの夏')).toBe('untitled');
+  });
+
+  it('định dạng giọng và nhịp', () => {
+    expect(formatKey('d major')).toBe('D major');
+    expect(formatKey(null)).toBe('Not set');
+    expect(formatTimeSignature([6, 8])).toBe('6/8');
+    expect(formatTimeSignature(null)).toBe('Not set');
   });
 });
 

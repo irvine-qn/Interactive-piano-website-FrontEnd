@@ -2,6 +2,7 @@ import { useId } from 'react';
 import { COMPOSER_MAX, DIFFICULTIES, TITLE_MAX } from '../config/upload';
 import { DIFFICULTY_META } from '../../library/config/difficulty';
 import { formatDuration } from '../../../utils/format';
+import { formatKey, formatTimeSignature } from '../utils/sheetDetails';
 import TagInput from './TagInput';
 
 const INPUT_CLASS =
@@ -89,15 +90,12 @@ const DifficultyPicker = ({ value, suggested, onChange, error }) => {
   );
 };
 
-const capitalize = (text) => text.charAt(0).toUpperCase() + text.slice(1);
-
 // Thông tin lấy từ file, chỉ hiển thị (đổi track thì số nốt và thời lượng đổi theo)
 const FileFacts = ({ analysis }) => {
-  const [beats, unit] = analysis.timeSignature ?? [];
   const facts = [
     ['Tempo', `${analysis.bpm} BPM`],
-    ['Key', analysis.keySignature ? capitalize(analysis.keySignature) : 'Not set'],
-    ['Time', beats && unit ? `${beats}/${unit}` : 'Not set'],
+    ['Key', formatKey(analysis.keySignature)],
+    ['Time', formatTimeSignature(analysis.timeSignature)],
     ['Length', formatDuration(analysis.durationSec)],
     ['Notes', analysis.noteCount.toLocaleString('en')],
   ];
