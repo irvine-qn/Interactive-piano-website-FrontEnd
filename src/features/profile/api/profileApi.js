@@ -8,3 +8,6 @@ export const getMe = ({ signal } = {}) =>
 
 export const updateProfile = (data) =>
   apiClient.put("/users/profile", data).then((res) => res.data);
+
+export const getPracticeHistory = (params = {}, { signal } = {}) =>
+  apiClient.get("/sheets/practice-history", { params, signal }).then((res) => res.data);

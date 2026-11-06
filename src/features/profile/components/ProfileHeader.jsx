@@ -1,5 +1,7 @@
 import {
+  AtSign,
   CalendarDays,
+  MapPin,
   Pencil,
   PlusSquare,
   SlidersHorizontal,
@@ -168,6 +170,24 @@ const ProfileHeader = ({ user }) => (
               <CalendarDays size={16} aria-hidden="true" />
               Joined {formatJoinedDate(user.createdAt)}
             </p>
+          )}
+          {(user.city || user.country) && (
+            <p className="m-0 flex items-center gap-1.5 text-[var(--color-neutral-600)]">
+              <MapPin size={16} aria-hidden="true" />
+              {[user.city, user.country].filter(Boolean).join(", ")}
+            </p>
+          )}
+          {user.instagram && (
+            <a
+              href={`https://www.instagram.com/${encodeURIComponent(user.instagram)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Instagram: ${user.instagram}`}
+              className="flex items-center gap-1.5 text-[var(--color-neutral-600)] no-underline hover:text-[var(--color-ink)]"
+            >
+              <AtSign size={16} aria-hidden="true" />
+              {user.instagram}
+            </a>
           )}
         </div>
         {user.bio && (
