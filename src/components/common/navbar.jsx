@@ -61,7 +61,7 @@ const Navbar = () => {
 
   return (
     <header className="relative z-20 border-b-4 border-[var(--color-ink)] bg-[linear-gradient(to_bottom,var(--color-sky-1)_0_16px,var(--color-sky-2)_16px_32px,var(--color-sky-3)_32px_48px,var(--color-sky-4)_48px_64px,var(--color-sky-5)_64px_80px,var(--color-sky-6)_80px)]">
-      <div className="relative mx-auto flex h-[92px] w-full max-w-[1600px] items-center gap-6 px-4">
+      <div className="relative mx-auto flex h-[92px] w-full max-w-7xl items-center gap-6 px-4">
         <NavLink
           to={ROUTES.HOME}
           aria-label="Fiano home"
@@ -113,17 +113,19 @@ const Navbar = () => {
 
         {user && (
           <div className="group relative shrink-0 lg:ml-auto">
-            <button
-              type="button"
+            <NavLink
+              to={ROUTES.PROFILE}
               aria-haspopup="menu"
-              className="avatar flex cursor-pointer border-0 bg-transparent p-0"
+              aria-label="Go to profile"
+              onClick={closeFocusedMenu}
+              className="avatar flex"
             >
               <img
                 src={defaultAvatar}
-                alt="User avatar"
-                className="avatar h-10 w-10 border-[2.5px] border-[var(--color-ink)] object-cover"
+                alt=""
+                className="avatar h-14 w-14 border-[2.5px] border-[var(--color-ink)] object-cover"
               />
-            </button>
+            </NavLink>
             <div className="invisible absolute right-0 top-full pt-3 opacity-0 transition-opacity group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
               <div
                 role="menu"
