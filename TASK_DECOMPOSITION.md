@@ -13,7 +13,7 @@
 > - Task `[BE]` có thêm/đổi API thì cập nhật luôn mục *Available API* trong README của BE.
 > - **Ngôn ngữ giao diện: tiếng Anh** (thống nhất với Quỳnh từ 2026-11). Comment trong code và WBS vẫn viết tiếng Việt.
 > - DB: chỉ dùng **Prisma** (schema + migration) cho mọi bảng, không tạo bảng bằng SQL lúc server khởi động.
-> - Thứ tự thực hiện: ~~Hạ tầng chung → Sheet Library (BE → FE) → C-06 → C-07 → C-08 → Piano Workspace (T-05 → T-08)~~ (xong) → **C-04, C-05, E-02** → **User upload sheet (MIDI)**. User profile / edit profile: Quỳnh làm. Wait Mode (T-09) và T-10: **pending**, làm sau Feature Upload MIDI.
+> - Thứ tự thực hiện: ~~Hạ tầng chung → Sheet Library (BE → FE) → C-06 → C-07 → C-08 → Piano Workspace (T-05 → T-08)~~ (xong) → **User upload sheet (MIDI)** (nhánh `upload-midi`, tách từ `develop` ngày 2026-11-06) → C-04, C-05, E-02, T-10. User profile / edit profile: Quỳnh làm. Wait Mode (T-09): Quỳnh đã làm (chế độ **Play**), xem mục *Thay đổi của Quỳnh sau khi merge*.
 > - Ghi chú kỹ thuật và nhật ký thay đổi: `docs/NOTES.md`, `docs/CHANGELOG.md` (có ở cả 2 repo).
 
 ## Hạ tầng chung (Common)
@@ -76,15 +76,15 @@
 | **T-05B** `[FE]` | Redirect `/workspace` không có id | `routes/AppRoutes.jsx`: `/workspace` dùng `<Navigate to={ROUTES.LIBRARY} replace />` (nút *Practice* trên Navbar trỏ tới `/workspace` → người dùng được đưa sang Library để chọn bài), `/workspace/:sheetId` vào WorkspacePage. Xoá `config/sheet.js` (`DEFAULT_SHEET_ID`) và phần fallback trong WorkspacePage. Phụ thuộc: C-06B. | Done |
 | **T-05C** `[FE]` | Tối ưu re-render (selector) | Thay mọi chỗ `const {...} = useWorkspaceStore()` bằng selector theo từng field hoặc `useShallow` (zustand/react/shallow) trong `WorkspacePage`, `ControlBar`, `PianoKeyboard`, `practiceWaterfall`, `useSheetLoader`. Không đổi hành vi. Kiểm tra bằng React DevTools Profiler: khi Auto-play, ControlBar và Canvas không render lại theo từng nốt. | Done |
 | **T-05D** `[FE]` | Tách state phím | Tách `activeKeys` thành `pressedKeys` (người dùng nhấn) và `playbackKeys` (Auto-play / gợi ý Practice, lưu kèm `hand`). Đổi `highlightKey`/`unhighlightKey` thành `setPlaybackKey`/`clearPlaybackKey`. `sheetPlayer.js` và `ControlBar.jsx` dùng API mới. `Key` nhận 2 trạng thái riêng. Phụ thuộc: T-05C. | Done |
-| **T-05E** `[FE]` | Khoá thao tác ở AUTO_PLAY | Ở `AUTO_PLAY` bỏ qua chuột và phím máy tính (không phát tiếng, không đổi `pressedKeys`), con trỏ chuột về mặc định. Đổi mode thì nhả hết phím đang giữ. Phụ thuộc: T-05D. | Done |
+| **T-05E** `[FE]` | Khoá thao tác ở AUTO_PLAY | Ở `AUTO_PLAY` bỏ qua chuột và phím máy tính (không phát tiếng, không đổi `pressedKeys`), con trỏ chuột về mặc định. Đổi mode thì nhả hết phím đang giữ. Phụ thuộc: T-05D. **Quỳnh đổi (2026-11-05):** Auto Play **cho phép** người dùng chơi phím trong lúc bài chạy (bỏ chặn trong `pressKey`). Khi bài chưa chạy, nhấn đúng nốt đầu tiên của bài thì bài tự chạy từ nốt đó (cả Auto Play và Play). Bình đồng ý giữ nguyên. | Done |
 
 ### Giai đoạn 3: Nhập liệu bàn phím
 
 | Sub-Task | Component | Contract & Constraints | Status |
 | :--- | :--- | :--- | :--- |
-| **T-06A** `[FE]` | Dùng bảng ánh xạ của Home | Workspace gọi `getPianoConfig()` (import từ `features/home/api/pianoApi.js`, không sửa file đó) để dựng map `keyboardKey → note` (`1`=C1 … `m`=C6). Xoá `config/keyMapping.js`. Xử lý trạng thái đang tải/lỗi của cấu hình. | Done |
-| **T-06B** `[FE]` | Chống kẹt phím | Tạo hook `features/workspace/hooks/useKeyboardInput.js` theo cách Home làm: tra theo `event.code` (nhả Shift trước vẫn nhả đúng nốt), bỏ qua `event.repeat`, bỏ qua khi focus ở `input/textarea/select/contenteditable`, `preventDefault`, nhả hết phím khi `window` `blur` và khi unmount, đếm số nguồn giữ mỗi nốt (chuột + phím cùng nốt). `PianoKeyboard.jsx` dùng hook này. Phụ thuộc: T-06A, T-05D. | Done |
-| **T-06C** `[FE]` | Octave Shift (logic) | Thêm `octaveShift` vào store (phạm vi tính từ config như Home: 0 → +1, tức C1–C6 ↔ C2–C7). Map phím tính lại theo shift. Đổi shift thì nhả các phím đang giữ. Phụ thuộc: T-06B. | Done |
+| **T-06A** `[FE]` | Dùng bảng ánh xạ của Home | Workspace gọi `getPianoConfig()` (import từ `features/home/api/pianoApi.js`, không sửa file đó) để dựng map `keyboardKey → note` (`1`=C1 … `m`=C6). Xoá `config/keyMapping.js`. Xử lý trạng thái đang tải/lỗi của cấu hình. **Quỳnh đổi (2026-11-05):** bảng phím Practice lấy từ `practiceKeys` của `GET /api/v1/piano` (2 vùng phím, không dùng Shift), Home và Practice dùng chung `useKeyMapping`. | Done |
+| **T-06B** `[FE]` | Chống kẹt phím | Tạo hook `features/workspace/hooks/useKeyboardInput.js` theo cách Home làm: tra theo `event.code` (nhả Shift trước vẫn nhả đúng nốt), bỏ qua `event.repeat`, bỏ qua khi focus ở `input/textarea/select/contenteditable`, `preventDefault`, nhả hết phím khi `window` `blur` và khi unmount, đếm số nguồn giữ mỗi nốt (chuột + phím cùng nốt). `PianoKeyboard.jsx` dùng hook này. Phụ thuộc: T-06A, T-05D. **Quỳnh đổi (2026-11-05):** `useKeyboardInput` viết lại, tra theo `event.code`, thêm phím hợp âm (giữ `A F K` / `1 4 8`) và mũi tên dời vùng phím. Vẫn giữ: bỏ qua ô gõ chữ, nhả hết khi `blur`. | Done |
+| **T-06C** `[FE]` | Octave Shift (logic) | Thêm `octaveShift` vào store (phạm vi tính từ config như Home: 0 → +1, tức C1–C6 ↔ C2–C7). Map phím tính lại theo shift. Đổi shift thì nhả các phím đang giữ. Phụ thuộc: T-06B. **Quỳnh đổi (2026-11-05):** bỏ `octaveShift`, thay bằng `handOctaves` (vùng tay trái / tay phải, `moveHandOctave`). Ở Play vùng phím tự dời theo `chords`. | Done |
 
 ### Giai đoạn 4: Bố cục & giao diện (sao chép UI của Home, giữ cơ chế Workspace)
 
@@ -92,9 +92,9 @@
 | :--- | :--- | :--- | :--- |
 | **T-07A** `[FE]` | Bố cục 3 tầng | `WorkspacePage.jsx` còn 3 tầng: (1) Thông tin bài + Control Bar, (2) Waterfall, (3) Piano. Xoá header `FIANO.` cũ. Khung theo design token (viền `--color-ink`, `--shadow-hard`, góc vuông), bỏ màu hex và `rounded-*`. Loading/lỗi/Thử lại giữ nguyên. | Done |
 | **T-07B** `[FE]` | Card thông tin bài | Tạo `features/workspace/components/SheetInfoPanel.jsx`: tiêu đề, tác giả, độ khó, tags, lượt xem, lượt thích (chỉ hiển thị). Theo thiết kế `Sheet_Practice_Studio_Waterfall`, chưa có nút Like/Share/Export. Phụ thuộc: T-07A, L-BE-08. | Done |
-| **T-07C** `[FE]` | Tăng lượt xem | Khi tải bài thành công thì gọi `POST /sheets/:id/view` một lần (`sheetsApi.js` + `useSheetLoader.js`). Chặn StrictMode gọi 2 lần trong dev. Phụ thuộc: L-BE-10. | Done |
+| **T-07C** `[FE]` | Tăng lượt xem | Khi tải bài thành công thì gọi `POST /sheets/:id/view` một lần (`sheetsApi.js` + `useSheetLoader.js`). Chặn StrictMode gọi 2 lần trong dev. Phụ thuộc: L-BE-10. **Quỳnh đổi (2026-11-05):** lượt xem chỉ tăng khi bấm *Practice* ở Library (`state.countView`), F5 hoặc mở thẳng link không tính. | Done |
 | **T-07D** `[FE]` | Bố trí phím dùng chung | Tạo `features/workspace/config/keyLayout.js` tính `left/width` (%) cho 88 phím theo công thức của Home (`BLACK_KEY_RATIO`). Bàn phím và Canvas cùng dùng layout này, thay cho việc đọc DOM `[data-note]` bằng `setTimeout 50ms`. | Done |
-| **T-07E** `[FE]` | Giao diện Piano giống Home | Viết lại phần render của `PianoKeyboard.jsx`/`Key.jsx` theo style Home: khung gỗ, dải nỉ đỏ, phím trắng/đen dùng token, nhãn phím tắt (`kbd`) + tên nốt, vạch đáy phím. Phím người dùng nhấn: màu brand như Home. Phím Auto-play: tay phải cam, tay trái xanh dương. Phụ thuộc: T-07D, T-05D. | Done |
+| **T-07E** `[FE]` | Giao diện Piano giống Home | Viết lại phần render của `PianoKeyboard.jsx`/`Key.jsx` theo style Home: khung gỗ, dải nỉ đỏ, phím trắng/đen dùng token, nhãn phím tắt (`kbd`) + tên nốt, vạch đáy phím. Phím người dùng nhấn: màu brand như Home. Phím Auto-play: tay phải cam, tay trái xanh dương. Phụ thuộc: T-07D, T-05D. **Quỳnh đổi (2026-11-05):** tách phần khung + phím thành `PianoKeybed.jsx`, Home và Practice dùng chung. | Done |
 | **T-07F** `[FE]` | Giao diện Waterfall giống Home | `practiceWaterfall.jsx`: nền giấy, lưới ngang, vạch phân quãng tám, vạch hit-line, khối nốt có gradient + viền ink + bóng cứng, đọc màu từ CSS variables. Tay phải = gradient cam (`--color-note-orange-*`), tay trái = gradient xanh (`--color-note-blue-*`). Hiện tên nốt trên khối nếu đủ chỗ. Chiều cao vùng waterfall co giãn theo chiều cao màn hình (tối đa 440px như thiết kế, tối thiểu ~260px) để bàn phím luôn nằm trọn trong màn hình 16:9 (đã thống nhất ở T-07A, có thể chỉnh sau). **Giữ nguyên cơ chế rơi theo `Tone.Transport`.** Phụ thuộc: T-07D. | Done |
 | **T-07G** `[FE]` | Kiểm tra màu 2 tay | Sau khi dữ liệu được convert lại (L-BE-05), kiểm tra Merry Christmas: âm trầm màu xanh (trái), âm cao màu cam (phải). Phụ thuộc: L-BE-05/L-BE-06. | Done |
 
@@ -107,22 +107,46 @@
 | **T-08C** `[FE]` | Volume thật | Slider âm lượng chỉ cho Workspace: chỉnh `pianoSampler.volume`, lưu giá trị gốc lúc mount và **khôi phục khi unmount** để không ảnh hưởng Home. | Done |
 | **T-08D** `[FE]` | Tốc độ phát: chuyển sang thời gian nhạc | `sheetPlayer.js`: lên lịch nốt theo ticks (dựa vào BPM bài) thay cho giây tuyệt đối, để đổi `Transport.bpm` thì cả âm thanh lẫn waterfall đều co giãn. Thêm helper `getSongTime()` dùng chung cho Canvas và Timeline. Chưa có UI. | Done |
 | **T-08E** `[FE]` | Tốc độ phát: UI | Bộ chọn 0.5x / 0.75x / 1x / 1.25x / 1.5x kèm hiển thị BPM thực tế (dạng `− 92 BPM +` như thiết kế). Phụ thuộc: T-08D. **Lưu ý (từ T-08D):** nốt tự nhả sau độ dài đã quy ra giây thật lúc bắt đầu, nên đổi tốc độ đúng lúc nốt đang ngân thì nốt đó vẫn ngân theo tốc độ cũ; nếu muốn chính xác, khi đổi tốc độ lúc đang phát thì tua lại tại chỗ (`setSongTime(getSongTime())`). | Done |
-| **T-08F** `[FE]` | Octave Shift (UI) | Cụm `-1 [C1-C6 (0)] +1` giống Home trong Control Bar, disable ở 2 đầu phạm vi và khi AUTO_PLAY. Phụ thuộc: T-06C. | Done |
-| **T-08G** `[FE]` | Bật/tắt nhãn phím | Select *Phím tắt + Tên nốt* / *Tên nốt* như Home, thay cho logic ẩn nhãn cứng theo mode. Phụ thuộc: T-07E. | Done |
+| **T-08F** `[FE]` | Octave Shift (UI) | Cụm `-1 [C1-C6 (0)] +1` giống Home trong Control Bar, disable ở 2 đầu phạm vi và khi AUTO_PLAY. Phụ thuộc: T-06C. **Quỳnh đổi (2026-11-05):** `OctaveShiftControl` thành 2 cụm *Zone 1* / *Zone 2* (`- Zone 1: C3 +`), dùng chung với Home, tự khoá ở Play. | Done |
+| **T-08G** `[FE]` | Bật/tắt nhãn phím | Select *Phím tắt + Tên nốt* / *Tên nốt* như Home, thay cho logic ẩn nhãn cứng theo mode. Phụ thuộc: T-07E. **Quỳnh đổi (2026-11-05):** `KeyLabelSelect` thành component nhận props, dùng chung với Home. Thêm nút Hide/Show shortcuts (`ShortcutToggle`). | Done |
 
-### Giai đoạn 6: Chế độ PRACTICE (Wait Mode) — Pending
+### Giai đoạn 6: Chế độ PRACTICE (Wait Mode → Play)
 
-> **Pending (2026-11-05):** tạm dừng Wait Mode, làm tiếp sau khi hoàn thiện Feature Upload MIDI (để thử với bài do người dùng tải lên). Trong lúc chờ, nút *Wait Mode* chỉ đổi sang chế độ người dùng tự chơi (có nhãn phím tắt, Octave Shift), chưa dừng chờ theo bài.
+> **Cập nhật (2026-11-06):** Bình tạm dừng nhóm này ngày 2026-11-05; cùng ngày Quỳnh đã làm Wait Mode trên `develop` và đổi tên thành **Play**. Các task bên dưới ghi lại phần Quỳnh đã làm và phần còn thiếu (T-09E).
 
 | Sub-Task | Component | Contract & Constraints | Status |
 | :--- | :--- | :--- | :--- |
-| **T-09A** `[FE]` | Gom nốt thành bước | Hàm thuần `features/workspace/practice/buildSteps.js`: gom nốt có `time` lệch nhau ≤ 50ms thành 1 bước `{ time, notes: Set<name>, hands }`, sắp theo thời gian. Có vài test case viết tay trong comment hoặc file test. | To Do |
-| **T-09B** `[FE]` | Dừng chờ tại mỗi bước | Ở PRACTICE: Transport chạy, đến thời điểm của bước thì `pause()` và đặt `playbackKeys` = các nốt cần nhấn (gợi ý). Không phát âm tự động. **Lưu ý (phát hiện ở T-05E):** `ControlBar` đang nghe sự kiện `pause`/`stop` của `Tone.Transport` để gọi `stopAllNotes()` + `resetKeys()`, và Tone phát sự kiện này trễ vài chục ms → nếu Wait Mode `pause()` để chờ thì sẽ **tắt tiếng và xoá phím người chơi đang giữ**. Phải tách "dừng do người dùng bấm Pause/Stop/tua" khỏi "dừng chờ của Wait Mode", và chỉ tắt âm/phím của bài nhạc (`playbackKeys`), không đụng `pressedKeys`. Phụ thuộc: T-09A, T-05D, T-08D. | To Do |
-| **T-09C** `[FE]` | Kiểm tra phím người dùng | Người dùng nhấn phím thì có tiếng. Đánh dấu nốt đúng của bước hiện tại. Đủ **tất cả** nốt (nhấn sau khi bước bắt đầu chờ) thì `start()` tiếp. Phím sai vẫn kêu nhưng không tính. Phụ thuộc: T-09B, T-06B. | To Do |
-| **T-09D** `[FE]` | Đồng bộ seek/restart | Tua, Restart, đổi mode thì tính lại bước hiện tại theo thời gian mới, xoá gợi ý và các nốt đã đánh dấu. Phụ thuộc: T-09C. | To Do |
-| **T-09E** `[FE]` | Phản hồi trực quan | Phím gợi ý có màu theo tay, nốt đã nhấn đúng đổi trạng thái, Control Bar hiện badge *Waiting for you*. Phụ thuộc: T-09C, T-07E. | To Do |
-| **T-10** `[FE]` | Review Workspace | Chạy `npm run lint` + `npm run build`, test thủ công (Auto/Practice, seek, đổi bài, rời trang không còn âm hay listener), cập nhật README FE. | To Do |
+| **T-09A** `[FE]` | Gom nốt thành bước | Hàm thuần `features/workspace/practice/buildSteps.js`: gom nốt có `time` lệch nhau ≤ 50ms thành 1 bước `{ time, notes: Set<name>, hands }`, sắp theo thời gian. Có vài test case viết tay trong comment hoặc file test. **Quỳnh làm (2026-11-05):** gom nốt ở **Backend** (`sheets.score.js` → `chords` trong `GET /sheets/:id`, nốt cách nhau ≤ 30 ms là 1 hợp âm, tối đa 4 nốt `required`), không có `buildSteps.js` ở FE. | Done (Quỳnh) |
+| **T-09B** `[FE]` | Dừng chờ tại mỗi bước | Ở PRACTICE: Transport chạy, đến thời điểm của bước thì `pause()` và đặt `playbackKeys` = các nốt cần nhấn (gợi ý). Không phát âm tự động. **Lưu ý (phát hiện ở T-05E):** `ControlBar` đang nghe sự kiện `pause`/`stop` của `Tone.Transport` để gọi `stopAllNotes()` + `resetKeys()`, và Tone phát sự kiện này trễ vài chục ms → nếu Wait Mode `pause()` để chờ thì sẽ **tắt tiếng và xoá phím người chơi đang giữ**. Phải tách "dừng do người dùng bấm Pause/Stop/tua" khỏi "dừng chờ của Wait Mode", và chỉ tắt âm/phím của bài nhạc (`playbackKeys`), không đụng `pressedKeys`. Phụ thuộc: T-09A, T-05D, T-08D. **Quỳnh làm:** `chordPart` + `handleChordReached` trong `audio/sheetPlayer.js` gọi `Transport.pause(time)`; Control Bar bỏ qua lần dừng chờ nhờ `isWaitPause(time)` nên không xoá phím người chơi. | Done (Quỳnh) |
+| **T-09C** `[FE]` | Kiểm tra phím người dùng | Người dùng nhấn phím thì có tiếng. Đánh dấu nốt đúng của bước hiện tại. Đủ **tất cả** nốt (nhấn sau khi bước bắt đầu chờ) thì `start()` tiếp. Phím sai vẫn kêu nhưng không tính. Phụ thuộc: T-09B, T-06B. **Quỳnh làm:** `handleUserNote` (gọi từ `pressKey`), nhấn sớm tối đa 400 ms vẫn tính; đủ nốt `required` thì chạy tiếp, các nốt không bắt buộc tự kêu. | Done (Quỳnh) |
+| **T-09D** `[FE]` | Đồng bộ seek/restart | Tua, Restart, đổi mode thì tính lại bước hiện tại theo thời gian mới, xoá gợi ý và các nốt đã đánh dấu. Phụ thuộc: T-09C. **Quỳnh làm:** `resetWaitState` + `alignOctavesToTime` khi tua, Restart, đổi chế độ; tua lúc đang chờ thì chạy tiếp từ vị trí mới. | Done (Quỳnh) |
+| **T-09E** `[FE]` | Phản hồi trực quan | Phím gợi ý có màu theo tay, nốt đã nhấn đúng đổi trạng thái, Control Bar hiện badge *Waiting for you*. Phụ thuộc: T-09C, T-07E. **Quỳnh làm một phần:** phím gợi ý đã có màu theo tay. **Còn thiếu:** badge *Waiting for you* trên Control Bar và trạng thái riêng cho nốt đã nhấn đúng. | Một phần (Quỳnh) |
+| **T-10** `[FE]` | Review Workspace | Chạy `npm run lint` + `npm run build`, test thủ công (Auto/Practice, seek, đổi bài, rời trang không còn âm hay listener), cập nhật README FE. **Cập nhật (2026-11-06):** không còn phải chờ, làm được bất cứ lúc nào. Thêm `npm test` (Quỳnh đã thêm Vitest) vào bước kiểm tra. | To Do |
 
+### Thay đổi của Quỳnh sau khi merge `sheet-library` (2026-11-05)
+
+Ghi lại để biết code hiện tại khác gì so với các task ở trên. Chi tiết: `docs/CHANGELOG.md` của 2 repo.
+
+| Thay đổi | Repo / file chính | Ảnh hưởng tới phần của Bình |
+| :--- | :--- | :--- |
+| Chế độ **Play** (Wait Mode) chờ theo hợp âm | FE `audio/sheetPlayer.js`, `ControlBar.jsx`; BE `sheets.score.js` (`chords`) | Thay nhóm T-09. Bài upload chỉ cần `notes` đúng định dạng là BE tự tính `chords` |
+| Phím Practice 2 vùng, phím hợp âm, mũi tên dời vùng, nhận đàn MIDI thật | FE `useKeyMapping`, `useKeyboardInput`, `useMidiInput`; BE `practiceKeys` trong `/piano` | Thay T-06A/B/C, T-08F |
+| Home và Practice dùng chung bàn phím và các control | FE `PianoKeybed`, `KeyLabelSelect`, `OctaveShiftControl`, nút How to play | Sửa các file này thì phải mở thử cả Home |
+| Dải Shortcuts nằm ngang + nút Hide/Show | FE `ShortcutStrip.jsx`, `ShortcutToggle.jsx` | Mới |
+| Xem bản nhạc (khuông nhạc) bằng VexFlow, nút chuyển Waterfall / Sheet music | FE `canvas/sheetMusicScore.jsx`, `ViewModeToggle.jsx`; BE `GET /sheets/:id/score` | Bài upload cũng có bản nhạc, BE tính từ `notes` |
+| Like thật (cần đăng nhập), `likedByMe` | FE `LikeButton.jsx` (Library + Workspace); BE bảng `sheet_likes`, `POST /sheets/:id/like`, `auth.middleware.js` | Có migration `add_sheet_likes`: **đưa `views`, `likes` của mọi bài về 0**. Máy cũ chạy `npm run db:deploy` |
+| Lượt xem chỉ tính khi bấm Practice ở Library | FE `SheetCard.jsx`, `useSheetLoader.js` | Thay T-07C |
+| Test tự động | FE `npm test` (Vitest); BE `npm test` (`node:test`), file `*.test.js` đặt cạnh code | Task mới nên kèm test |
+| Rút gọn comment trong code (nhánh `fix-codestyle-logic`) | Nhiều file của Workspace và Library | Comment giải thích "vì sao" gần như bị xoá, logic giữ nguyên. Lý do của các cách làm khó (tua, tick, lookahead) xem `docs/NOTES.md` mục 3 |
+| `npm run dev` cho BE, cấu hình nguồn mẫu âm piano | BE `package.json`; FE `config/api.js` (`PIANO_SAMPLES_BASE_URL`) | Không |
+
+### Lưu ý nhỏ (ghi lại để xử lý sau, chưa phải bug)
+
+- **Auto Play cho phép người dùng đánh đàn** và nhấn nốt đầu tiên thì bài tự chạy (cả ở Auto Play). Bình đồng ý giữ nguyên (2026-11-06). Nếu thấy vô tình chạm phím làm bài tự chạy gây khó chịu thì có thể giới hạn phần tự chạy chỉ ở Play.
+- **Store và `sheetPlayer.js` import lẫn nhau** (`useWorkspaceStore` ↔ `audio/sheetPlayer`). Hiện chạy được vì 2 bên chỉ gọi nhau bên trong hàm; đừng thêm code dùng store ở cấp module trong `sheetPlayer.js` (sẽ lỗi do thứ tự import).
+- Bộ test e2e (CDP) Bình dùng cho T-05 → T-08 đã cũ so với hành vi mới (nhãn *Play*, Auto Play nhận phím, Zone thay Octave Shift, cách đếm lượt xem). Cần viết lại trước khi dùng làm test hồi quy.
+- Bảng phân công trong `docs/NOTES.md` (2 repo) ghi Quỳnh không sửa phần Workspace/Library; thực tế Quỳnh đã sửa. Cập nhật lại sau khi Bình và Quỳnh thống nhất.
+- Nhánh `profile` trên GitHub hiện trùng `main` (2026-11-06), chưa có code trang profile.
 ## Feature: Sheet Library 
 
 ### Backend: Database (PostgreSQL + Prisma)
