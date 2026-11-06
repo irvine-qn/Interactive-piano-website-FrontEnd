@@ -12,6 +12,7 @@ import ShortcutToggle from "../features/workspace/components/ShortcutToggle";
 import ViewModeToggle from "../features/workspace/components/ViewModeToggle";
 import WaterfallCanvas from "../features/workspace/canvas/practiceWaterfall";
 import { useSheetLoader } from "../features/workspace/hooks/useSheetLoader";
+import { usePracticeSession } from "../features/workspace/hooks/usePracticeSession";
 import Footer from "../components/common/footer";
 import HowToPlay from "../features/home/components/HowToPlay";
 
@@ -38,6 +39,7 @@ const WorkspacePage = () => {
   const isSheetView = viewMode === "sheet";
   const { sheetId } = useParams();
   const reloadSheet = useSheetLoader(sheetId);
+  usePracticeSession(sheetId);
 
   return (
     <div className="flex flex-1 flex-col">
