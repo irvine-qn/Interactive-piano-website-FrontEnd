@@ -99,13 +99,17 @@ Lệnh này sẽ đọc file `package.json` và tự động cài toàn bộ th�
 ## 4. Chạy Frontend
 
 > Frontend lấy dữ liệu từ Backend (cấu hình piano ở Home, danh sách bài ở Sheet Library, nốt nhạc ở Workspace).
-> Hãy chạy Backend trước theo README của repo `Interactive-piano-website-Backend`: bật PostgreSQL (`docker compose up -d`), `npm run db:migrate`, `npm run db:seed`, rồi `npm start` (mặc định `http://localhost:5000`).
+> Hãy chạy Backend trước theo mục *Useful Commands* trong README của repo `Interactive-piano-website-Backend` (mặc định `http://localhost:5000`).
 
-Sau khi cài dependencies:
+Chạy lần đầu:
 
 ```bash
+npm install
+cp .env.example .env
 npm run dev
 ```
+
+Những lần sau chỉ cần `npm run dev`. Sau khi pull code mới, chạy `npm install` trước.
 
 Terminal sẽ hiển thị URL tương tự:
 
@@ -135,6 +139,7 @@ frontend/
 │   │   ├── home/              # Virtual piano trang chủ
 │   │   ├── piano/audio/       # toneEngine (Tone.js Sampler) dùng chung Home + Workspace
 │   │   ├── workspace/         # Trang luyện tập: store, audio, canvas waterfall, bàn phím
+│   │   ├── upload/            # Upload sheet MIDI: api, config, hooks/useUploadForm, components (thẻ của trang /upload), utils
 │   │   └── library/           # Sheet Library
 │   │       ├── api/           # libraryApi: getSheets, getTags
 │   │       ├── components/    # LibraryBrowser, LibraryToolbar, LibraryFilters, SheetGrid, SheetCard, SheetCover, Pagination
@@ -142,7 +147,7 @@ frontend/
 │   │       ├── hooks/         # useLibraryQuery (bộ lọc theo URL), useTags
 │   │       └── utils/         # pagination (dãy số trang)
 │   ├── lib/axios.js           # apiClient: baseURL `${VITE_API_URL}/api/v1`, chuẩn hoá lỗi
-│   ├── pages/                 # HomePage, LibraryPage, WorkspacePage, NotFoundPage, auth/, profile/
+│   ├── pages/                 # HomePage, LibraryPage, WorkspacePage, UploadPage, NotFoundPage, auth/, profile/
 │   ├── routes/AppRoutes.jsx
 │   ├── utils/format.js        # formatCount (45.2K), formatDuration (03:45)
 │   ├── App.jsx
@@ -169,7 +174,9 @@ frontend/
 | `/workspace/:sheetId` | `WorkspacePage` | Luyện tập một bài, ví dụ `/workspace/canon-in-d` |
 | `/workspace` | → `/library` | Chưa chọn bài (vd. nút *Practice* trên Navbar) thì chuyển sang Library để chọn |
 | `/login`, `/register`, `/forgot-password` | `pages/auth/*` | Chỉ dành cho khách (`GuestRoute`), đã đăng nhập thì chuyển đi |
-| `/profile`, `/upload` | `pages/profile/*`, … | Cần đăng nhập (`ProtectedRoute`), chưa đăng nhập thì về `/login` |
+| `/profile` | `UserProfilePage` | Cần đăng nhập (`ProtectedRoute`), chưa đăng nhập thì về `/login`. Tab bài đã upload, bài đã lưu, lịch sử chơi |
+| `/profile/edit` | `EditProfilePage` | Cần đăng nhập. Sửa thông tin, đổi avatar và ảnh bìa |
+| `/upload` | `UploadPage` | Tải file MIDI lên thành bài nhạc (cần đăng nhập). 1 trang 2 cột theo thiết kế `User_Upload_Sheet_Cartoon` |
 | `*` | `NotFoundPage` | Trang 404 |
 
 Đường dẫn được khai báo tập trung trong `src/config/routes.js` (`ROUTES`). Chữ hiển thị trên giao diện dùng **tiếng Anh**.

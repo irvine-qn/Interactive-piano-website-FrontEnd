@@ -1,12 +1,8 @@
 import sheetCoverDots from '../../../assets/virtual-piano-assets/sheet-cover-dots.svg';
 import { DIFFICULTY_META } from '../config/difficulty';
+import { COVER_BG } from '../config/cover';
+import PrivateBadge from './PrivateBadge';
 
-const COVER_BG = {
-  yellow: 'bg-[var(--color-pastel-yellow)]',
-  pink: 'bg-[var(--color-pastel-pink)]',
-  mint: 'bg-[var(--color-pastel-mint)]',
-  lavender: 'bg-[var(--color-pastel-lavender)]',
-};
 
 const createRandom = (seedText) => {
   let seed = [...seedText].reduce((hash, char) => (hash * 31 + char.charCodeAt(0)) | 0, 7);
@@ -152,9 +148,13 @@ const SheetCover = ({ sheet }) => {
       <div className="absolute left-2.5 top-2.5">
         <DifficultyBadge difficulty={sheet.difficulty} />
       </div>
-      <span className="absolute right-2.5 top-2.5 border-[1.5px] border-[var(--color-ink)] bg-[var(--color-surface-card)] px-2 py-0.5 text-[11px] font-bold text-[var(--color-brand-strong)]">
-        MIDI
-      </span>
+      <div className="absolute right-2.5 top-2.5 flex gap-1.5">
+        {/* Bài upload chỉ mình thấy (U-FE-10) */}
+        {sheet.visibility === 'PRIVATE' && <PrivateBadge />}
+        <span className="border-[1.5px] border-[var(--color-ink)] bg-[var(--color-surface-card)] px-2 py-0.5 text-[11px] font-bold text-[var(--color-brand-strong)]">
+          MIDI
+        </span>
+      </div>
     </div>
   );
 };

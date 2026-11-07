@@ -2,11 +2,14 @@ import { Link } from 'react-router-dom';
 import { Clock, Eye } from 'lucide-react';
 import LikeButton from './LikeButton';
 import SheetCover from './SheetCover';
+import UploadedBy from './UploadedBy';
+import { uploaderLabel } from '../utils/uploader';
 import PianoKeysIcon from '../../../components/icons/PianoKeysIcon';
 import { formatCount, formatDuration } from '../../../utils/format';
 
 const SheetCard = ({ sheet }) => {
   const byline = sheet.subtitle ? `${sheet.composer} · ${sheet.subtitle}` : sheet.composer;
+  const uploadedBy = uploaderLabel(sheet);
 
   return (
     <article className="flex flex-col border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] shadow-[var(--shadow-hard)]">
@@ -21,6 +24,7 @@ const SheetCard = ({ sheet }) => {
         <p title={byline} className="m-0 mt-1 truncate text-sm text-[var(--color-neutral-450)]">
           {byline}
         </p>
+        {uploadedBy && <UploadedBy text={uploadedBy} />}
 
         <ul className="m-0 mt-3 flex list-none items-center gap-5 p-0 text-sm font-bold">
           <li className="flex items-center gap-1.5 text-[var(--color-neutral-600)]" aria-label={`${sheet.views} views`}>

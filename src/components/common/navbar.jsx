@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { toImageUrl } from "../../config/api";
 import defaultAvatar from "../../assets/virtual-piano-assets/default-avatar.jpeg";
 import fianoLogo from "../../assets/virtual-piano-assets/fiano-logo.png";
 import foxMascot from "../../assets/virtual-piano-assets/fox-mascot.png";
-import { LogOut, Menu, Search, User, X } from "lucide-react";
+import { LogOut, Menu, User, X } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
 import { ROUTES } from "../../config/routes";
+import NavbarSearch from "./NavbarSearch";
 
 const NAV_ITEMS = [
   { to: ROUTES.HOME, label: "Piano" },
@@ -50,7 +52,11 @@ const Navbar = () => {
       <NavLink
         key={item.to}
         to={item.to}
-        state={item.to === ROUTES.LOGIN || item.to === ROUTES.REGISTER ? { from } : undefined}
+        state={
+          item.to === ROUTES.LOGIN || item.to === ROUTES.REGISTER
+            ? { from }
+            : undefined
+        }
         end
         onClick={onItemClick}
         className={navLinkClass}
@@ -60,8 +66,8 @@ const Navbar = () => {
     ));
 
   return (
-    <header className="relative z-20 border-b-4 border-[var(--color-ink)] bg-[linear-gradient(to_bottom,var(--color-sky-1)_0_16px,var(--color-sky-2)_16px_32px,var(--color-sky-3)_32px_48px,var(--color-sky-4)_48px_64px,var(--color-sky-5)_64px_80px,var(--color-sky-6)_80px)]">
-      <div className="relative mx-auto flex h-[92px] w-full max-w-[1600px] items-center gap-6 px-4">
+    <header className="sticky top-0 z-20 border-b-4 border-[var(--color-ink)] bg-[linear-gradient(to_bottom,var(--color-sky-1)_0_11px,var(--color-sky-2)_11px_22px,var(--color-sky-3)_22px_33px,var(--color-sky-4)_33px_44px,var(--color-sky-5)_44px_55px,var(--color-sky-6)_55px)]">
+      <div className="relative mx-auto flex h-16 w-full max-w-7xl items-center gap-6 px-4">
         <NavLink
           to={ROUTES.HOME}
           aria-label="Fiano home"
@@ -70,7 +76,7 @@ const Navbar = () => {
           <img
             src={foxMascot}
             alt=""
-            className="absolute left-[21px] top-[43px] h-[88px] w-[94px] -rotate-2"
+            className="absolute left-[21px] top-[15px] h-[88px] w-[94px] -rotate-2"
           />
           <img
             src={fianoLogo}
@@ -78,17 +84,9 @@ const Navbar = () => {
             className="ml-[120px] h-[46px] w-[95px]"
           />
         </NavLink>
-        <label className="ml-10 hidden h-10 w-[380px] shrink items-center border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-4 md:flex">
-          <input
-            type="search"
-            placeholder="Find some music?"
-            className="min-w-0 flex-1 appearance-none border-0 bg-transparent p-0 font-[inherit] text-sm text-[var(--color-ink)] outline-none placeholder:text-[var(--color-neutral-350)]"
-          />
-          <Search
-            aria-hidden="true"
-            className="h-[26px] w-7 text-[var(--color-brand)]"
-          />
-        </label>
+        <NavbarSearch
+          className={location.pathname === ROUTES.LIBRARY ? "invisible" : ""}
+        />
         <nav
           aria-label="Main navigation"
           className="ml-12 hidden items-center gap-[14px] lg:flex"
@@ -113,17 +111,19 @@ const Navbar = () => {
 
         {user && (
           <div className="group relative shrink-0 lg:ml-auto">
-            <button
-              type="button"
+            <NavLink
+              to={ROUTES.PROFILE}
               aria-haspopup="menu"
-              className="avatar flex cursor-pointer border-0 bg-transparent p-0"
+              aria-label="Go to profile"
+              onClick={closeFocusedMenu}
+              className="avatar flex"
             >
               <img
-                src={defaultAvatar}
-                alt="User avatar"
-                className="avatar h-10 w-10 border-[2.5px] border-[var(--color-ink)] object-cover"
+                src={toImageUrl(user?.avatarUrl) || defaultAvatar}
+                alt=""
+                className="avatar h-12 w-12 border-[2.5px] border-[var(--color-ink)] object-cover"
               />
-            </button>
+            </NavLink>
             <div className="invisible absolute right-0 top-full pt-3 opacity-0 transition-opacity group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
               <div
                 role="menu"

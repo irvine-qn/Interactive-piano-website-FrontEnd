@@ -24,6 +24,8 @@ apiClient.interceptors.response.use(
       status: error.response?.status ?? null,
       code: apiError?.code ?? 'NETWORK_ERROR',
       message: apiError?.message ?? 'Unable to connect to the server',
+      // Thông tin thêm của lỗi nếu BE gửi, vd { field: 'title' } ở POST /sheets (upload hiện lỗi dưới đúng ô)
+      details: apiError?.details,
     });
   },
 );

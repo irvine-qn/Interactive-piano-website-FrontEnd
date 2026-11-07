@@ -6,6 +6,8 @@ import LoginPage from "../pages/auth/LoginPage";
 import RegisterPage from "../pages/auth/RegisterPage";
 import ForgotPasswordPage from "../pages/auth/ForgotPasswordPage";
 import UserProfilePage from "../pages/profile/UserProfilePage";
+import UploadPage from "../pages/UploadPage";
+import EditProfilePage from "../pages/profile/EditProfilePage";
 import NotFoundPage from "../pages/NotFoundPage";
 import { GuestRoute, ProtectedRoute } from "./RouteGuards";
 import { ROUTES } from "../config/routes";
@@ -23,7 +25,8 @@ const AppRoutes = () => (
     </Route>
     <Route element={<ProtectedRoute />}>
       <Route path={ROUTES.PROFILE} element={<UserProfilePage />} />
-      <Route path={ROUTES.UPLOAD} element={<NotFoundPage />} />
+      <Route path={ROUTES.UPLOAD} element={<UploadPage />} />
+      <Route path={ROUTES.PROFILE_EDIT} element={<EditProfilePage />} />
     </Route>
     <Route path="*" element={<NotFoundPage />} />
   </Routes>

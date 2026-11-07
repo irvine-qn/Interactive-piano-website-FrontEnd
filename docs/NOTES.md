@@ -9,16 +9,16 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
 
 ## 1. Ai phụ trách phần nào
 
-| Phần | Phụ trách | Ghi chú |
-| --- | --- | --- |
-| HomePage (`pages/HomePage.jsx`, `features/home/*`) | **Quỳnh** | Bình **không sửa**. Cần dùng lại thì import (vd. Workspace dùng `features/home/api/pianoApi.js`) |
-| Auth (`features/auth/*`, `pages/auth/*`, `RouteGuards.jsx`, `useAuthStore.js`), Navbar mới, `NotFoundPage` | **Quỳnh** | Riêng chữ thương hiệu trên Navbar (C-04) Bình làm, giữ nguyên phần còn lại của Quỳnh |
-| Sheet Library (`features/library/*`, `pages/LibraryPage.jsx`) | **Bình** (nhánh `sheet-library`) | Quỳnh **không sửa** |
-| Piano Workspace (`features/workspace/*`, `pages/WorkspacePage.jsx`) | **Bình** (nhánh `sheet-library`) | Quỳnh **không sửa**, kể cả Wait Mode (T-09) đang pending |
-| User profile + User edit profile (`pages/profile/*`: trang profile, trang chỉnh sửa profile, ảnh avatar) | **Quỳnh** | Bình **không sửa** |
-| User upload sheet (upload file MIDI, trang `/upload`) | **Bình** (sắp làm) | Quỳnh **không sửa**. Route `ROUTES.UPLOAD` (đã có trong `AppRoutes.jsx`, nằm trong `ProtectedRoute`) hiện trỏ tạm tới `NotFoundPage`; Bình sẽ thay bằng trang upload. Trang profile cần danh sách bài đã upload thì thống nhất API trước |
-| Bài đã lưu của người dùng | Chưa phân công | |
-| Code dùng chung: `features/piano/audio/toneEngine.js`, `components/common/*`, `index.css`, `lib/axios.js` | Cả hai | Chỉ sửa nếu **không đổi hành vi** của phần người kia. Sửa xong mở thử Home, Library, Workspace |
+| Phần                                                                                                                                 | Phụ trách                                | Ghi chú                                                                                                                                               |
+| ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| HomePage (`pages/HomePage.jsx`, `features/home/*`)                                                                                | **Quỳnh**                           | Bình **không sửa**. Cần dùng lại thì import (vd. Workspace dùng `features/home/api/pianoApi.js`)                                       |
+| Auth (`features/auth/*`, `pages/auth/*`, `RouteGuards.jsx`, `useAuthStore.js`), Navbar mới, `NotFoundPage`                 | **Quỳnh**                           | Riêng chữ thương hiệu trên Navbar (C-04) Bình làm, giữ nguyên phần còn lại của Quỳnh                                                    |
+| Sheet Library (`features/library/*`, `pages/LibraryPage.jsx`)                                                                     | **Bình** (nhánh `sheet-library`) | Quỳnh **không sửa**                                                                                                                           |
+| Piano Workspace (`features/workspace/*`, `pages/WorkspacePage.jsx`)                                                               | **Bình** (nhánh `sheet-library`) | Quỳnh **không sửa**, kể cả Wait Mode (T-09) đang pending                                                                                   |
+| User profile + User edit profile (`pages/profile/*`: trang profile, trang chỉnh sửa profile, ảnh avatar)                         | **Quỳnh**                           | Bình **không sửa**                                                                                                                            |
+| User upload sheet (`features/upload/*`, `pages/UploadPage.jsx`, nhãn *Private* / *Uploaded by* trong `features/library/*`) | **Bình**                            | Quỳnh **không sửa**. Trang profile lấy bài của một người qua `getUserSheets(userId)` (`features/upload/api/uploadApi.js`, đã có) |
+| Bài đã lưu của người dùng                                                                                                     | Chưa phân công                          |                                                                                                                                                        |
+| Code dùng chung: `features/piano/audio/toneEngine.js`, `components/common/*`, `index.css`, `lib/axios.js`                    | Cả hai                                    | Chỉ sửa nếu **không đổi hành vi** của phần người kia. Sửa xong mở thử Home, Library, Workspace                                     |
 
 > Phân công giữa **Nguyễn Thanh Bình** và **Nguyễn Thị Ngọc Quỳnh**. Khi đọc tài liệu/WBS này để làm việc, chỉ làm phần của người đang được giao; phần của người kia thì không sửa, cần đổi thì báo để người đó làm.
 
@@ -38,16 +38,16 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
 
 ### 3.1 Các file chính
 
-| File | Vai trò |
-| --- | --- |
-| `audio/songClock.js` | "Đồng hồ bài nhạc": `Transport.bpm` = BPM gốc của bài ở 1x; `getSongTime()` / `setSongTime()` / `setPlaybackRate()` |
-| `audio/sheetPlayer.js` | Nạp bài vào `Tone.Part` (lên lịch theo **tick**), tự dừng khi hết bài, `silencePlayback()` khi dừng/tua |
-| `store/useWorkspaceStore.js` | Zustand: chế độ, phím đang nhấn, phím do bài bật sáng, quãng, âm lượng, tốc độ, nhãn phím, sheet |
-| `canvas/practiceWaterfall.jsx` | Vẽ nốt rơi bằng canvas, đọc `getSongTime()` mỗi khung hình |
-| `components/ControlBar.jsx` | Chọn chế độ, timeline, tốc độ, Restart, Play/Pause, âm lượng; nghe sự kiện `start`/`pause`/`stop` của Transport |
-| `config/keyLayout.js` | Vị trí 88 phím (A0–C8) dùng chung cho bàn phím **và** waterfall, để nốt rơi đúng phím |
-| `hooks/useKeyMapping.js`, `hooks/useKeyboardInput.js` | Phím tắt máy tính theo bảng của Home (`GET /api/v1/piano`), Octave Shift, chống kẹt phím |
-| `hooks/useWorkspaceVolume.js` | Âm lượng riêng của Workspace, trả lại mức gốc khi rời trang |
+| File                                                      | Vai trò                                                                                                                             |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `audio/songClock.js`                                    | "Đồng hồ bài nhạc": `Transport.bpm` = BPM gốc của bài ở 1x; `getSongTime()` / `setSongTime()` / `setPlaybackRate()` |
+| `audio/sheetPlayer.js`                                  | Nạp bài vào `Tone.Part` (lên lịch theo **tick**), tự dừng khi hết bài, `silencePlayback()` khi dừng/tua          |
+| `store/useWorkspaceStore.js`                            | Zustand: chế độ, phím đang nhấn, phím do bài bật sáng, quãng, âm lượng, tốc độ, nhãn phím, sheet                  |
+| `canvas/practiceWaterfall.jsx`                          | Vẽ nốt rơi bằng canvas, đọc `getSongTime()` mỗi khung hình                                                                 |
+| `components/ControlBar.jsx`                             | Chọn chế độ, timeline, tốc độ, Restart, Play/Pause, âm lượng; nghe sự kiện `start`/`pause`/`stop` của Transport   |
+| `config/keyLayout.js`                                   | Vị trí 88 phím (A0–C8) dùng chung cho bàn phím **và** waterfall, để nốt rơi đúng phím                           |
+| `hooks/useKeyMapping.js`, `hooks/useKeyboardInput.js` | Phím tắt máy tính theo bảng của Home (`GET /api/v1/piano`), Octave Shift, chống kẹt phím                                  |
+| `hooks/useWorkspaceVolume.js`                           | Âm lượng riêng của Workspace, trả lại mức gốc khi rời trang                                                                |
 
 ### 3.2 Những điều dễ làm hỏng
 
@@ -70,22 +70,38 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
 - ESLint (react-hooks v7) báo lỗi `set-state-in-effect`: trạng thái "đang tải" nên **suy ra** từ dữ liệu (vd. so `result.key` với `reloadKey`) thay vì gọi `setState` trong effect.
 - Màu và bóng dùng design token trong `index.css` (`var(--color-*)`, `var(--shadow-hard)`), kể cả trên canvas (đọc bằng `getComputedStyle`).
 
+## 3b. Upload sheet (Bình)
+
+- Gửi file bằng `FormData` thì **không tự đặt `Content-Type`** (axios tự thêm boundary). Mảng (tracks, tags) gửi thành nhiều trường cùng tên.
+- Giới hạn file (1 MB, `.mid`/`.midi`, timeout 30 s) và thông tin bài (độ dài title, composer, số tag) ở `features/upload/config/upload.js`, **phải khớp Backend**.
+- `lib/axios.js` (dùng chung) biến request bị huỷ thành `NETWORK_ERROR` *"Unable to connect to the server"*. `uploadApi.js` trả mã `CANCELED` để giao diện bỏ qua; nơi khác dùng `signal` thì kiểm tra `signal.aborted` trước khi hiện lỗi. Lỗi có thêm `details` nếu Backend gửi (vd `{ field: 'title' }`).
+- **Mọi state của trang `/upload` nằm trong `useUploadForm`**: thẻ mới chỉ đọc/ghi qua hook, không tự giữ state riêng. Muốn lấy title / độ khó thì đọc `details`, không đọc `fields`: trong `fields` giá trị `null` nghĩa là chưa sửa, dùng gợi ý của Backend. Không gộp trạng thái đổi track vào trạng thái file (dòng file sẽ nhảy về *Analyzing*/*Failed* khi chỉ đổi track).
+- Đừng bỏ đoạn chặn thả file toàn trang trong `FileDropzone`: lỡ thả ra ngoài thì trình duyệt mở file, rời trang, mất dữ liệu đang nhập.
+- Bìa bài vẽ theo `id`. Preview ở `/upload` đoán id bằng `toSlug(title)` (`utils/sheetDetails.js`): đổi cách Backend tạo id thì sửa cả `toSlug`, nếu không bìa Preview sẽ khác bìa thật.
+- `getUserSheets(userId)` dành cho trang profile của Quỳnh (bài PUBLIC của một người dùng).
+- **Profile:** `ProfileSheetList` dùng chung cho cả 3 tab, đổi phần thông tin bằng `renderMeta`, nút bằng `renderActions`. `useMySheets` tính trang *Load more* từ số bài đang có (`nextPageToLoad`): đừng đổi thành cộng dồn số trang, xoá bài xong sẽ sót bài.
+- **Ảnh hồ sơ:** Backend trả đường dẫn tương đối, hiển thị qua `toImageUrl` (`config/api.js`). `PhotoPositionDialog` cắt ảnh bằng canvas ở trình duyệt; chỉnh lại vị trí phải chọn lại ảnh vì Backend chỉ lưu bản đã cắt.
+- **`npm uninstall` / `npm install <gói>` có thể hạ `eslint` từ 10 xuống 9**, làm lint báo hàng loạt lỗi `no-unused-vars` giả. Gặp thì kiểm tra `npm ls eslint`; thêm `--legacy-peer-deps` khi gỡ gói.
+
 ## 4. Giới hạn đã biết (chưa sửa)
 
-| Vấn đề | Ghi chú |
-| --- | --- |
-| Đổi tốc độ đúng lúc một nốt đang ngân thì nốt đó vẫn ngân theo tốc độ cũ | Các nốt sau đúng tốc độ mới. Muốn chính xác thì tua lại tại chỗ khi đổi tốc độ, nhưng sẽ cắt các nốt đang ngân |
-| Tua vào giữa một nốt thì nốt đó không phát lại | Hành vi của `Tone.Part` |
-| Mở bài không tồn tại: timeline vẫn hiện độ dài của bài trước | Sẽ sửa ở E-02 (trang báo bài không tồn tại) |
-| Bundle JS lớn hơn 500 kB (Vite cảnh báo khi build) | Sẽ tách theo route ở C-05 |
-| `/favicon.ico` báo 404 ở mọi trang | `index.html` chưa có favicon |
+| Vấn đề                                                                                                                                  | Ghi chú                                                                                                                                  |
+| ------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Đổi tốc độ đúng lúc một nốt đang ngân thì nốt đó vẫn ngân theo tốc độ cũ                                             | Các nốt sau đúng tốc độ mới. Muốn chính xác thì tua lại tại chỗ khi đổi tốc độ, nhưng sẽ cắt các nốt đang ngân |
+| Tua vào giữa một nốt thì nốt đó không phát lại                                                                                  | Hành vi của `Tone.Part`                                                                                                               |
+| Trang *Sheet not found* (và lúc đang tải bài): timeline vẫn hiện độ dài của bài trước, hoặc 4:10 nếu chưa mở bài nào | `duration` của `useWorkspaceStore` (mặc định 250 giây) không đặt lại khi tải bài lỗi                                      |
+| Bundle JS lớn hơn 500 kB (Vite cảnh báo khi build)                                                                                     | Sẽ tách theo route ở C-05                                                                                                              |
+| `/favicon.ico` báo 404 ở mọi trang                                                                                                    | `index.html` chưa có favicon                                                                                                          |
 
 ## 5. Việc đang chờ
 
 - Review Workspace (T-10): **pending**. Chế độ chờ nốt nay có tên **Play** và đã chạy, logic nằm trong `audio/sheetPlayer.js`.
-- **C-04** chữ thương hiệu trên Navbar mới (giữ con cáo), **C-05** tách bundle, **E-02** trang bài không tồn tại.
-- **Upload sheet MIDI** (Bình): việc tiếp theo, sau đó mới làm lại Wait Mode.
-- **User profile / edit profile** (Quỳnh).
+- **C-04** chữ thương hiệu trên Navbar mới (giữ con cáo), **C-05** tách bundle.
+- **User profile / edit profile** (Quỳnh): còn đổi mật khẩu và các mục *Coming soon*.
+- **Kết quả đánh giá code (2026-11-07):** AU-01 → AU-17 trong `TASK_DECOMPOSITION.md`. **Chưa nên deploy công khai** khi chưa xong nhóm 1. Lỗi cần biết: link quên mật khẩu đang gọi API không tồn tại (AU-01).
+- Size mobile: chưa hoàn thiện. Hiện tại website còn bị dính scale khá nhiều khi thu phóng
+- Security: chưa đảm bảo
+- Code test kiểm thử: chưa viết
 
 ## 6. Kiểm tra trước khi tạo PR
 
@@ -98,5 +114,9 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
      - đổi tốc độ 0.5x–1.5x, âm lượng (rời sang Home thì âm lượng Home vẫn như cũ);
      - nốt rơi đúng phím, tay phải cam, tay trái xanh;
      - Play: nốt chạm vạch thì dừng, nhấn đủ mới chạy tiếp; phím tắt, Octave Shift, Key labels.
+   - `/upload` (đã đăng nhập): chọn một file mẫu, đổi track, sửa thông tin, *Publish* mở được bài ở Workspace; xoá bài thử khi xong.
+   - `/profile`: tab *Uploaded sheets* sửa, đổi Public/Private, xoá bài; tab *Practice history*.
+   - `/profile/edit`: đổi avatar, ảnh bìa, kéo chỉnh vị trí; Navbar hiện avatar mới.
+   - `/workspace/khong-co-bai-nay`: hiện *Sheet not found* và nút về Library.
    - `/workspace` chuyển sang `/library`; `/login`, `/register`, một URL không tồn tại ra trang 404.
 3. Mở DevTools Console: không có lỗi đỏ mới (ngoài favicon và MIDI ở Home đã biết).

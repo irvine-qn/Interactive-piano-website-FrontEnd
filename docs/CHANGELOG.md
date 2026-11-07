@@ -5,6 +5,25 @@ Mục **Cần làm sau khi pull** là các lệnh phải chạy trên máy của
 
 ---
 
+## 2026-11-07 – Profile: bài đã upload, ảnh hồ sơ, lịch sử chơi
+
+- **Tab *Uploaded sheets*:** dữ liệu thật, có tìm kiếm, lọc độ khó, *Load more*; xem, sửa, đổi Public/Private, xoá bài. Thẻ *Sheets uploaded* hiện số thật. Bỏ nút Download và phần Draft vì chưa có tính năng.
+- **Ảnh hồ sơ:** đổi / xoá avatar và ảnh bìa ở `/profile/edit`. Chọn ảnh xong kéo để chỉnh vị trí, bấm *Save* mới tải lên. Avatar hiện ở trang profile và Navbar.
+- **Tab *Practice history*:** dùng chung `ProfileSheetList` với *Saved collections*.
+- Gỡ `multer` khỏi FE (thư viện phía server), xoá route `/upload` bị trùng sau merge.
+
+**Cần làm sau khi pull:** `npm install`; cập nhật Backend theo CHANGELOG của Backend (`npm install`, `npm run db:deploy`, `npm run db:seed`).
+
+## 2026-11-06 – Upload MIDI (Bình)
+
+- **Trang `/upload`** (link *Upload* trên Navbar, cần đăng nhập): chọn file MIDI, chọn track, nhập thông tin bài, xem trước, chọn *Public* / *Private* rồi *Publish*; bài được lưu và mở ngay ở Workspace.
+- **Library / Workspace:** bài người dùng upload có dòng *Uploaded by …*; bài *Private* có nhãn khoá và chỉ người upload thấy.
+- **Workspace:** mở bài không tồn tại (hoặc bài *Private* của người khác) hiện *Sheet not found* kèm nút về Library (E-02).
+- **`lib/axios.js`** (dùng chung): lỗi có thêm `details` nếu Backend gửi. Chỉ thêm trường, hành vi cũ giữ nguyên.
+- Sửa / xoá bài đã upload nằm ở tab *Uploaded sheets* của `/profile` (U-FE-09).
+
+**Cần làm sau khi pull:** cập nhật Backend theo CHANGELOG của Backend (`npm install`, `npm run db:deploy`, `npm run db:seed`). Phía FE không cần chạy lệnh gì thêm.
+
 ## 2026-11-05 – Hoá biểu, dấu nối và test
 
 - Bản nhạc có hoá biểu và dấu nối (dữ liệu từ Backend).
