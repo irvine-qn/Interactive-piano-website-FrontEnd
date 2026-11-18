@@ -443,7 +443,7 @@ const EditProfileFields = ({ user, onSaved, onPhotoChange }) => {
 
       <FormError message={error} />
 
-      <div className="flex flex-wrap items-center justify-between gap-3 border-2 border-[var(--color-ink)] bg-[var(--color-surface-soft)] px-5 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-2 border-[var(--color-ink)] bg-[var(--color-surface-soft)] px-5 py-3 max-sm:fixed max-sm:inset-x-0 max-sm:bottom-0 max-sm:z-20 max-sm:gap-2 max-sm:border-x-0 max-sm:border-b-0 max-sm:bg-[var(--color-surface-card)] max-sm:px-4">
         <p className="m-0 flex items-center gap-2 text-sm font-semibold text-[var(--color-neutral-600)]">
           {isDirty && (
             <>
@@ -452,7 +452,7 @@ const EditProfileFields = ({ user, onSaved, onPhotoChange }) => {
             </>
           )}
         </p>
-        <div className="flex gap-2">
+        <div className="flex gap-2 max-sm:w-full max-sm:[&>*]:flex-1 max-sm:[&>*]:justify-center">
           <Link to={ROUTES.PROFILE} className={SECONDARY_BUTTON_CLASS}>
             Cancel
           </Link>

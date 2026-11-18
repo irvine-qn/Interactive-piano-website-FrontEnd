@@ -26,10 +26,10 @@ const MenuItem = ({ label, Icon, isActive, isDanger, onClick }) => {
       type="button"
       aria-current={isActive ? "page" : undefined}
       onClick={onClick}
-      className={`flex h-11 w-full cursor-pointer items-center gap-3 border-2 px-3 font-[inherit] text-sm font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-brand)] ${
+      className={`flex h-11 w-full cursor-pointer items-center gap-3 border-2 px-3 max-sm:w-auto max-sm:shrink-0 max-sm:whitespace-nowrap font-[inherit] text-sm font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-brand)] ${
         isActive
           ? "border-[var(--color-ink)] bg-[var(--color-brand)] text-[var(--color-ink)]"
-          : `border-transparent bg-transparent ${inactiveClass}`
+          : `border-transparent bg-transparent max-sm:border-[var(--color-ink)] max-sm:bg-[var(--color-surface-card)] ${inactiveClass}`
       }`}
     >
       <Icon size={18} aria-hidden="true" />
@@ -59,7 +59,7 @@ const EditProfilePage = () => {
   );
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex flex-1 flex-col max-sm:pb-[4.75rem]">
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 pb-14 pt-6">
         <nav aria-label="Breadcrumb" className="text-sm font-semibold text-[var(--color-neutral-400)]">
           <Link to={ROUTES.PROFILE} className="text-inherit no-underline hover:text-[var(--color-ink)]">
@@ -67,13 +67,13 @@ const EditProfilePage = () => {
           </Link>
           {" / Edit profile"}
         </nav>
-        <h1 className="m-0 mt-2 text-3xl font-extrabold text-[var(--color-ink)] sm:text-4xl">Edit profile</h1>
+        <h1 className="m-0 mt-2 text-[26px] font-extrabold text-[var(--color-ink)] sm:text-4xl">Edit profile</h1>
         <p className="m-0 mt-2 text-sm text-[var(--color-neutral-600)]">
           Update the information shown on your profile.
         </p>
 
-        <div className="mt-8 grid items-start gap-6 lg:grid-cols-4">
-          <aside className="flex flex-col gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] p-3">
+        <div className="mt-8 grid items-start gap-6 max-sm:mt-5 max-sm:gap-4 lg:grid-cols-4">
+          <aside className="flex flex-col gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] p-3 max-sm:-mx-4 max-sm:flex-row max-sm:overflow-x-auto max-sm:border-0 max-sm:bg-transparent max-sm:px-4 max-sm:py-0 max-sm:pb-1 max-sm:[scrollbar-width:none]">
             <MenuItem
               label="Personal information"
               Icon={UserRound}
@@ -89,7 +89,7 @@ const EditProfilePage = () => {
                 onClick={() => setActiveSection(key)}
               />
             ))}
-            <div className="border-0 border-t-2 border-dashed border-[var(--color-line-dashed)] pt-2">
+            <div className="border-0 border-t-2 border-dashed border-[var(--color-line-dashed)] pt-2 max-sm:shrink-0 max-sm:border-t-0 max-sm:pt-0">
               <MenuItem
                 label={DELETE_SECTION.label}
                 Icon={DELETE_SECTION.Icon}
