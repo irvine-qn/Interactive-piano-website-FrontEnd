@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Accidental, Beam, Dot, Formatter, Renderer, Stave, StaveConnector, StaveNote, StaveTie, Voice } from 'vexflow';
+import { Accidental, Beam, Dot, Formatter, Renderer, Stave, StaveConnector, StaveNote, StaveTie, Voice } from 'vexflow/bravura';
 import { getSheetScore } from '../api/sheetsApi';
 import { getSongTime } from '../audio/songClock';
 import { useWorkspaceStore } from '../store/useWorkspaceStore';
