@@ -14,6 +14,7 @@ import ViewModeToggle from "../features/workspace/components/ViewModeToggle";
 import WaterfallCanvas from "../features/workspace/canvas/practiceWaterfall";
 import { useSheetLoader } from "../features/workspace/hooks/useSheetLoader";
 import { usePracticeSession } from "../features/workspace/hooks/usePracticeSession";
+import { useFollowNotes } from "../features/workspace/hooks/useFollowNotes";
 import Footer from "../components/common/footer";
 import HowToPlay from "../features/home/components/HowToPlay";
 import OctaveNavigator from "../features/home/components/OctaveNavigator";
@@ -25,7 +26,7 @@ const CARD_CLASS =
   "border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] shadow-[var(--shadow-hard)]";
 
 const WorkspacePage = () => {
-  const { sheet, sheetStatus, sheetError, viewMode, keyLabels, setKeyLabels, handOctaves, moveHandOctave, showShortcuts, currentMode } = useWorkspaceStore(
+  const { sheet, sheetStatus, sheetError, viewMode, keyLabels, setKeyLabels, handOctaves, moveHandOctave, showShortcuts, currentMode, isPlaying } = useWorkspaceStore(
     useShallow((state) => ({
       sheet: state.sheet,
       sheetStatus: state.sheetStatus,
@@ -33,6 +34,7 @@ const WorkspacePage = () => {
       viewMode: state.viewMode,
       showShortcuts: state.showShortcuts,
       currentMode: state.currentMode,
+      isPlaying: state.isPlaying,
       keyLabels: state.keyLabels,
       setKeyLabels: state.setKeyLabels,
       handOctaves: state.handOctaves,
@@ -43,7 +45,8 @@ const WorkspacePage = () => {
   const { sheetId } = useParams();
   const reloadSheet = useSheetLoader(sheetId);
   usePracticeSession(sheetId);
-  const { view, viewOctave, maxViewOctave, moveView, renderInView } = useOctaveView({ portrait: 3, landscape: 2 });
+  const { view, viewOctave, maxViewOctave, moveView, setViewOctave, renderInView } = useOctaveView({ portrait: 3, landscape: 2 });
+  useFollowNotes({ notes: sheet?.notes, isPlaying, view, viewOctave, setViewOctave });
 
   return (
     <div className="flex flex-1 flex-col">

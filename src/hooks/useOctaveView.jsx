@@ -1,4 +1,4 @@
-import { useState, useSyncExternalStore } from "react";
+import { useCallback, useState, useSyncExternalStore } from "react";
 import { KEY_LAYOUT } from "../features/workspace/config/keyLayout";
 
 // Mobile: dọc hiện 2 quãng, ngang hiện 4 quãng; desktop hiện đủ 88 phím.
@@ -32,6 +32,15 @@ export const useOctaveView = (initial) => {
   const view = VIEW_BY_MODE[mode] ?? null;
   const viewOctave = view ? viewOctaves[mode] : null;
   const maxViewOctave = view ? getMaxViewOctave(view.octaves) : null;
+
+  const setViewOctave = useCallback(
+    (octave) =>
+      setViewOctaves((current) => ({
+        ...current,
+        [mode]: Math.min(maxViewOctave, Math.max(MIN_VIEW_OCTAVE, octave)),
+      })),
+    [mode, maxViewOctave],
+  );
 
   const moveView = (delta) =>
     setViewOctaves((current) => ({
@@ -71,5 +80,5 @@ export const useOctaveView = (initial) => {
     );
   };
 
-  return { mode, view, viewOctave, maxViewOctave, moveView, renderInView };
+  return { mode, view, viewOctave, maxViewOctave, moveView, setViewOctave, renderInView };
 };

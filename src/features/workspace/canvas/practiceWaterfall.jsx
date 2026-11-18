@@ -7,11 +7,6 @@ const PIXELS_PER_SECOND = 150;
 const ROW_HEIGHT = 24;
 const HIT_LINE_HEIGHT = 4;
 const SHADOW_OFFSET = 2;
-const LABEL_SIZES = [10, 8];
-const LABEL_PADDING = 3;
-const LABEL_BACKGROUND_HEIGHT = 12;
-const LABEL_BASELINE_OFFSET = 3;
-const LABEL_MIN_HEIGHT = 16;
 
 const readColors = (element) => {
   const style = getComputedStyle(element);
@@ -22,8 +17,6 @@ const readColors = (element) => {
     paper: read('--color-surface-paper'),
     grid: read('--color-line-grid'),
     octave: read('--color-line-lane-octave'),
-    label: read('--color-neutral-white'),
-    fontFamily: read('--font-sans') || 'sans-serif',
     right: [read('--color-note-orange-top'), read('--color-note-orange-mid'), read('--color-note-orange-end')],
     left: [read('--color-note-blue-top'), read('--color-note-blue-mid'), read('--color-note-blue-end')],
   };
@@ -68,7 +61,6 @@ const WaterfallCanvas = () => {
       const bedWidth = bed.width - borderLeft - borderRight;
       keyMap = {};
       octaveLines = [];
-      labelCache.clear();
       KEY_LAYOUT.forEach((key) => {
         const x = offset + (key.left / 100) * bedWidth;
         keyMap[key.note] = { x, width: (key.width / 100) * bedWidth, isBlack: key.isBlack };
@@ -105,43 +97,6 @@ const WaterfallCanvas = () => {
       ctx.strokeStyle = colors.ink;
       ctx.lineWidth = 2;
       ctx.strokeRect(x + 1, top + 1, width - 2, height - 2);
-
-      const label = height >= LABEL_MIN_HEIGHT ? fitLabel(note.name, width) : null;
-      if (label) {
-        ctx.font = label.font;
-        const bottom = top + height - 2;
-        ctx.fillStyle = colors.ink;
-        ctx.fillRect(x + 2, bottom - LABEL_BACKGROUND_HEIGHT, width - 4, LABEL_BACKGROUND_HEIGHT);
-        ctx.fillStyle = colors.label;
-        ctx.fillText(label.text, x + width / 2, bottom - LABEL_BASELINE_OFFSET);
-      }
-    };
-
-    const labelCache = new Map();
-    const labelFont = (size) => `700 ${size}px ${colors.fontFamily}`;
-    // Đo lại nhãn sau khi font tải xong
-    const clearLabelCache = () => labelCache.clear();
-    document.fonts?.addEventListener('loadingdone', clearLabelCache);
-    const fitLabel = (name, width) => {
-      const space = Math.floor(width);
-      const cacheKey = `${name}|${space}`;
-      if (labelCache.has(cacheKey)) return labelCache.get(cacheKey);
-      const pitch = name.replace(/-?\d+$/, '');
-      const options = [
-        { text: name, font: labelFont(LABEL_SIZES[0]) },
-        { text: name, font: labelFont(LABEL_SIZES[1]) },
-        { text: pitch, font: labelFont(LABEL_SIZES[1]) },
-      ];
-      let result = null;
-      for (const option of options) {
-        ctx.font = option.font;
-        if (ctx.measureText(option.text).width + LABEL_PADDING <= space - 4) {
-          result = option;
-          break;
-        }
-      }
-      labelCache.set(cacheKey, result);
-      return result;
     };
 
     let lastBedLeft = null;
@@ -175,7 +130,6 @@ const WaterfallCanvas = () => {
         ctx.beginPath();
         ctx.rect(0, 0, canvasWidth, hitY);
         ctx.clip();
-        ctx.textAlign = 'center';
         ctx.lineJoin = 'round';
         visible.forEach((v) => !v.keyData.isBlack && drawNote(v.note, v.keyData, v.top, v.height));
         visible.forEach((v) => v.keyData.isBlack && drawNote(v.note, v.keyData, v.top, v.height));
@@ -198,7 +152,6 @@ const WaterfallCanvas = () => {
 
     return () => {
       resizeObserver.disconnect();
-      document.fonts?.removeEventListener('loadingdone', clearLabelCache);
       cancelAnimationFrame(animationFrameId);
     };
   }, [notes]);
