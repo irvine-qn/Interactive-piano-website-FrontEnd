@@ -10,6 +10,8 @@ const WorkspacePage = lazy(() => import("../pages/WorkspacePage"));
 const LoginPage = lazy(() => import("../pages/auth/LoginPage"));
 const RegisterPage = lazy(() => import("../pages/auth/RegisterPage"));
 const ForgotPasswordPage = lazy(() => import("../pages/auth/ForgotPasswordPage"));
+const ResetPasswordPage = lazy(() => import("../pages/auth/ResetPasswordPage"));
+const VerifyEmailPage = lazy(() => import("../pages/auth/VerifyEmailPage"));
 const UserProfilePage = lazy(() => import("../pages/profile/UserProfilePage"));
 const UploadPage = lazy(() => import("../pages/UploadPage"));
 const EditProfilePage = lazy(() => import("../pages/profile/EditProfilePage"));
@@ -22,6 +24,8 @@ const AppRoutes = () => (
       <Route path={ROUTES.LIBRARY} element={<LibraryPage />} />
       <Route path={ROUTES.WORKSPACE} element={<Navigate to={ROUTES.LIBRARY} replace />} />
       <Route path={`${ROUTES.WORKSPACE}/:sheetId`} element={<WorkspacePage />} />
+      <Route path={ROUTES.RESET_PASSWORD} element={<ResetPasswordPage />} />
+      <Route path={ROUTES.VERIFY_EMAIL} element={<VerifyEmailPage />} />
       <Route element={<GuestRoute />}>
         <Route path={ROUTES.LOGIN} element={<LoginPage />} />
         <Route path={ROUTES.REGISTER} element={<RegisterPage />} />
