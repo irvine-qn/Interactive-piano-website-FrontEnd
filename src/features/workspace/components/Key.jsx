@@ -5,12 +5,14 @@ const WHITE_STYLES = {
   pressed: { key: 'bg-[var(--color-key-pressed)]', name: 'text-[var(--color-brand-deep)]', bed: 'bg-[var(--color-brand-light)]', dot: 'bg-[var(--color-brand)]' },
   'playback-right': { key: 'bg-[var(--color-key-pressed)]', name: 'text-[var(--color-brand-deep)]', bed: 'bg-[var(--color-brand-light)]', dot: 'bg-[var(--color-brand)]' },
   'playback-left': { key: 'bg-[var(--color-note-blue-top)]', name: 'text-[var(--color-note-blue-end)]', bed: 'bg-[var(--color-note-blue-mid)]', dot: 'bg-[var(--color-note-blue-end)]' },
+  'playback-suggest': { key: 'bg-[var(--color-pastel-mint)]', name: 'text-[var(--color-success-strong)]', bed: 'bg-[var(--color-success-bright)]', dot: 'bg-[var(--color-success)]' },
 };
 const BLACK_STYLES = {
   idle: 'bg-[var(--color-key-black)]',
   pressed: 'bg-[var(--color-brand-light)]',
   'playback-right': 'bg-[var(--color-brand-light)]',
   'playback-left': 'bg-[var(--color-note-blue-mid)]',
+  'playback-suggest': 'bg-[var(--color-success-bright)]',
 };
 
 const OCTAVE_NUMBER = /-?\d+$/;
