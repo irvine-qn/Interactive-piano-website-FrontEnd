@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Mail } from "lucide-react";
+import { ArrowLeft, Mail } from "lucide-react";
 import { forgotPassword } from "../api/authApi";
 import { ROUTES } from "../../../config/routes";
 import { EMAIL_REGEX } from "../../../config/auth";
@@ -44,7 +44,8 @@ const ForgotPasswordForm = () => {
         >
           We've sent you a password reset email. Please check your inbox.
         </p>
-        <Link to={ROUTES.LOGIN} className={`text-center text-sm ${linkClass}`}>
+        <Link to={ROUTES.LOGIN} className={`inline-flex items-center justify-center gap-1.5 text-center text-sm ${linkClass}`}>
+          <ArrowLeft size={16} aria-hidden="true" />
           Back to log in
         </Link>
       </div>
@@ -86,7 +87,8 @@ const ForgotPasswordForm = () => {
       </button>
 
       <p className="m-0 text-center text-sm">
-        <Link to={ROUTES.LOGIN} className={linkClass}>
+        <Link to={ROUTES.LOGIN} className={`inline-flex items-center gap-1.5 ${linkClass}`}>
+          <ArrowLeft size={16} aria-hidden="true" />
           Back to log in
         </Link>
       </p>
