@@ -26,17 +26,33 @@ export const useMidiInput = ({ pressKey, releaseKey }) => {
       });
     };
 
-    navigator.requestMIDIAccess?.()
-      .then((midiAccess) => {
-        if (cancelled) return;
-        access = midiAccess;
-        access.onstatechange = connectInputs;
-        connectInputs();
-      })
-      .catch(() => {});
+    const requestAccess = () => {
+      removeGestureListeners();
+      if (cancelled || access) return;
+      navigator.requestMIDIAccess?.({ sysex: false })
+        .then((midiAccess) => {
+          if (cancelled) return;
+          access = midiAccess;
+          access.onstatechange = connectInputs;
+          connectInputs();
+        })
+        .catch(() => {});
+    };
+
+    // Chi xin quyen MIDI khi da duoc cap san, hoac sau thao tac dau tien cua nguoi dung.
+    // Tranh popup xin quyen luc tai trang va giu duoc back/forward cache.
+    const GESTURES = ['pointerdown', 'keydown'];
+    const removeGestureListeners = () => GESTURES.forEach((type) => window.removeEventListener(type, requestAccess));
+    if (navigator.requestMIDIAccess) {
+      GESTURES.forEach((type) => window.addEventListener(type, requestAccess, { once: true }));
+      navigator.permissions?.query({ name: 'midi' })
+        .then((status) => { if (status.state === 'granted') requestAccess(); })
+        .catch(() => {});
+    }
 
     return () => {
       cancelled = true;
+      removeGestureListeners();
       if (!access) return;
       access.onstatechange = null;
       access.inputs.forEach((input) => {
