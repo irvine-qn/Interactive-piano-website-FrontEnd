@@ -8,6 +8,8 @@ const ERROR_MESSAGES = {
   EMAIL_TAKEN: "This email is already in use.",
   VALIDATION_FAILED: "Some information is invalid. Please check and try again.",
   NOT_FOUND: "This feature is not available yet.",
+  EMAIL_NOT_VERIFIED: "This account's email has not been verified yet.",
+  TOO_MANY_REQUESTS: "Too many attempts. Please wait a few minutes and try again.",
   NETWORK_ERROR: "Unable to connect to the server.",
 };
 
