@@ -37,7 +37,7 @@ const ForgotPasswordForm = () => {
   if (success) {
     return (
       <div className="flex flex-col gap-5">
-        <h2 className="m-0 text-[30px] font-extrabold text-[var(--color-ink)]">Check your inbox</h2>
+        <h2 className="m-0 text-[24px] font-extrabold sm:text-[30px] text-[var(--color-ink)]">Check your inbox</h2>
         <p
           role="status"
           className="m-0 border-2 border-[var(--color-success-border)] bg-[var(--color-success-banner)] px-4 py-3 text-sm font-semibold text-[var(--color-success-deep)]"
@@ -54,7 +54,7 @@ const ForgotPasswordForm = () => {
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
       <div>
-        <h2 className="m-0 text-[30px] font-extrabold text-[var(--color-ink)]">Forgot password</h2>
+        <h2 className="m-0 text-[24px] font-extrabold sm:text-[30px] text-[var(--color-ink)]">Forgot password</h2>
         <p className="mt-2 text-sm font-medium text-[var(--color-neutral-600)]">
           Enter your account email to receive a password reset link.
         </p>

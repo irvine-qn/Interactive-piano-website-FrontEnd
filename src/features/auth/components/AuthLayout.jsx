@@ -20,9 +20,9 @@ const AuthLayout = ({ title, subtitle, children }) => (
       className="relative -mx-4 mb-6 overflow-hidden bg-[linear-gradient(to_bottom,var(--color-sky-1)_0_20%,var(--color-sky-2)_20%_40%,var(--color-sky-3)_40%_60%,var(--color-sky-4)_60%_80%,var(--color-sky-5)_80%)] lg:hidden"
     >
       <Sun className="absolute right-8 top-6 h-10 w-10 fill-[var(--color-sun)] text-[var(--color-sun-ray)]" />
-      <span className="absolute right-[9.5rem] top-[2.75rem] h-2 w-8 bg-[var(--color-cloud)]" />
-      <div className="relative z-10 max-w-[60%] px-4 pb-6 pt-8">
-        <p className="m-0 text-[26px] font-extrabold leading-tight text-[var(--color-ink)]">{title}</p>
+      <span className="absolute right-[9.5rem] top-4 h-2 w-8 bg-[var(--color-cloud)]" />
+      <div className="relative z-10 max-w-[calc(100%-9.5rem)] px-4 pb-14 pt-10">
+        <p className="m-0 text-[22px] font-extrabold leading-tight text-[var(--color-ink)]">{title}</p>
         <p className="m-0 mt-2 text-sm font-medium text-[var(--color-ink-soft)]">{subtitle}</p>
       </div>
       <img
@@ -100,7 +100,7 @@ const AuthLayout = ({ title, subtitle, children }) => (
         </div>
       </div>
 
-      <div className="flex flex-col justify-center px-5 py-7 sm:px-14 sm:py-10">
+      <div className="flex flex-col justify-center px-4 py-6 sm:px-14 sm:py-10">
         {children}
       </div>
     </section>

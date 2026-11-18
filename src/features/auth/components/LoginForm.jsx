@@ -43,7 +43,7 @@ const LoginForm = () => {
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
       <div>
-        <h2 className="m-0 text-[30px] font-extrabold text-[var(--color-ink)]">
+        <h2 className="m-0 text-[24px] font-extrabold sm:text-[30px] text-[var(--color-ink)]">
           Log in
         </h2>
         <p className="mt-2 text-sm font-medium text-[var(--color-neutral-600)]">
