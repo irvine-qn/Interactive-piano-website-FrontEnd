@@ -17,14 +17,18 @@ const BLACK_STYLES = {
 
 const OCTAVE_NUMBER = /-?\d+$/;
 
-const Key = ({ note, left, width, isBlack, hint, showHint = true, isPressed, playbackHand, interactive = true, onMouseDown, onMouseUp }) => {
+const pointerSource = (event) => (event.pointerType === 'mouse' ? 'mouse' : `pointer-${event.pointerId}`);
+
+const Key = ({ note, left, width, isBlack, hint, showHint = true, isPressed, playbackHand, interactive = true, onPress, onRelease }) => {
   const state = isPressed ? 'pressed' : playbackHand ? `playback-${playbackHand}` : 'idle';
   const label = hint && showHint ? `${note}, key ${hint}` : note;
 
-  const handleMouseDown = (event) => {
+  const handlePointerDown = (event) => {
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
     event.preventDefault();
-    onMouseDown(note);
+    onPress(note, pointerSource(event));
   };
+  const handlePointerUp = (event) => onRelease(pointerSource(event));
 
   const common = {
     type: 'button',
@@ -33,9 +37,11 @@ const Key = ({ note, left, width, isBlack, hint, showHint = true, isPressed, pla
     'data-state': state,
     'aria-label': label,
     'aria-pressed': state !== 'idle',
-    onMouseDown: handleMouseDown,
-    onMouseUp: () => onMouseUp(note),
-    onMouseLeave: () => onMouseUp(note),
+    onPointerDown: handlePointerDown,
+    onPointerUp: handlePointerUp,
+    onPointerCancel: handlePointerUp,
+    onPointerLeave: handlePointerUp,
+    onContextMenu: (event) => event.preventDefault(),
     style: { left: `${left}%`, width: `${width}%` },
   };
   const cursor = interactive ? 'cursor-pointer' : 'cursor-default';

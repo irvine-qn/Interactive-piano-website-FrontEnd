@@ -13,9 +13,9 @@ const SheetCard = ({ sheet }) => {
   const uploadedBy = uploaderLabel(sheet);
 
   return (
-    <article className="grid grid-cols-[8.5rem_minmax(0,1fr)] sm:flex sm:flex-col border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] shadow-[var(--shadow-hard)]">
+    <article className="grid grid-cols-[7rem_minmax(0,1fr)] sm:flex sm:flex-col border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] shadow-[var(--shadow-hard)]">
       <div className="border-r-2 border-[var(--color-ink)] sm:border-r-0 sm:border-b-2">
-        <SheetCover sheet={sheet} className="max-sm:aspect-auto max-sm:h-full max-sm:min-h-[9.5rem]" />
+        <SheetCover sheet={sheet} className="max-sm:aspect-auto max-sm:h-full max-sm:min-h-[8.5rem]" />
       </div>
 
       <div className="flex flex-1 flex-col px-3 pb-3 pt-2.5 sm:px-4 sm:pb-4 sm:pt-3.5">
@@ -38,7 +38,7 @@ const SheetCard = ({ sheet }) => {
             <Eye aria-hidden="true" className="h-4 w-4" />
             {formatCount(sheet.views)}
           </li>
-          <li>
+          <li className="max-sm:hidden">
             <LikeButton sheetId={sheet.id} liked={sheet.likedByMe} likes={sheet.likes} />
           </li>
           <li className="flex items-center gap-1.5 text-[var(--color-neutral-600)]" aria-label={`Duration ${formatDuration(sheet.durationSec)}`}>
@@ -49,14 +49,19 @@ const SheetCard = ({ sheet }) => {
 
         <div className="mt-auto pt-3">
           <div aria-hidden="true" className="mb-3 hidden sm:block border-0 border-t-2 border-dashed border-[var(--color-line-dashed)]" />
+          <div className="flex gap-2">
           <Link
             to={`/workspace/${encodeURIComponent(sheet.id)}`}
             state={{ countView: true }}
-            className="flex h-10 items-center justify-center gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-brand)] text-[15px] font-bold text-[var(--color-ink)] no-underline shadow-[var(--shadow-hard-sm)] transition-colors hover:bg-[var(--color-brand-strong)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-ink)]"
+            className="flex h-10 flex-1 items-center justify-center gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-brand)] text-[15px] font-bold text-[var(--color-ink)] no-underline shadow-[var(--shadow-hard-sm)] transition-colors hover:bg-[var(--color-brand-strong)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-ink)]"
           >
             <PianoKeysIcon />
             Practice
           </Link>
+          <div className="flex h-10 shrink-0 items-center border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-2.5 shadow-[var(--shadow-hard-sm)] sm:hidden">
+            <LikeButton sheetId={sheet.id} liked={sheet.likedByMe} likes={sheet.likes} />
+          </div>
+          </div>
         </div>
       </div>
     </article>
