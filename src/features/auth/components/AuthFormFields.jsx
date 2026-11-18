@@ -40,7 +40,7 @@ export const PasswordInput = ({
         type="button"
         onClick={() => setVisible((v) => !v)}
         aria-label={visible ? "Hide password" : "Show password"}
-        className="absolute right-3 top-1/2 flex -translate-y-1/2 cursor-pointer border-0 bg-transparent p-1 text-[var(--color-ink)]"
+        className="absolute right-2 top-1/2 flex h-8 w-8 items-center justify-center -translate-y-1/2 cursor-pointer border-0 bg-transparent p-0 text-[var(--color-ink)]"
       >
         <Icon aria-hidden="true" className="h-4 w-4" />
       </button>
