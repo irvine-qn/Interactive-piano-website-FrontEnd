@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react';
-import { PAGE_SIZE, useLibraryQuery } from '../hooks/useLibraryQuery';
+import { DEFAULT_SORT, PAGE_SIZE, useLibraryQuery } from '../hooks/useLibraryQuery';
 import { useTags } from '../hooks/useTags';
 import LibraryFilters from './LibraryFilters';
 import LibraryToolbar from './LibraryToolbar';
@@ -12,6 +12,7 @@ const LibraryBrowser = () => {
 
   const handleSearch = useCallback((q) => updateQuery({ q }, { replace: true }), [updateQuery]);
   const handleSortChange = useCallback((sort) => updateQuery({ sort }), [updateQuery]);
+  const handleReset = useCallback(() => updateQuery({ difficulty: '', tag: '', sort: DEFAULT_SORT }), [updateQuery]);
   const handlePageChange = (page) => {
     updateQuery({ page });
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -32,6 +33,7 @@ const LibraryBrowser = () => {
         shownCount={sheets.length}
         onSearch={handleSearch}
         onSortChange={handleSortChange}
+        onReset={handleReset}
       >
         <LibraryFilters difficulty={query.difficulty} tag={query.tag} tags={tags} onChange={updateQuery} />
       </LibraryToolbar>

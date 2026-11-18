@@ -1,7 +1,7 @@
 import { DIFFICULTY_META } from '../config/difficulty';
 import { DIFFICULTIES } from '../hooks/useLibraryQuery';
 
-const ChipButton = ({ active, onClick, children }) => (
+export const ChipButton = ({ active, onClick, children }) => (
   <button
     type="button"
     aria-pressed={active}
