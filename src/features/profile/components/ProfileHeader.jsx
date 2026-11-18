@@ -157,13 +157,13 @@ const ProfileHeader = ({ user }) => (
           alt={`${user.username} avatar`}
           className="avatar relative -mb-12 size-24 shrink-0 border-4 border-[var(--color-ink)] bg-[var(--color-surface-card)] object-cover sm:-mb-20 sm:size-40"
         />
-        <h1 className="m-0 min-w-0 truncate pb-2 text-2xl font-extrabold text-[var(--color-ink)] sm:text-5xl">
+        <h1 className="m-0 min-w-0 truncate pb-2 text-2xl font-extrabold text-[var(--color-ink)] max-sm:absolute max-sm:inset-x-4 max-sm:top-full max-sm:mt-14 max-sm:pb-0 sm:text-5xl">
           {user.displayName || user.username}
         </h1>
       </div>
     </div>
 
-    <div className="mx-auto flex w-full max-w-7xl flex-wrap items-start justify-between gap-4 px-4 pt-14 sm:pl-48 sm:pt-4">
+    <div className="mx-auto flex w-full max-w-7xl flex-wrap items-start justify-between gap-4 px-4 pt-14 max-sm:pt-[6.25rem] sm:pl-48 sm:pt-4">
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-semibold">
           <p className="m-0 font-bold text-[var(--color-brand-deep)]">

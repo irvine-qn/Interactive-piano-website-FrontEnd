@@ -26,7 +26,7 @@ const renderSheetMeta = (sheet) => (
 );
 
 const ProfileSheetItem = ({ sheet, renderMeta, renderActions }) => (
-  <li className="flex flex-wrap items-center gap-4 border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] p-4">
+  <li className="relative flex flex-wrap items-center gap-4 border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] p-4">
     <div
       aria-hidden="true"
       className="flex size-20 shrink-0 items-center justify-center border-2 border-[var(--color-ink)] text-[var(--color-file-icon)]"
@@ -34,7 +34,7 @@ const ProfileSheetItem = ({ sheet, renderMeta, renderActions }) => (
     >
       <FileMusic size={32} />
     </div>
-    <div className="min-w-0 flex-1">
+    <div className="min-w-0 flex-1 max-sm:pr-10">
       <h3 className="m-0 truncate text-lg font-bold text-[var(--color-ink)]">
         {sheet.title}
       </h3>
