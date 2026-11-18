@@ -28,7 +28,7 @@ const MenuItem = ({ label, Icon, isActive, isDanger, onClick }) => {
       onClick={onClick}
       className={`flex h-11 w-full cursor-pointer items-center gap-3 border-2 px-3 font-[inherit] text-sm font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-brand)] ${
         isActive
-          ? "border-[var(--color-ink)] bg-[var(--color-brand)] text-[var(--color-neutral-white)]"
+          ? "border-[var(--color-ink)] bg-[var(--color-brand)] text-[var(--color-ink)]"
           : `border-transparent bg-transparent ${inactiveClass}`
       }`}
     >
@@ -44,7 +44,7 @@ const ComingSoonPanel = ({ title }) => (
       {title}
     </h2>
     <div className="flex flex-col items-center gap-3 p-12 text-center">
-      <span className="flex size-12 items-center justify-center border-2 border-[var(--color-ink)] bg-[var(--color-brand-tint)] text-[var(--color-brand-strong)]">
+      <span className="flex size-12 items-center justify-center border-2 border-[var(--color-ink)] bg-[var(--color-brand-tint)] text-[var(--color-brand-deep)]">
         <Clock size={24} aria-hidden="true" />
       </span>
       <p className="m-0 text-xl font-extrabold text-[var(--color-ink)]">Coming soon</p>
