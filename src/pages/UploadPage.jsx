@@ -66,7 +66,7 @@ const UploadPage = () => {
         : 'Publish';
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex flex-1 flex-col max-sm:pb-[6.5rem]">
       <main className="mx-auto flex w-full max-w-[100rem] flex-1 flex-col gap-6 px-4 pb-14 pt-6 sm:gap-8 sm:pt-10">
         <header id="upload-page" className="flex flex-col gap-4">
           <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
@@ -84,12 +84,12 @@ const UploadPage = () => {
                   </li>
                 </ol>
               </nav>
-              <h1 className="m-0 mt-2 text-[32px] font-extrabold leading-tight text-[var(--color-ink)]">Upload a new sheet</h1>
+              <h1 className="m-0 mt-2 text-[26px] sm:text-[32px] font-extrabold leading-tight text-[var(--color-ink)]">Upload a new sheet</h1>
               <p className="m-0 mt-2 text-sm font-medium text-[var(--color-neutral-600)]">
                 Turn a MIDI file into a sheet you can practice, then share it with the Fiano community.
               </p>
             </div>
-            <div className="flex flex-col items-stretch gap-2">
+            <div className="flex flex-col items-stretch gap-2 max-sm:fixed max-sm:inset-x-0 max-sm:bottom-0 max-sm:z-20 max-sm:border-0 max-sm:border-t-2 max-sm:border-solid max-sm:border-[var(--color-ink)] max-sm:bg-[var(--color-surface-card)] max-sm:px-4 max-sm:py-3">
               <button
                 type="button"
                 onClick={handlePublish}
@@ -106,7 +106,7 @@ const UploadPage = () => {
                 {publishLabel}
               </button>
               {publishBlocker && (
-                <span id="publish-blocker" className="text-right text-xs font-medium text-[var(--color-neutral-500)]">
+                <span id="publish-blocker" className="text-right text-xs max-sm:text-center font-medium text-[var(--color-neutral-500)]">
                   {publishBlocker}
                 </span>
               )}

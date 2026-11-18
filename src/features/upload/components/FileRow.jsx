@@ -22,7 +22,7 @@ const FileRow = ({ file, upload, analysis, onRemove }) => {
   }
 
   return (
-    <div className="flex items-center gap-4 border-2 border-solid border-[var(--color-ink)] bg-[var(--color-surface-card)] px-4 py-3">
+    <div className="flex items-center gap-4 border-2 border-solid border-[var(--color-ink)] bg-[var(--color-surface-card)] px-4 py-3 max-sm:gap-2.5 max-sm:px-3">
       <span className="flex h-10 w-10 shrink-0 items-center justify-center border-2 border-solid border-[var(--color-ink)] bg-[var(--color-brand-tint)] text-[var(--color-brand-deep)]">
         <PianoKeysIcon className="h-5 w-5" />
       </span>
@@ -50,7 +50,7 @@ const FileRow = ({ file, upload, analysis, onRemove }) => {
         </div>
       )}
       {status && (
-        <span aria-live="polite" className={`w-20 shrink-0 text-right text-xs font-bold ${status.color}`}>
+        <span aria-live="polite" className={`w-20 shrink-0 max-sm:w-auto text-right text-xs font-bold ${status.color}`}>
           {status.text(upload.progress)}
         </span>
       )}

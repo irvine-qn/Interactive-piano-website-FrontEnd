@@ -37,13 +37,13 @@ const TrackTable = ({ analysis, selectedTracks, isUpdating, error, onChange }) =
       </p>
 
       <div className="overflow-x-auto border-2 border-solid border-[var(--color-ink)]">
-        <table className="w-full min-w-[35rem] border-collapse">
+        <table className="w-full min-w-[35rem] border-collapse max-sm:min-w-0">
           <thead className="bg-[var(--color-surface-soft)]">
             <tr>
               <th scope="col" className={HEADER_CELL}>Track</th>
               <th scope="col" className={HEADER_CELL}>Instrument</th>
               <th scope="col" className={`${HEADER_CELL} text-right`}>Notes</th>
-              <th scope="col" className={HEADER_CELL}>Range</th>
+              <th scope="col" className={`${HEADER_CELL} max-sm:hidden`}>Range</th>
             </tr>
           </thead>
           <tbody>
@@ -76,7 +76,7 @@ const TrackTable = ({ analysis, selectedTracks, isUpdating, error, onChange }) =
                     </span>
                   </td>
                   <td className={`${CELL} text-right tabular-nums`}>{track.noteCount.toLocaleString('en')}</td>
-                  <td className={`${CELL} whitespace-nowrap tabular-nums`}>
+                  <td className={`${CELL} whitespace-nowrap tabular-nums max-sm:hidden`}>
                     {track.minNote} – {track.maxNote}
                   </td>
                 </tr>
