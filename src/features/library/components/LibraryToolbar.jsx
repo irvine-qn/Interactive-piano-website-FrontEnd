@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import { ChevronDown, ListFilter, Search, X } from 'lucide-react';
+import { ChevronDown, ListFilter, Search, SlidersHorizontal, X } from 'lucide-react';
 
 const SEARCH_DELAY_MS = 300;
 
@@ -41,10 +41,10 @@ const SearchBox = ({ value, onSearch }) => {
     <form
       role="search"
       onSubmit={handleSubmit}
-      className="flex h-11 w-full max-w-[760px] items-center gap-2.5 border-2 border-[var(--color-ink)] bg-[var(--color-surface-soft)] px-3 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[var(--color-brand)]"
+      className="flex h-11 w-full max-w-[47.5rem] items-center gap-2.5 border-2 border-[var(--color-ink)] bg-[var(--color-surface-soft)] px-3 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[var(--color-brand)]"
     >
       <label htmlFor={inputId} className="flex shrink-0">
-        <Search aria-hidden="true" className="h-5 w-5 text-[var(--color-brand)]" />
+        <Search aria-hidden="true" className="h-5 w-5 text-[var(--color-brand-deep)]" />
         <span className="sr-only">Search sheets</span>
       </label>
       <input
@@ -76,7 +76,7 @@ const SortSelect = ({ value, onChange }) => {
   return (
     <div className="flex items-center gap-2.5">
       <ListFilter aria-hidden="true" className="h-5 w-5 text-[var(--color-ink)]" />
-      <label htmlFor={selectId} className="text-sm font-bold text-[var(--color-ink)]">
+      <label htmlFor={selectId} className="text-sm font-bold text-[var(--color-ink)] max-sm:sr-only">
         Sort by:
       </label>
       <span className="relative flex">
@@ -84,7 +84,7 @@ const SortSelect = ({ value, onChange }) => {
           id={selectId}
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          className="h-11 w-[190px] cursor-pointer appearance-none border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] pl-4 pr-9 font-[inherit] text-sm font-bold text-[var(--color-ink)] outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-brand)]"
+          className="h-11 w-[11.875rem] max-sm:h-9 max-sm:w-auto max-sm:border-0 max-sm:bg-transparent max-sm:pl-1 cursor-pointer appearance-none border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] pl-4 pr-9 font-[inherit] text-sm font-bold text-[var(--color-ink)] outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-brand)]"
         >
           {Object.entries(SORT_LABELS).map(([sort, label]) => (
             <option key={sort} value={sort}>
@@ -101,16 +101,35 @@ const SortSelect = ({ value, onChange }) => {
   );
 };
 
-const LibraryToolbar = ({ query, meta, shownCount, onSearch, onSortChange, children }) => (
+const LibraryToolbar = ({ query, meta, shownCount, onSearch, onSortChange, children }) => {
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const filtersId = useId();
+  return (
   <section
     aria-label="Search, sort and filter"
-    className="flex flex-col border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-4 py-3.5 shadow-[var(--shadow-hard)]"
+    className="flex flex-col border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-4 py-3.5 shadow-[var(--shadow-hard)] max-sm:border-0 max-sm:bg-transparent max-sm:p-0 max-sm:shadow-none"
   >
     <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-      <SearchBox value={query.q} onSearch={onSearch} />
-      <div className="ml-auto flex flex-wrap items-center gap-x-6 gap-y-3">
+      <div className="flex w-full max-w-[47.5rem] gap-3 sm:contents">
+        <SearchBox value={query.q} onSearch={onSearch} />
+        {children && (
+          <button
+            type="button"
+            onClick={() => setFiltersOpen((open) => !open)}
+            aria-expanded={filtersOpen}
+            aria-controls={filtersId}
+            aria-label={filtersOpen ? 'Hide filters' : 'Show filters'}
+            className={`flex h-11 w-12 shrink-0 cursor-pointer items-center justify-center border-2 border-[var(--color-ink)] p-0 text-[var(--color-ink)] shadow-[var(--shadow-hard-sm)] sm:hidden ${
+              filtersOpen ? 'bg-[var(--color-brand)]' : 'bg-[var(--color-surface-card)]'
+            }`}
+          >
+            <SlidersHorizontal aria-hidden="true" className="h-5 w-5" />
+          </button>
+        )}
+      </div>
+      <div className="ml-auto flex flex-wrap items-center gap-x-6 gap-y-3 max-sm:ml-0 max-sm:w-full max-sm:flex-nowrap max-sm:justify-between">
         {meta && (
-          <p aria-live="polite" className="m-0 text-sm text-[var(--color-neutral-500)]">
+          <p aria-live="polite" className="m-0 text-sm text-[var(--color-neutral-500)] max-sm:font-bold">
             Showing {shownCount} of {meta.total.toLocaleString('en')} {meta.total === 1 ? 'sheet' : 'sheets'}
           </p>
         )}
@@ -118,9 +137,17 @@ const LibraryToolbar = ({ query, meta, shownCount, onSearch, onSortChange, child
       </div>
     </div>
     {children && (
-      <div className="mt-3.5 border-0 border-t-2 border-dashed border-[var(--color-line-dashed)] pt-3.5">{children}</div>
+      <div
+        id={filtersId}
+        className={`mt-3.5 border-0 border-t-2 border-dashed border-[var(--color-line-dashed)] pt-3.5 max-sm:border-2 max-sm:border-solid max-sm:border-[var(--color-ink)] max-sm:bg-[var(--color-surface-card)] max-sm:p-3 max-sm:shadow-[var(--shadow-hard-sm)] ${
+          filtersOpen ? '' : 'max-sm:hidden'
+        }`}
+      >
+        {children}
+      </div>
     )}
   </section>
-);
+  );
+};
 
 export default LibraryToolbar;

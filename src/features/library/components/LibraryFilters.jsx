@@ -8,7 +8,7 @@ const ChipButton = ({ active, onClick, children }) => (
     onClick={onClick}
     className={`flex h-8 cursor-pointer items-center gap-1.5 border-2 border-[var(--color-ink)] px-3 font-[inherit] text-[13px] font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-brand)] ${
       active
-        ? 'bg-[var(--color-brand)] text-[var(--color-neutral-white)] shadow-[var(--shadow-hard-sm)]'
+        ? 'bg-[var(--color-brand)] text-[var(--color-ink)] shadow-[var(--shadow-hard-sm)]'
         : 'bg-[var(--color-surface-card)] text-[var(--color-ink)] hover:bg-[var(--color-surface-soft)]'
     }`}
   >
@@ -18,7 +18,7 @@ const ChipButton = ({ active, onClick, children }) => (
 
 const FilterRow = ({ label, children }) => (
   <div role="group" aria-label={label} className="flex flex-wrap items-center gap-2">
-    <span className="w-[76px] shrink-0 text-sm font-bold text-[var(--color-ink)]">{label}:</span>
+    <span className="w-[4.75rem] shrink-0 text-sm font-bold text-[var(--color-ink)]">{label}:</span>
     {children}
   </div>
 );
