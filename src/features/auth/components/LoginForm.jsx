@@ -81,7 +81,7 @@ const LoginForm = () => {
         <div className="mt-3 flex justify-end">
           <Link
             to={ROUTES.FORGOT_PASSWORD}
-            className="text-sm font-bold text-[var(--color-brand-strong)] no-underline"
+            className="text-sm font-bold text-[var(--color-brand-deep)] no-underline"
           >
             Forgot password?
           </Link>
@@ -91,7 +91,7 @@ const LoginForm = () => {
       <button
         type="submit"
         disabled={loading}
-        className="flex h-12 cursor-pointer items-center justify-center gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-brand)] font-[inherit] text-sm font-bold text-[var(--color-neutral-white)] disabled:cursor-not-allowed disabled:bg-[var(--color-brand-light)]"
+        className="flex h-12 cursor-pointer items-center justify-center gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-brand)] font-[inherit] text-sm font-bold text-[var(--color-ink)] disabled:cursor-not-allowed disabled:bg-[var(--color-brand-light)]"
       >
         <LogIn aria-hidden="true" className="h-4 w-4" />
         {loading ? "Logging in..." : "Log in"}
@@ -117,7 +117,7 @@ const LoginForm = () => {
         <Link
           to={ROUTES.REGISTER}
           state={location.state}
-          className="ml-2 font-bold text-[var(--color-brand-strong)] no-underline"
+          className="ml-2 font-bold text-[var(--color-brand-deep)] no-underline"
         >
           Sign up now
         </Link>
