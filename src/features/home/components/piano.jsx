@@ -6,7 +6,7 @@ import Waterfall from "../canvas/waterfall";
 import KeyLabelSelect from "../../workspace/components/KeyLabelSelect";
 import OctaveShiftControl from "../../workspace/components/OctaveShiftControl";
 import PianoKeybed from "../../workspace/components/PianoKeybed";
-import { KEY_LAYOUT } from "../../workspace/config/keyLayout";
+import { DEFAULT_KEY_LABELS, KEY_LAYOUT } from "../../workspace/config/keyLayout";
 import { useKeyMapping } from "../../workspace/hooks/useKeyMapping";
 import { useKeyboardInput } from "../../workspace/hooks/useKeyboardInput";
 
@@ -19,7 +19,7 @@ const WATERFALL_LAYOUT = KEY_LAYOUT.map(({ note, isBlack, left, width }) => ({
 }));
 const NOTE_BY_MIDI = new Map(KEY_LAYOUT.map(({ midi, note }) => [midi, note]));
 const Piano = ({ children }) => {
-  const [keyLabels, setKeyLabels] = useState("shortcuts");
+  const [keyLabels, setKeyLabels] = useState(DEFAULT_KEY_LABELS);
   const [zoneOctaves, setZoneOctaves] = useState(DEFAULT_ZONE_OCTAVES);
   const [error, setError] = useState("");
   const { mode, view, viewOctave, maxViewOctave, moveView, renderInView } = useOctaveView({
@@ -159,10 +159,8 @@ const Piano = ({ children }) => {
         className="sticky left-0 z-10 flex w-[min(100%,calc(100vw-2rem))] flex-wrap items-center gap-x-5 gap-y-3 border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-[14px] py-[12px] max-lg:landscape:col-start-1 max-lg:landscape:row-span-4 max-lg:landscape:row-start-1 max-lg:landscape:w-auto max-lg:landscape:flex-col max-lg:landscape:flex-nowrap max-lg:landscape:items-stretch max-lg:landscape:self-start max-lg:landscape:mt-6 max-lg:landscape:gap-y-2 max-lg:landscape:px-2 max-lg:landscape:py-2 max-lg:landscape:shadow-[var(--shadow-hard-sm)] max-lg:landscape:[&_label]:flex-col max-lg:landscape:[&_label]:items-stretch max-lg:landscape:[&_label]:gap-1 max-lg:landscape:[&_label]:text-[10px] max-lg:landscape:[&_label]:text-center max-lg:landscape:[&_label>svg]:hidden max-lg:landscape:[&_label>span]:ml-0 max-lg:landscape:[&_select]:w-full max-lg:landscape:[&_select]:h-8 max-lg:landscape:[&_select]:text-xs max-lg:landscape:[&_select]:pl-2 max-lg:landscape:[&_select]:pr-6 max-lg:landscape:[&_[role=group]]:h-8 max-lg:landscape:[&_[role=group]]:px-0 max-lg:landscape:[&_[role=group]]:gap-0 max-lg:landscape:[&_output.w-24]:h-6 max-lg:landscape:[&_output.w-24]:w-auto max-lg:landscape:[&_output.w-24]:flex-1 max-lg:landscape:[&_output.w-24]:text-[11px] max-lg:landscape:[&_[role=group]_button]:w-6 max-md:portrait:flex-col max-md:portrait:items-stretch max-md:portrait:gap-y-4 max-md:portrait:px-4 max-md:portrait:py-4 max-md:portrait:shadow-[var(--shadow-hard-sm)] max-md:portrait:[&_label]:justify-between max-md:portrait:[&_label>span:last-child]:flex-1 max-md:portrait:[&_select]:w-full max-md:portrait:[&_select]:h-11"
       >
         {children}
-        <div className="ml-auto flex flex-wrap items-center gap-x-6 gap-y-2 max-lg:ml-0 max-lg:landscape:flex-col max-lg:landscape:items-stretch">
-          <div className="contents pointer-coarse:hidden!">
-            <KeyLabelSelect value={keyLabels} onChange={setKeyLabels} />
-          </div>
+        <div className="ml-auto flex flex-wrap items-center gap-x-6 gap-y-2 max-lg:ml-0 max-md:portrait:w-full max-md:portrait:[&>label]:w-full max-lg:landscape:flex-col max-lg:landscape:items-stretch">
+          <KeyLabelSelect value={keyLabels} onChange={setKeyLabels} />
           <div className="contents pointer-coarse:hidden! max-lg:landscape:flex max-lg:landscape:flex-col max-lg:landscape:gap-2 max-lg:landscape:[&>div]:flex-col max-lg:landscape:[&>div]:items-stretch max-lg:landscape:[&>div]:gap-2">
             <OctaveShiftControl handOctaves={zoneOctaves} onMove={moveZone} />
           </div>
@@ -206,6 +204,7 @@ const Piano = ({ children }) => {
             onPress={pressKey}
             onRelease={releaseMouse}
           />,
+          { framed: true },
         )}
       </div>
 
