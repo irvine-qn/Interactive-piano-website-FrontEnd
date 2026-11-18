@@ -12,7 +12,7 @@ const PianoKeybed = ({ keyByNote, showHints, isPressed, playbackKeys = {}, onPre
       data-keybed
       role="group"
       aria-label="Piano keyboard"
-      className="relative h-[12.5rem] select-none border-l-[1.5px] border-[var(--color-ink)] bg-[var(--color-key-white)]"
+      className="relative h-[12.5rem] touch-none select-none [-webkit-touch-callout:none] border-l-[1.5px] border-[var(--color-ink)] bg-[var(--color-key-white)]"
     >
       {KEY_LAYOUT.map((key) => (
         <Key
@@ -26,8 +26,8 @@ const PianoKeybed = ({ keyByNote, showHints, isPressed, playbackKeys = {}, onPre
           interactive
           isPressed={isPressed(key.note)}
           playbackHand={playbackKeys[key.note]?.hand ?? null}
-          onMouseDown={onPress}
-          onMouseUp={onRelease}
+          onPress={onPress}
+          onRelease={onRelease}
         />
       ))}
     </div>

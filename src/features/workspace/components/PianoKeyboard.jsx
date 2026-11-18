@@ -25,8 +25,8 @@ const PianoKeyboard = () => {
   useKeyboardInput({ noteByCode, handByCode, chordKeys, pressKey, releaseKey, moveZone });
   useMidiInput({ pressKey, releaseKey });
 
-  const pressWithMouse = useCallback((note) => pressKey(note, 'mouse'), [pressKey]);
-  const releaseMouse = useCallback(() => releaseKey('mouse'), [releaseKey]);
+  const pressWithMouse = useCallback((note, source = 'mouse') => pressKey(note, source), [pressKey]);
+  const releaseMouse = useCallback((source = 'mouse') => releaseKey(source), [releaseKey]);
 
   return (
     <>
