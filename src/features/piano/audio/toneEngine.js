@@ -41,19 +41,7 @@ export const pianoSampler = new Tone.Sampler({
   baseUrl: PIANO_SAMPLES_BASE_URL,
   release: 0.5,
   volume: -5,
-  onload: () => {
-    console.log("Fiano Audio Engine: Piano samples loaded!");
-  },
 }).connect(masterLimiter);
-
-export const playNote = async (note) => {
-  if (Tone.context.state !== "running") {
-    await Tone.start();
-  }
-  if (pianoSampler.loaded) {
-    pianoSampler.triggerAttack(note);
-  }
-};
 
 export const playNoteImmediately = async (note) => {
   if (Tone.context.state !== "running") {
