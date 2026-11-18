@@ -65,7 +65,7 @@ export const DifficultyPicker = ({ value, suggested, onChange, error }) => {
               key={level}
               className={`flex h-11 cursor-pointer items-center px-4 text-sm font-bold has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:-outline-offset-4 has-[:focus-visible]:outline-[var(--color-ink)] ${
                 checked
-                  ? 'bg-[var(--color-brand)] text-[var(--color-neutral-white)]'
+                  ? 'bg-[var(--color-brand)] text-[var(--color-ink)]'
                   : 'text-[var(--color-ink)] hover:bg-[var(--color-brand-glow)]'
               }`}
             >
@@ -106,7 +106,7 @@ const FileFacts = ({ analysis }) => {
       <dl className="m-0 grid grid-cols-2 gap-2 sm:grid-cols-5">
         {facts.map(([label, value]) => (
           <div key={label} className="min-w-0 border-2 border-solid border-[var(--color-line-soft)] bg-[var(--color-surface-soft)] px-3 py-2">
-            <dt className="text-[11px] font-bold uppercase tracking-wide text-[var(--color-neutral-500)]">{label}</dt>
+            <dt className="text-xs font-bold uppercase tracking-wide text-[var(--color-neutral-500)]">{label}</dt>
             <dd className="m-0 truncate text-sm font-bold tabular-nums text-[var(--color-ink)]">{value}</dd>
           </div>
         ))}

@@ -144,7 +144,18 @@ const WaterfallCanvas = () => {
       return result;
     };
 
+    let lastBedLeft = null;
+    let lastBedWidth = null;
     const renderLoop = () => {
+      // Trên mobile keybed bị dịch bằng transform (đổi quãng) nên ResizeObserver không báo.
+      if (keybed) {
+        const { left, width } = keybed.getBoundingClientRect();
+        if (left !== lastBedLeft || width !== lastBedWidth) {
+          lastBedLeft = left;
+          lastBedWidth = width;
+          updateLayout();
+        }
+      }
       const hitY = canvasHeight - HIT_LINE_HEIGHT;
       drawBackground(hitY);
 

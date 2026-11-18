@@ -82,7 +82,7 @@ const TagInput = ({ id, tags, knownTags, onChange, error: formError }) => {
           placeholder={isFull ? `Up to ${MAX_TAGS} tags` : 'Add a tag…'}
           aria-describedby={hintId}
           aria-invalid={message ? true : undefined}
-          className="h-7 min-w-[120px] flex-1 border-0 bg-transparent p-0 font-[inherit] text-sm text-[var(--color-ink)] outline-none placeholder:text-[var(--color-neutral-300)] disabled:cursor-not-allowed"
+          className="h-7 min-w-[7.5rem] flex-1 border-0 bg-transparent p-0 font-[inherit] text-sm text-[var(--color-ink)] outline-none placeholder:text-[var(--color-neutral-300)] disabled:cursor-not-allowed"
         />
       </div>
 

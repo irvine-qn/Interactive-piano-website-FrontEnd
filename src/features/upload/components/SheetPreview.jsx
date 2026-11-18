@@ -68,7 +68,7 @@ const SheetPreview = ({ analysis, details, onChange }) => {
             <UploadedBy text="Uploaded by you" />
             <ul className="m-0 mt-3 flex list-none flex-wrap items-center gap-x-4 gap-y-1 p-0 text-sm font-bold text-[var(--color-neutral-600)]">
               {facts.map(({ icon: Icon, label, text, accent }) => (
-                <li key={label} aria-label={`${label}: ${text}`} className={`flex items-center gap-1.5 ${accent ? 'text-[var(--color-brand-strong)]' : ''}`}>
+                <li key={label} aria-label={`${label}: ${text}`} className={`flex items-center gap-1.5 ${accent ? 'text-[var(--color-brand-deep)]' : ''}`}>
                   {Icon && <Icon aria-hidden="true" className="h-4 w-4" />}
                   {text}
                 </li>
