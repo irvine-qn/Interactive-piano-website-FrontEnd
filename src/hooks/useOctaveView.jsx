@@ -40,11 +40,11 @@ export const useOctaveView = (initial) => {
     }));
 
   // Phóng to cả dải phím rồi dịch sang quãng đang xem; canvas đọc vị trí keybed nên tự khớp.
-  const renderInView = (content) => {
+  const renderInView = (content, { framed = false } = {}) => {
     if (!view) return content;
     const visibleWhites = view.octaves * 7;
     return (
-      <div className="overflow-hidden">
+      <div className="relative overflow-hidden">
         <div
           style={{
             width: `calc((100% - ${FRAME_INSET * 2}px) * ${WHITE_KEY_COUNT / visibleWhites} + ${FRAME_INSET * 2}px)`,
@@ -53,6 +53,20 @@ export const useOctaveView = (initial) => {
         >
           {content}
         </div>
+        {framed && (
+          <>
+            <span
+              aria-hidden="true"
+              style={{ width: FRAME_INSET }}
+              className="pointer-events-none absolute inset-y-0 left-0 border-y-2 border-l-2 border-r-[1.5px] border-[var(--color-ink)] bg-[var(--color-piano-wood)]"
+            />
+            <span
+              aria-hidden="true"
+              style={{ width: FRAME_INSET }}
+              className="pointer-events-none absolute inset-y-0 right-0 border-y-2 border-r-2 border-l-[1.5px] border-[var(--color-ink)] bg-[var(--color-piano-wood)]"
+            />
+          </>
+        )}
       </div>
     );
   };

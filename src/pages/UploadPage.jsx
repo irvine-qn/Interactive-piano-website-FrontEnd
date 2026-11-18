@@ -67,7 +67,7 @@ const UploadPage = () => {
 
   return (
     <div className="flex flex-1 flex-col">
-      <main className="mx-auto flex w-full max-w-[1600px] flex-1 flex-col gap-8 px-4 pb-14 pt-10">
+      <main className="mx-auto flex w-full max-w-[100rem] flex-1 flex-col gap-6 px-4 pb-14 pt-6 sm:gap-8 sm:pt-10">
         <header id="upload-page" className="flex flex-col gap-4">
           <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
             <div>
@@ -96,7 +96,7 @@ const UploadPage = () => {
                 disabled={Boolean(publishBlocker) || isPublishing || publish.status === 'done'}
                 title={publishBlocker ?? undefined}
                 aria-describedby={publishBlocker ? 'publish-blocker' : undefined}
-                className="flex h-11 min-w-[160px] cursor-pointer items-center justify-center gap-2 border-2 border-solid border-[var(--color-ink)] bg-[var(--color-brand)] px-6 font-[inherit] text-[15px] font-bold text-[var(--color-neutral-white)] shadow-[var(--shadow-hard-sm)] hover:bg-[var(--color-brand-strong)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none disabled:cursor-not-allowed disabled:bg-[var(--color-surface-disabled)] disabled:text-[var(--color-neutral-500)] disabled:shadow-none"
+                className="flex h-11 min-w-[10rem] cursor-pointer items-center justify-center gap-2 border-2 border-solid border-[var(--color-ink)] bg-[var(--color-brand)] px-6 font-[inherit] text-[15px] font-bold text-[var(--color-ink)] shadow-[var(--shadow-hard-sm)] hover:bg-[var(--color-brand-strong)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none disabled:cursor-not-allowed disabled:bg-[var(--color-surface-disabled)] disabled:text-[var(--color-neutral-500)] disabled:shadow-none"
               >
                 {isPublishing || publish.status === 'done' ? (
                   <LoaderCircle aria-hidden="true" className="h-4 w-4 animate-spin" />
