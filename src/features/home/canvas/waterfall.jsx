@@ -125,7 +125,7 @@ const Waterfall = ({ keyLayout, activeNotes }) => {
 
   return (
     <div className="border-2 border-[var(--color-ink)] bg-[var(--color-surface-paper)] px-[14px]">
-      <canvas ref={canvasRef} aria-hidden="true" className="block h-[clamp(160px,calc(100dvh-480px),300px)] w-full" />
+      <canvas ref={canvasRef} aria-hidden="true" className="block h-[clamp(10rem,calc(100dvh-30rem),18.75rem)] w-full max-md:portrait:h-[clamp(14rem,45dvh,20rem)]" />
     </div>
   );
 };
