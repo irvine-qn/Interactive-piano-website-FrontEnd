@@ -1,7 +1,7 @@
 import { CheckSquare, Plus, Upload, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import defaultAvatar from "../../../assets/virtual-piano-assets/default-avatar.jpeg";
+import defaultAvatar from "../../../assets/virtual-piano-assets/default-avatar.webp";
 import { toImageUrl } from "../../../config/api";
 import { DISPLAY_NAME_MAX_LENGTH } from "../../../config/auth";
 import {
@@ -35,7 +35,7 @@ const DISABLED_INPUT_CLASS = `${inputClass} disabled:bg-[var(--color-surface-mut
 const SECONDARY_BUTTON_CLASS =
   "flex h-10 cursor-pointer items-center justify-center gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-4 font-[inherit] text-sm font-bold text-[var(--color-ink)] no-underline transition-colors hover:bg-[var(--color-surface-soft)] disabled:cursor-not-allowed disabled:opacity-60";
 const PRIMARY_BUTTON_CLASS =
-  "flex h-10 cursor-pointer items-center justify-center gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-brand)] px-4 font-[inherit] text-sm font-bold text-[var(--color-neutral-white)] transition-colors hover:bg-[var(--color-brand-strong)] disabled:cursor-not-allowed disabled:bg-[var(--color-surface-disabled)] disabled:text-[var(--color-neutral-500)] disabled:opacity-60";
+  "flex h-10 cursor-pointer items-center justify-center gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-brand)] px-4 font-[inherit] text-sm font-bold text-[var(--color-ink)] transition-colors hover:bg-[var(--color-brand-strong)] disabled:cursor-not-allowed disabled:bg-[var(--color-surface-disabled)] disabled:text-[var(--color-neutral-500)] disabled:opacity-60";
 
 const toFormValues = (user) => ({
   displayName: user.displayName ?? "",
@@ -400,7 +400,7 @@ const EditProfileFields = ({ user, onSaved, onPhotoChange }) => {
                     onClick={() => setField("level", isSelected ? "" : value)}
                     className={`h-9 cursor-pointer border-2 px-4 font-[inherit] text-sm font-bold transition-colors ${
                       isSelected
-                        ? "border-[var(--color-ink)] bg-[var(--color-brand)] text-[var(--color-neutral-white)]"
+                        ? "border-[var(--color-ink)] bg-[var(--color-brand)] text-[var(--color-ink)]"
                         : "border-transparent bg-transparent text-[var(--color-ink)] hover:bg-[var(--color-surface-soft)]"
                     }`}
                   >

@@ -76,7 +76,7 @@ const SheetSearchControls = ({ search, onSearchChange, difficulty, onDifficultyC
                 onClick={() => onDifficultyChange?.(value)}
                 className={`h-8 cursor-pointer border-2 border-[var(--color-ink)] px-3 font-[inherit] text-[13px] font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-brand)] ${
                   isSelected
-                    ? "bg-[var(--color-brand)] text-[var(--color-neutral-white)]"
+                    ? "bg-[var(--color-brand)] text-[var(--color-ink)]"
                     : "bg-[var(--color-surface-card)] text-[var(--color-ink)] hover:bg-[var(--color-surface-soft)]"
                 }`}
               >
@@ -115,7 +115,7 @@ const ProfileTabs = ({
             onClick={() => onTabChange?.(key)}
             className={`flex h-10 cursor-pointer items-center gap-2 border-2 px-3 font-[inherit] text-sm font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-ink)] ${
               isActive
-                ? "border-[var(--color-ink)] bg-[var(--color-brand)] text-[var(--color-neutral-white)]"
+                ? "border-[var(--color-ink)] bg-[var(--color-brand)] text-[var(--color-ink)]"
                 : "border-transparent bg-transparent text-[var(--color-ink)] hover:bg-[var(--color-surface-soft)]"
             }`}
           >

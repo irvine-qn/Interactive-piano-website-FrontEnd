@@ -9,7 +9,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { toImageUrl } from "../../../config/api";
-import defaultAvatar from "../../../assets/virtual-piano-assets/default-avatar.jpeg";
+import defaultAvatar from "../../../assets/virtual-piano-assets/default-avatar.webp";
 import { ROUTES } from "../../../config/routes";
 import AccountSecurityPanel from "./AccountSecurityPanel";
 
@@ -84,7 +84,7 @@ export const BannerDecorations = ({ notes = BANNER_NOTES, showStar = true }) => 
       <svg
         viewBox="0 0 66 60"
         shapeRendering="crispEdges"
-        className="absolute left-[83.85%] top-[13.7%] h-[60px] w-[66px] text-[var(--color-sun)]"
+        className="absolute left-[83.85%] top-[13.7%] h-[3.75rem] w-[4.125rem] text-[var(--color-sun)]"
       >
         <PixelRects pixels={STAR_PIXELS} />
         <g className="text-[var(--color-ink)]">
@@ -166,7 +166,7 @@ const ProfileHeader = ({ user }) => (
     <div className="mx-auto flex w-full max-w-7xl flex-wrap items-start justify-between gap-4 px-4 pt-14 sm:pl-48 sm:pt-4">
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm font-semibold">
-          <p className="m-0 font-bold text-[var(--color-brand-strong)]">
+          <p className="m-0 font-bold text-[var(--color-brand-deep)]">
             @{user.username}
           </p>
           {user.createdAt && (
@@ -214,7 +214,7 @@ const ProfileHeader = ({ user }) => (
         </div>
         <Link
           to={ROUTES.UPLOAD}
-          className="flex h-10 items-center justify-center gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-brand)] px-4 text-sm font-bold text-[var(--color-neutral-white)] no-underline transition-colors hover:bg-[var(--color-brand-strong)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-ink)]"
+          className="flex h-10 items-center justify-center gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-brand)] px-4 text-sm font-bold text-[var(--color-ink)] no-underline transition-colors hover:bg-[var(--color-brand-strong)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-ink)]"
         >
           <PlusSquare size={16} aria-hidden="true" />
           Upload new sheet (+ MIDI)

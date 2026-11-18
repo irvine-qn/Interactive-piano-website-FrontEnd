@@ -49,7 +49,7 @@ const AccountSecurityPanel = ({ user, securityScore, deviceCount }) => (
       <Smartphone
         size={20}
         aria-hidden="true"
-        className="shrink-0 text-[var(--color-brand-strong)]"
+        className="shrink-0 text-[var(--color-brand-deep)]"
       />
       <div className="min-w-0 flex-1">
         <h3 className="m-0 text-sm font-bold text-[var(--color-ink)]">
@@ -61,7 +61,7 @@ const AccountSecurityPanel = ({ user, securityScore, deviceCount }) => (
       </div>
       <button
         type="button"
-        className="shrink-0 cursor-pointer border-0 bg-transparent p-0 font-[inherit] text-xs font-bold text-[var(--color-brand-strong)] hover:text-[var(--color-brand-deep)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-brand)]"
+        className="shrink-0 cursor-pointer border-0 bg-transparent p-0 font-[inherit] text-xs font-bold text-[var(--color-brand-deep)] hover:text-[var(--color-brand-deep)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-brand)]"
       >
         Enable now
       </button>
