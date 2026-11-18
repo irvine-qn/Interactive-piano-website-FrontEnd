@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { ChevronDown, ListFilter, Search, SlidersHorizontal, X } from 'lucide-react';
+import { ChipButton } from './LibraryFilters';
 
 const SEARCH_DELAY_MS = 300;
 
@@ -101,9 +102,64 @@ const SortSelect = ({ value, onChange }) => {
   );
 };
 
-const LibraryToolbar = ({ query, meta, shownCount, onSearch, onSortChange, children }) => {
-  const [filtersOpen, setFiltersOpen] = useState(false);
-  const filtersId = useId();
+const FilterSheet = ({ dialogRef, sort, total, onSortChange, onReset, children }) => {
+  const close = () => dialogRef.current?.close();
+  return (
+    <dialog
+      ref={dialogRef}
+      aria-label="Filters and sort"
+      onClick={(event) => {
+        if (event.target === dialogRef.current) close();
+      }}
+      className="mb-0 mt-auto max-h-[85dvh] w-full max-w-none border-0 border-t-2 border-solid border-[var(--color-ink)] bg-[var(--color-surface-card)] p-0 backdrop:bg-(--color-ink)/40 sm:hidden"
+    >
+      <div className="flex max-h-[85dvh] flex-col">
+        <div className="overflow-y-auto px-4 pb-4 pt-3">
+          <span aria-hidden="true" className="mx-auto mb-3 block h-1 w-12 bg-[var(--color-line-dashed)]" />
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="m-0 text-xl font-bold text-[var(--color-ink)]">Filters &amp; Sort</h2>
+            <button
+              type="button"
+              onClick={close}
+              aria-label="Close filters"
+              className="flex h-9 w-9 cursor-pointer items-center justify-center border-0 bg-transparent p-0 text-[var(--color-ink)]"
+            >
+              <X aria-hidden="true" className="h-6 w-6" />
+            </button>
+          </div>
+          <div role="group" aria-label="Sort by" className="mb-4 flex flex-wrap items-center gap-2">
+            <span className="w-full text-sm font-bold text-[var(--color-ink)]">Sort by</span>
+            {Object.entries(SORT_LABELS).map(([value, label]) => (
+              <ChipButton key={value} active={sort === value} onClick={() => onSortChange(value)}>
+                {label}
+              </ChipButton>
+            ))}
+          </div>
+          <div className="[&_[role=group]>span:first-child]:w-full [&>div]:gap-4">{children}</div>
+        </div>
+        <div className="flex gap-3 border-0 border-t-2 border-solid border-[var(--color-line-dashed)] px-4 py-3">
+          <button
+            type="button"
+            onClick={onReset}
+            className="flex h-11 flex-1 cursor-pointer items-center justify-center border-2 border-solid border-[var(--color-ink)] bg-[var(--color-surface-card)] font-[inherit] text-sm font-bold text-[var(--color-ink)] shadow-[var(--shadow-hard-sm)]"
+          >
+            Reset
+          </button>
+          <button
+            type="button"
+            onClick={close}
+            className="flex h-11 flex-1 cursor-pointer items-center justify-center border-2 border-solid border-[var(--color-ink)] bg-[var(--color-brand)] font-[inherit] text-sm font-bold text-[var(--color-ink)] shadow-[var(--shadow-hard-sm)] hover:bg-[var(--color-brand-strong)]"
+          >
+            Show {total.toLocaleString('en')} {total === 1 ? 'result' : 'results'}
+          </button>
+        </div>
+      </div>
+    </dialog>
+  );
+};
+
+const LibraryToolbar = ({ query, meta, shownCount, onSearch, onSortChange, onReset, children }) => {
+  const sheetRef = useRef(null);
   return (
   <section
     aria-label="Search, sort and filter"
@@ -115,13 +171,10 @@ const LibraryToolbar = ({ query, meta, shownCount, onSearch, onSortChange, child
         {children && (
           <button
             type="button"
-            onClick={() => setFiltersOpen((open) => !open)}
-            aria-expanded={filtersOpen}
-            aria-controls={filtersId}
-            aria-label={filtersOpen ? 'Hide filters' : 'Show filters'}
-            className={`flex h-11 w-12 shrink-0 cursor-pointer items-center justify-center border-2 border-[var(--color-ink)] p-0 text-[var(--color-ink)] shadow-[var(--shadow-hard-sm)] sm:hidden ${
-              filtersOpen ? 'bg-[var(--color-brand)]' : 'bg-[var(--color-surface-card)]'
-            }`}
+            onClick={() => sheetRef.current?.showModal()}
+            aria-haspopup="dialog"
+            aria-label="Show filters"
+            className="flex h-11 w-12 shrink-0 cursor-pointer items-center justify-center border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] p-0 text-[var(--color-ink)] shadow-[var(--shadow-hard-sm)] sm:hidden"
           >
             <SlidersHorizontal aria-hidden="true" className="h-5 w-5" />
           </button>
@@ -137,14 +190,14 @@ const LibraryToolbar = ({ query, meta, shownCount, onSearch, onSortChange, child
       </div>
     </div>
     {children && (
-      <div
-        id={filtersId}
-        className={`mt-3.5 border-0 border-t-2 border-dashed border-[var(--color-line-dashed)] pt-3.5 max-sm:border-2 max-sm:border-solid max-sm:border-[var(--color-ink)] max-sm:bg-[var(--color-surface-card)] max-sm:p-3 max-sm:shadow-[var(--shadow-hard-sm)] ${
-          filtersOpen ? '' : 'max-sm:hidden'
-        }`}
-      >
-        {children}
-      </div>
+      <>
+        <div className="mt-3.5 border-0 border-t-2 border-dashed border-[var(--color-line-dashed)] pt-3.5 max-sm:hidden">
+          {children}
+        </div>
+        <FilterSheet dialogRef={sheetRef} sort={query.sort} total={meta?.total ?? 0} onSortChange={onSortChange} onReset={onReset}>
+          {children}
+        </FilterSheet>
+      </>
     )}
   </section>
   );

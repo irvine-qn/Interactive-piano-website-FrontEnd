@@ -50,7 +50,7 @@ const Piano = ({ children }) => {
     (source = "mouse") => releaseNote(source),
     [releaseNote],
   );
-  const releaseMouse = useCallback(() => releaseNote("mouse"), [releaseNote]);
+  const releaseMouse = useCallback((source = "mouse") => releaseNote(source), [releaseNote]);
   const moveZone = useCallback(
     (hand, delta, range = octaveRange) =>
       setZoneOctaves((current) => ({
