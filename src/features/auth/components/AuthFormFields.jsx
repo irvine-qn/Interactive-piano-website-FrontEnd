@@ -57,3 +57,22 @@ export const FormError = ({ message }) =>
       {message}
     </p>
   ) : null;
+
+export const primaryButtonClass =
+  "flex h-12 cursor-pointer items-center justify-center gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-brand)] font-[inherit] text-sm font-bold text-[var(--color-ink)] no-underline disabled:cursor-not-allowed disabled:bg-[var(--color-brand-light)]";
+
+export const AuthStatus = ({ Icon, tone = "brand", title, children }) => (
+  <div className="flex flex-col items-center gap-3 text-center">
+    <span
+      className={`flex size-14 items-center justify-center border-2 border-[var(--color-ink)] shadow-[var(--shadow-hard-sm)] ${
+        tone === "success"
+          ? "bg-[var(--color-success-tint)] text-[var(--color-success-strong)]"
+          : "bg-[var(--color-brand-tint)] text-[var(--color-brand-deep)]"
+      }`}
+    >
+      <Icon aria-hidden="true" className="h-7 w-7" />
+    </span>
+    <h2 className="m-0 text-[24px] font-extrabold text-[var(--color-ink)] sm:text-[28px]">{title}</h2>
+    {children}
+  </div>
+);
