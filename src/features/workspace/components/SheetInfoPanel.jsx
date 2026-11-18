@@ -25,7 +25,7 @@ const SheetInfoPanel = ({ sheet, status, notFound = false }) => {
     <div className="flex items-center gap-5">
       <span
         aria-hidden="true"
-        className="flex h-[58px] w-[58px] shrink-0 items-center justify-center border-2 border-[var(--color-ink)] bg-[var(--color-brand-tint)] text-[var(--color-brand-strong)] shadow-[var(--shadow-hard)]"
+        className="flex h-[3.625rem] w-[3.625rem] shrink-0 items-center justify-center border-2 border-[var(--color-ink)] bg-[var(--color-brand-tint)] text-[var(--color-brand-deep)] shadow-[var(--shadow-hard)]"
       >
         <PianoKeysIcon className="h-7 w-7" />
       </span>

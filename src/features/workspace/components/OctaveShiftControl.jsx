@@ -12,7 +12,7 @@ const OctaveShiftControl = ({ handOctaves, onMove, automatic = false }) => {
   const locked = automatic || status !== 'ready';
 
   return (
-    <div className="flex items-center gap-3" title={automatic ? 'Zones follow the song in Play mode' : undefined}>
+    <div className="flex flex-wrap items-center gap-3" title={automatic ? 'Zones follow the song in Play mode' : undefined}>
       {ZONES.map(({ hand, label }) => (
         <div
           key={hand}

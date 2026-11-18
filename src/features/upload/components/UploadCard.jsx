@@ -18,7 +18,7 @@ const UploadCard = ({ number, title, locked = false, lockedMessage, actions, chi
             className={`flex h-6 w-6 shrink-0 items-center justify-center border-2 border-solid border-[var(--color-ink)] text-xs font-extrabold ${
               locked
                 ? 'bg-[var(--color-surface-disabled)] text-[var(--color-neutral-500)]'
-                : 'bg-[var(--color-brand)] text-[var(--color-neutral-white)]'
+                : 'bg-[var(--color-brand)] text-[var(--color-ink)]'
             }`}
           >
             {number}

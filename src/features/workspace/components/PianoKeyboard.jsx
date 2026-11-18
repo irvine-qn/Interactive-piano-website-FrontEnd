@@ -31,7 +31,7 @@ const PianoKeyboard = () => {
   return (
     <>
       {mappingStatus === 'error' && (
-        <p role="alert" className="m-0 mb-2 flex items-center gap-3 text-sm font-semibold text-[var(--color-danger)]">
+        <p role="alert" className="m-0 mb-2 flex items-center pointer-coarse:hidden! gap-3 text-sm font-semibold text-[var(--color-danger)]">
           Keyboard shortcuts are unavailable (could not load the key map). You can still play with the mouse.
           <button
             type="button"
