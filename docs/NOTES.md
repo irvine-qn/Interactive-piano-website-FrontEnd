@@ -33,6 +33,9 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
   - `/workspace` không có id thì chuyển sang `/library`.
   - Bàn phím 88 phím và waterfall làm lại theo giao diện Home.
   - Control Bar có Restart, âm lượng, tốc độ; header Waterfall có Key labels và Octave Shift.
+- **Giao diện mobile (2026-11-20):** phân biệt **thiết bị cảm ứng** bằng biến thể Tailwind `pointer-coarse:` (không theo độ rộng màn hình). Trên cảm ứng ẩn mọi thứ chỉ dùng cho bàn phím máy tính (dải Shortcuts, Zone, How to play, ký tự phím tắt). Bố cục điện thoại dùng `max-sm:` (dưới 640px) nên desktop không đổi. Hằng số dùng chung: `IS_TOUCH_SCREEN`, `DEFAULT_KEY_LABELS` trong `features/workspace/config/keyLayout.js`.
+- **`API_BASE_URL` (2026-11-20):** không có `VITE_API_URL` thì dùng `<giao thức>//<tên máy đang mở trang>:5000` (`config/api.js`). Thử trên điện thoại: `npm run dev -- --host`, mở địa chỉ *Network* Vite in ra.
+- **Auth (2026-11-20):** thêm trang `/reset-password`, `/verify-email` (không nằm trong `GuestRoute`, người đang đăng nhập vẫn mở được link). Khung trạng thái dùng chung: `AuthStatus` trong `AuthFormFields.jsx`.
 
 ## 3. Workspace: cách phát nhạc (đọc trước khi sửa `features/workspace/audio/*`)
 
@@ -47,6 +50,7 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
 | `components/ControlBar.jsx`                             | Chọn chế độ, timeline, tốc độ, Restart, Play/Pause, âm lượng; nghe sự kiện `start`/`pause`/`stop` của Transport   |
 | `config/keyLayout.js`                                   | Vị trí 88 phím (A0–C8) dùng chung cho bàn phím **và** waterfall, để nốt rơi đúng phím                           |
 | `hooks/useKeyMapping.js`, `hooks/useKeyboardInput.js` | Phím tắt máy tính theo bảng của Home (`GET /api/v1/piano`), Octave Shift, chống kẹt phím                                  |
+| `hooks/useFollowNotes.js`                               | Mobile: khi đang phát, dời khung nhìn quãng theo nốt sắp rơi trong 3 giây tới                                                |
 | `hooks/useWorkspaceVolume.js`                           | Âm lượng riêng của Workspace, trả lại mức gốc khi rời trang                                                                |
 
 ### 3.2 Những điều dễ làm hỏng
@@ -62,12 +66,16 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
 - **Sự kiện `pause`/`stop` của Transport** làm Control Bar tắt âm và xóa phím sáng. Khi làm Wait Mode (T-09B) phải tách "dừng do người dùng bấm" khỏi "dừng để chờ", nếu không phím người chơi đang giữ sẽ bị xóa (đã ghi trong WBS).
 - **Phím tắt Practice:** bảng phím lấy từ `practiceKeys` của `GET /api/v1/piano`, tra theo `event.code` nên Shift không ảnh hưởng. `useKeyboardInput` bỏ qua phím khi focus đang ở ô gõ chữ (ô search, form), nhưng **không** bỏ qua khi focus ở thanh trượt (timeline, âm lượng). Ô select chọn xong tự bỏ focus.
 - **Thứ tự khóa trong object:** JavaScript luôn xếp khóa dạng số (`"0"`–`"9"`) lên trước, nên đừng lấy "phím đầu/cuối" theo thứ tự `Object.values(noteByKey)` (lỗi cũ: nhãn hiện `E2-C6` thay vì `C1-C6`).
-- **Chữ trên canvas:** font Inter tải từ Google Fonts ở chế độ `display=swap`, nên lúc đầu canvas đo chữ bằng font dự phòng. Waterfall đo lại nhãn khi `document.fonts` báo tải xong.
+- **Waterfall không vẽ chữ tên nốt** (bỏ ngày 2026-11-20 theo yêu cầu). Tên nốt chỉ hiện trên phím đàn.
+- **Phím cần bấm ở chế độ Play** (`playback-suggest`, màu xanh lá) được **đặt lại toàn bộ** bằng `useWorkspaceStore.setState({ playbackKeys })` mỗi khi tới hợp âm mới và xoá khi bấm đủ. Đừng đổi về cộng / trừ dần từng phím: sẽ còn phím sáng sót.
+- **`handleUserNote` chỉ chạy ở chế độ Play.** Bỏ điều kiện này thì bấm phím lúc Auto Play đang dừng sẽ làm bài tự chạy ngầm.
+- **Phím đàn dùng Pointer Events** (`Key.jsx`): chuột có nguồn `mouse`, mỗi ngón tay có nguồn `pointer-<id>`. Store và bộ phát âm nhả nốt theo nguồn, nên giữ đúng nguồn khi gọi `onPress` / `onRelease`.
 
 ### 3.3 Quy ước React/ESLint gặp nhiều
 
 - Lấy dữ liệu từ store bằng `useShallow` (`zustand/react/shallow`) và chỉ lấy field cần dùng, để bàn phím không render lại cả 88 phím mỗi khi một phím sáng.
 - ESLint (react-hooks v7) báo lỗi `set-state-in-effect`: trạng thái "đang tải" nên **suy ra** từ dữ liệu (vd. so `result.key` với `reloadKey`) thay vì gọi `setState` trong effect.
+- ESLint bỏ qua biến và tham số viết hoa đầu (`varsIgnorePattern` / `argsIgnorePattern` là `^[A-Z_]`), giống template Vite React, vì `no-unused-vars` không hiểu biến dùng làm thẻ JSX (`<Icon />`).
 - Màu và bóng dùng design token trong `index.css` (`var(--color-*)`, `var(--shadow-hard)`), kể cả trên canvas (đọc bằng `getComputedStyle`).
 
 ## 3b. Upload sheet (Bình)
@@ -90,7 +98,9 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
 | Đổi tốc độ đúng lúc một nốt đang ngân thì nốt đó vẫn ngân theo tốc độ cũ                                             | Các nốt sau đúng tốc độ mới. Muốn chính xác thì tua lại tại chỗ khi đổi tốc độ, nhưng sẽ cắt các nốt đang ngân |
 | Tua vào giữa một nốt thì nốt đó không phát lại                                                                                  | Hành vi của `Tone.Part`                                                                                                               |
 | Trang *Sheet not found* (và lúc đang tải bài): timeline vẫn hiện độ dài của bài trước, hoặc 4:10 nếu chưa mở bài nào | `duration` của `useWorkspaceStore` (mặc định 250 giây) không đặt lại khi tải bài lỗi                                      |
-| Bundle JS lớn hơn 500 kB (Vite cảnh báo khi build)                                                                                     | Sẽ tách theo route ở C-05                                                                                                              |
+| Chunk bản nhạc (VexFlow) 562 kB, Vite vẫn cảnh báo lớn hơn 500 kB                                                                     | Chỉ tải khi bấm *Show sheet music*. Đã bỏ 5 bộ font thừa (C-05). Chunk Tone.js khoảng 420 kB dùng chung cho Home và Workspace       |
+| Mobile: nốt hai tay cách nhau xa hơn số quãng màn hình hiện được thì khung nhìn ưu tiên phần trầm                                  | `pickViewOctave` trong `useFollowNotes.js`. Xoay ngang (4 quãng) để thấy cả hai tay                                                  |
+| Đặt ngón lên phím rồi trượt sang phím khác thì nốt vẫn là phím ban đầu                                                                | Hành vi mặc định của Pointer Events trên cảm ứng. Chưa làm kiểu trượt ngón đổi phím                                                  |
 | `/favicon.ico` báo 404 ở mọi trang                                                                                                    | `index.html` chưa có favicon                                                                                                          |
 
 ## 5. Việc đang chờ
@@ -98,14 +108,15 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
 - Review Workspace (T-10): **pending**. Chế độ chờ nốt nay có tên **Play** và đã chạy, logic nằm trong `audio/sheetPlayer.js`.
 - **C-04** chữ thương hiệu trên Navbar mới (giữ con cáo), **C-05** tách bundle.
 - **User profile / edit profile** (Quỳnh): còn đổi mật khẩu và các mục *Coming soon*.
-- **Kết quả đánh giá code (2026-11-07):** AU-01 → AU-17 trong `TASK_DECOMPOSITION.md`. **Chưa nên deploy công khai** khi chưa xong nhóm 1. Lỗi cần biết: link quên mật khẩu đang gọi API không tồn tại (AU-01).
-- Size mobile: chưa hoàn thiện. Hiện tại website còn bị dính scale khá nhiều khi thu phóng
-- Security: chưa đảm bảo
-- Code test kiểm thử: chưa viết
+- **Kết quả đánh giá code (2026-11-07):** AU-01 → AU-17 trong `TASK_DECOMPOSITION.md`. **Chưa nên deploy công khai** khi chưa xong nhóm 1. AU-01 (quên mật khẩu) và AU-07 (xác thực email) đã xong ngày 2026-11-20.
+- **Giao diện mobile:** đã sửa đủ 11 trang theo thiết kế (MB-xx). Còn các tính năng chỉ có trong thiết kế (Playlist, Export, Chia sẻ, Lưu nháp, thanh độ mạnh mật khẩu...) và footer theo thiết kế: chờ quyết định.
+- **Chưa có nút gửi lại email xác thực trên giao diện** (API `POST /auth/verify-email/resend` đã có). Tài khoản cũ chưa xác thực thì chưa dùng được Quên mật khẩu.
+- Security: còn AU-04 → AU-06.
+- Test component FE: chưa viết.
 
 ## 6. Kiểm tra trước khi tạo PR
 
-1. `npm run lint`, `npm test` và `npm run build` không lỗi (cảnh báo bundle lớn hơn 500 kB là bình thường cho tới C-05).
+1. `npm run lint`, `npm test` và `npm run build` không lỗi (cảnh báo chunk VexFlow lớn hơn 500 kB là bình thường).
 2. Chạy Backend (PostgreSQL bật, đã migrate và seed), `npm run dev`, rồi mở thử:
    - `/`: Home chơi được bằng chuột và phím, metronome chạy, Octave Shift của Home đúng.
    - `/library`: tìm kiếm, lọc, sắp xếp, phân trang; bấm *Practice* mở Workspace.
@@ -119,4 +130,6 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
    - `/profile/edit`: đổi avatar, ảnh bìa, kéo chỉnh vị trí; Navbar hiện avatar mới.
    - `/workspace/khong-co-bai-nay`: hiện *Sheet not found* và nút về Library.
    - `/workspace` chuyển sang `/library`; `/login`, `/register`, một URL không tồn tại ra trang 404.
+   - `/forgot-password` → mở link trong email (hoặc console Backend) → `/reset-password` đổi được mật khẩu; mở lại link thì báo hết hạn. Tương tự `/verify-email`.
+   - **Mobile:** DevTools bật Device Toolbar (Ctrl+Shift+M), chọn một điện thoại, tải lại trang. Shortcuts phải ẩn, bàn phím giữ nhiều ngón được, các thanh nút cố định ở đáy (Upload, Edit profile) không che nội dung. Tắt Device Toolbar thì shortcuts hiện lại.
 3. Mở DevTools Console: không có lỗi đỏ mới (ngoài favicon và MIDI ở Home đã biết).

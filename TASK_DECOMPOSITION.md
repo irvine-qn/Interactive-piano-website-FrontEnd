@@ -13,7 +13,7 @@
 > - Task `[BE]` có thêm/đổi API thì cập nhật luôn mục *Available API* trong README của BE.
 > - **Ngôn ngữ giao diện: tiếng Anh** (thống nhất với Quỳnh từ 2026-11). Comment trong code và WBS vẫn viết tiếng Việt.
 > - DB: chỉ dùng **Prisma** (schema + migration) cho mọi bảng, không tạo bảng bằng SQL lúc server khởi động.
-> - Thứ tự thực hiện: ~~Hạ tầng chung → Sheet Library (BE → FE) → C-06 → C-07 → C-08 → Piano Workspace (T-05 → T-08)~~ (xong) → **User upload sheet (MIDI)** (nhánh `upload-midi`, tách từ `develop` ngày 2026-11-06) → C-04, C-05, E-02, T-10. User profile / edit profile: Quỳnh làm. Wait Mode (T-09): Quỳnh đã làm (chế độ **Play**), xem mục *Thay đổi của Quỳnh sau khi merge*.
+> - Thứ tự thực hiện: ~~Hạ tầng chung → Sheet Library (BE → FE) → C-06 → C-07 → C-08 → Piano Workspace (T-05 → T-08)~~ (xong) → **User upload sheet (MIDI)** (nhánh `upload-midi`, tách từ `develop` ngày 2026-11-06) → C-04, ~~C-05~~, ~~E-02~~, T-10. Giao diện mobile (MB-xx) và sửa Workspace (WS-xx): xong ngày 2026-11-20. User profile / edit profile: Quỳnh làm. Wait Mode (T-09): Quỳnh đã làm (chế độ **Play**), xem mục *Thay đổi của Quỳnh sau khi merge*.
 > - Ghi chú kỹ thuật và nhật ký thay đổi: `docs/NOTES.md`, `docs/CHANGELOG.md` (có ở cả 2 repo).
 
 ## Hạ tầng chung (Common)
@@ -24,7 +24,7 @@
 | **C-02** `[FE]` | axios baseURL `/api/v1` | Sửa `src/lib/axios.js`: `baseURL = ${API_BASE_URL}/api/v1`. Không sửa `features/home/api/pianoApi.js` (đường dẫn tương đối `/piano` vẫn đúng). Kiểm tra Home vẫn tải được cấu hình piano/metronome. Phụ thuộc: C-01. | Done |
 | **C-03** `[FE]` | Chuẩn hoá thư mục `pages/` | Chuyển `pages/sheet/WorkspacePage.jsx` thành `pages/WorkspacePage.jsx`, xoá thư mục `pages/sheet/`, sửa import trong `routes/AppRoutes.jsx`. Trang sau này đặt phẳng trong `pages/` (`LibraryPage`, `NotFoundPage`, ...). | Done |
 | **C-04** `[FE]` | Navbar: chữ thương hiệu mới | Làm trên **Navbar mới của Quỳnh** (sau C-06B): trong `components/common/navbar.jsx`, thay ảnh `fiano-logo.png` bằng chữ `FIANO` + dấu chấm màu `--color-brand` (giống tầng 1 hiện tại của WorkspacePage), dùng design token. **Giữ nguyên con cáo mascot**, menu, ô search, phần đăng nhập/đăng xuất và menu mobile của Quỳnh. Phụ thuộc: C-06B. | To Do |
-| **C-05** `[FE]` | Tách bundle theo route | Dùng `React.lazy` + `Suspense` trong `routes/AppRoutes.jsx` cho các page để Tone.js không nằm trong bundle chính. So sánh kích thước `dist/assets/*.js` trước và sau. Làm cuối phiên. | To Do |
+| **C-05** `[FE]` | Tách bundle theo route | Dùng `React.lazy` + `Suspense` trong `routes/AppRoutes.jsx` cho các page để Tone.js không nằm trong bundle chính. So sánh kích thước `dist/assets/*.js` trước và sau. Làm cuối phiên.  **Kết quả:** các page đã tách bằng `React.lazy` trong `AppRoutes.jsx`. Ngày 2026-11-20 đổi `import from 'vexflow'` thành `'vexflow/bravura'` (chỉ nạp 1 bộ font): chunk `sheetMusicScore` 984 kB còn 562 kB, bản nhạc hiển thị không đổi. Chunk Tone.js khoảng 420 kB dùng chung, chưa tách thêm. | Done |
 
 ### Đồng bộ với `develop` (sau khi Feature Auth của Quỳnh được merge)
 
@@ -72,21 +72,21 @@
 
 | Sub-Task | Component | Contract & Constraints | Status |
 | :--- | :--- | :--- | :--- |
-| **AU-01** `[BE+FE]` | Quên mật khẩu | FE gọi `POST /auth/forgot-password` nhưng BE trả 404. Làm API (cần dịch vụ gửi email), trước mắt có thể ẩn link. | To Do |
+| **AU-01** `[BE+FE]` | Quên mật khẩu | FE gọi `POST /auth/forgot-password` nhưng BE trả 404. Làm API (cần dịch vụ gửi email), trước mắt có thể ẩn link.  **Kết quả (2026-11-20):** xong cùng A-F02, A-F03. | Done |
 | **AU-02** `[BE+FE]` | Đổi mật khẩu, 2FA, Device log | Các nút trong `AccountSecurityPanel` chưa làm gì. Làm tính năng hoặc ẩn đi. | To Do |
-| **AU-03** `[BE]` | Rate limit | Giới hạn `login`, `register`, upload; cả `POST /sheets/:id/view` và `practice-sessions` để số liệu không bị thổi phồng. | To Do |
+| **AU-03** `[BE]` | Rate limit | Giới hạn `login`, `register`, upload; cả `POST /sheets/:id/view` và `practice-sessions` để số liệu không bị thổi phồng.  **Kết quả (2026-11-20):** `express-rate-limit` cho mọi route `/auth/*` (20 request / 15 phút / IP, `429 TOO_MANY_REQUESTS`). Còn upload, `view`, `practice-sessions`. | In Progress |
 | **AU-04** `[BE]` | Hạn mức upload | Giới hạn số bài / dung lượng mỗi tài khoản. Hiện đăng ký không cần xác minh email nên DB có thể bị làm đầy. | To Do |
 | **AU-05** `[BE]` | Cấu hình bảo mật | Giới hạn CORS theo domain FE, thêm `helmet`, dừng server khi thiếu `JWT_SECRET`, giới hạn mật khẩu 72 byte (bcrypt chỉ dùng 72 byte đầu). | To Do |
 | **AU-06** `[BE+FE]` | Thu hồi token | JWT nằm trong `localStorage`, sống 7 ngày, không thu hồi được. Cân nhắc token ngắn hạn + refresh token. | To Do |
-| **AU-07** `[BE+FE]` | Xác minh email | Có cột `isVerified` và giao diện *Not verified* nhưng chưa có API. | To Do |
+| **AU-07** `[BE+FE]` | Xác minh email | Có cột `isVerified` và giao diện *Not verified* nhưng chưa có API.  **Kết quả (2026-11-20):** xong cùng A-R04. Còn thiếu nút *gửi lại email xác thực* trên giao diện (API đã có). | Done |
 
 #### Nhóm 2: Chất lượng
 
 | Sub-Task | Component | Contract & Constraints | Status |
 | :--- | :--- | :--- | :--- |
-| **AU-08** `[BE+FE]` | CI + E2E | CI chạy lint / test / build; vài test E2E cho đăng nhập, upload, sửa bài, đổi ảnh. FE chưa có test component. | To Do |
+| **AU-08** `[BE+FE]` | CI + E2E | CI chạy lint / test / build; vài test E2E cho đăng nhập, upload, sửa bài, đổi ảnh. FE chưa có test component.  **Kết quả (2026-11-20):** BE có ESLint (`npm run lint`); FE sửa cấu hình ESLint, hết 266 lỗi giả. Cả hai lint sạch. Còn CI và E2E. | In Progress |
 | **AU-09** `[BE]` | Vận hành | Dockerfile cho app, health check có kiểm tra DB, log có cấu trúc. | To Do |
-| **AU-10** `[BE+FE]` | Dọn code thừa | Gỡ `file-type` (BE); xoá `features/collections` trống; xoá `package.json` + `node_modules` ở thư mục gốc; xoá `console.log` ở `toneEngine.js`. Xem từng export có thể thừa. FE: `playNote`, `stopAllNotes`, `getBaseBpm`, `volumeToDb`, `DEFAULT_SORT`, `SORT_OPTIONS`, `INITIAL_FIELDS`, `BLACK_KEY_RATIO`, `PRACTICE_MIN_NOTES`, `PRACTICE_IDLE_GAP_MS`. BE: `measureDifficulty`, `RESERVED_IDS`. **Giữ** `pg` (Prisma adapter cần) và `getUserSheets` nếu sắp làm profile công khai. | To Do |
+| **AU-10** `[BE+FE]` | Dọn code thừa | Gỡ `file-type` (BE); xoá `features/collections` trống; xoá `package.json` + `node_modules` ở thư mục gốc; xoá `console.log` ở `toneEngine.js`. Xem từng export có thể thừa. FE: `playNote`, `stopAllNotes`, `getBaseBpm`, `volumeToDb`, `DEFAULT_SORT`, `SORT_OPTIONS`, `INITIAL_FIELDS`, `BLACK_KEY_RATIO`, `PRACTICE_MIN_NOTES`, `PRACTICE_IDLE_GAP_MS`. BE: `measureDifficulty`, `RESERVED_IDS`. **Giữ** `pg` (Prisma adapter cần) và `getUserSheets` nếu sắp làm profile công khai.  **Kết quả (2026-11-20):** đã xoá `playNote`, `getBaseBpm`, `console.log` ở `toneEngine.js`; xoá thư mục trống BE (`features/collections`, `common/utils`, `features/auth/strategies`, `features/sheets/helpers`, `types`); xoá ảnh không dùng (`default-avatar.jpeg`, `fiano-logo.png`, `fox-mascot.png`). Các export còn lại được dùng trong chính file hoặc trong test nên giữ. Còn: gỡ `file-type` (BE), xoá `package.json` ở thư mục gốc. | In Progress |
 | **AU-11** `[BE+FE]` | Tính năng chưa có trong `README_main.md` | Theo dõi người dùng, bộ sưu tập / danh sách phát, nhãn định danh. Cần chốt phạm vi. | To Do |
 
 #### Nhóm 3: Khi có người dùng thật (scale)
@@ -102,7 +102,28 @@ Backend gần như không giữ trạng thái (JWT, không session) nên chạy 
 | **AU-16** `[BE]` | Ghi `views` theo đợt | Bài nhiều lượt xem sẽ tranh khoá cùng một dòng. | To Do |
 | **AU-17** `[BE]` | Dọn `practice_sessions` | Bảng tăng mãi, cần chính sách dọn hoặc gộp dữ liệu cũ. | To Do |
 
-Tách bundle FE (khoảng 907 KB và 984 KB) đã có ở **C-05**.
+Tách bundle FE: xem **C-05** (Done).
+
+### Giao diện mobile và sửa lỗi (2026-11-18 → 2026-11-20)
+
+> Làm theo thiết kế `UI/mobile` (73 màn). Chỉ đổi bố cục ở màn hình nhỏ (`max-sm:`) hoặc thiết bị cảm ứng (`pointer-coarse:`), desktop giữ nguyên. Không thêm màu mới. Tính năng chỉ có trong thiết kế mà app chưa có (Playlist, Export, Chia sẻ, Lưu nháp, Facebook, thanh độ mạnh mật khẩu, thanh 3 bước Quên mật khẩu, footer mới) **chưa làm**, chờ quyết định.
+
+| Sub-Task | Component | Contract & Constraints | Status |
+| :--- | :--- | :--- | :--- |
+| **MB-01** `[FE]` | Cảm ứng: ẩn shortcuts | `pointer-coarse:hidden!` cho dải Shortcuts, nút Show/Hide shortcuts, Zone 1/2, *How to play*, ký tự phím tắt trên phím (`WorkspacePage.jsx`, `piano.jsx`, `Key.jsx`, `HowToPlay.jsx`, `PianoKeyboard.jsx`). *Key labels* mặc định *Note names* trên cảm ứng (`IS_TOUCH_SCREEN`, `DEFAULT_KEY_LABELS` trong `keyLayout.js`); ở Workspace ẩn hẳn ô này. | Done |
+| **MB-02** `[FE]` | Home mobile | Bàn phím theo quãng có khung gỗ hai bên, hiện vừa khít số quãng (`useOctaveView.renderInView(content, { framed })`). Ô *Key labels* giãn hết chiều ngang. | Done |
+| **MB-03** `[FE]` | Workspace mobile | Canvas dọc thấp lại (khoảng 38% màn hình). Khi phát, khung nhìn tự dời theo nốt sắp rơi (`hooks/useFollowNotes.js`, `setViewOctave` trong `useOctaveView`). | Done |
+| **MB-04** `[FE]` | Library mobile | Thẻ bài gọn hơn, nút tim cạnh *Practice*. Bộ lọc thành bảng trượt từ dưới (`FilterSheet` trong `LibraryToolbar.jsx`, `<dialog>`): Sort, Difficulty, Genre, *Reset*, *Show N results*. Không làm lọc MIDI/PDF, Thời lượng (API chưa có). | Done |
+| **MB-05** `[FE]` | Profile mobile | Tên dưới avatar; tab thành hàng ngang vuốt được; thao tác bài gom vào nút *⋯* mở bảng trượt (*Practice now*, *Edit info*, *Make public/private*, *Delete sheet* có xác nhận) trong `UploadedSheets.jsx`. | Done |
+| **MB-06** `[FE]` | Auth mobile | `AuthLayout`: chữ không bị cáo che, tiêu đề form 24px trên mobile; mũi tên ở *Back to log in*. | Done |
+| **MB-07** `[FE]` | Upload mobile | Nút *Publish* thành thanh cố định ở đáy; bảng Tracks vừa màn hình (ẩn cột Range); dòng file hiện đủ tên. | Done |
+| **MB-08** `[FE]` | Edit profile mobile | Menu cài đặt thành hàng tab ngang; *Cancel* / *Save changes* thành thanh cố định ở đáy. | Done |
+| **MB-09** `[FE]` | Giữ phím trên cảm ứng | `Key.jsx` dùng Pointer Events, mỗi ngón một nguồn `pointer-<id>`: giữ thì nốt ngân, bấm nhiều ngón, không bật menu chạm giữ (`touch-none`, chặn `contextmenu`). | Done |
+| **MB-10** `[FE]` | API trên điện thoại | `config/api.js`: không có `VITE_API_URL` thì gọi Backend ở cùng tên máy đang mở trang, cổng 5000 (trước đây cố định `localhost`, điện thoại không tải được bài). | Done |
+| **WS-01** `[FE]` | Workspace vừa một màn hình (desktop) | Từ `lg`: khối Waterfall cao `100dvh` trừ Navbar, canvas co giãn, bàn phím `clamp(6.5rem,16dvh,11rem)`. Nút *How to play* đổi `fixed` thành `absolute` để không che Zone 2. Ô BPM rộng hơn, không xuống dòng. | Done |
+| **WS-02** `[FE]` | Màu phím cần bấm ở chế độ Play | Trạng thái `playback-suggest` (xanh lá, token `--color-pastel-mint`, `--color-success-*`) khác màu phím đang bấm. `sheetPlayer.js` đặt lại toàn bộ `playbackKeys` theo hợp âm đang chờ. | Done |
+| **WS-03** `[FE]` | Bài tự chạy khi bấm phím ở Auto Play | `handleUserNote` (`sheetPlayer.js`) chỉ chạy ở chế độ Play. Trước đây bấm một nốt của hợp âm đầu khi Auto Play đang dừng làm bài chạy ngầm, phím tự sáng. | Done |
+| **WS-04** `[FE]` | Bỏ chữ trên waterfall | `practiceWaterfall.jsx` không vẽ tên nốt trên thanh rơi; xoá `fitLabel`, hằng số `LABEL_*`. | Done |
 
 ## Feature: Piano Workspace 
 
@@ -355,13 +376,13 @@ Ghi lại để biết code hiện tại khác gì so với các task ở trên.
 
 ### Sub feature: Forgot password
 
-> **Chưa dùng được:** FE đã gọi `POST /auth/forgot-password` nhưng Backend chưa có route này nên hiện nhận 404 và form báo lỗi. Chưa có dịch vụ gửi email.
+> **Đã dùng được (2026-11-20).** Gửi email bằng Nodemailer (`src/lib/mailer.js`), chưa cấu hình SMTP thì email in ra console của Backend. Cấu hình `.env`: README Backend mục *Environment* và `docs/api.md` › Auth.
 
 | Sub-Task | Component | Contract & Constraints | Status |
 | :--- | :--- | :--- | :--- |
 | **A-F01** `[FE]` | Trang + form quên mật khẩu | `pages/auth/ForgotPasswordPage.jsx`, `features/auth/components/ForgotPasswordForm.jsx`, hàm `forgotPassword` trong `authApi.js`. Validate email, trạng thái đang gửi, màn hình *Check your inbox*, link về đăng nhập. | Done |
-| **A-F02** `[BE]` | `POST /api/v1/auth/forgot-password` | Tạo token/OTP ngẫu nhiên dùng một lần, có hạn; chỉ lưu bản hash trong DB (migration riêng); gửi qua email bằng Nodemailer. **Chỉ gửi nếu tài khoản đã xác thực email, ngược lại báo lỗi** (`README_main.md` mục 3.5). Có giới hạn tần suất. Phụ thuộc: A-R04. | To Do |
-| **A-F03** `[BE+FE]` | Đặt lại mật khẩu | `POST /api/v1/auth/reset-password` (`{ token, password }`, cùng quy tắc mật khẩu với đăng ký, token dùng xong thì vô hiệu) + trang `/reset-password` mở từ link trong email. Phụ thuộc: A-F02. | To Do |
+| **A-F02** `[BE]` | `POST /api/v1/auth/forgot-password` | Tạo token/OTP ngẫu nhiên dùng một lần, có hạn; chỉ lưu bản hash trong DB (migration riêng); gửi qua email bằng Nodemailer. **Chỉ gửi nếu tài khoản đã xác thực email, ngược lại báo lỗi** (`README_main.md` mục 3.5). Có giới hạn tần suất. Phụ thuộc: A-R04.  **Kết quả:** bảng `auth_tokens` (migration `add_auth_tokens`, chỉ lưu SHA-256), link hạn 30 phút, dùng một lần. Chưa xác thực trả `403 EMAIL_NOT_VERIFIED`; email không tồn tại vẫn trả `200` cùng câu để không lộ tài khoản. Rate limit theo AU-03. | Done |
+| **A-F03** `[BE+FE]` | Đặt lại mật khẩu | `POST /api/v1/auth/reset-password` (`{ token, password }`, cùng quy tắc mật khẩu với đăng ký, token dùng xong thì vô hiệu) + trang `/reset-password` mở từ link trong email. Phụ thuộc: A-F02.  **Kết quả:** API `POST /auth/reset-password`; trang `pages/auth/ResetPasswordPage.jsx` + `features/auth/components/ResetPasswordForm.jsx` (form, *Password changed!*, *This link has expired* kèm nút gửi link mới). Token đăng nhập cũ vẫn còn hiệu lực (AU-06). | Done |
 
 ### Sub feature: Register
 
@@ -370,7 +391,7 @@ Ghi lại để biết code hiện tại khác gì so với các task ở trên.
 | **A-R01** `[BE]` | `POST /api/v1/auth/register` | Body `{ displayName, username, email, password }`. Username chỉ gồm chữ thường và số; email chuyển về chữ thường; mật khẩu tối thiểu 8 ký tự, có ít nhất 1 chữ hoa và 1 chữ số; hash bằng `bcrypt`. Trả `201 { accessToken, user }`. Lỗi: `409 USERNAME_TAKEN`, `409 EMAIL_TAKEN`, `422 VALIDATION_FAILED`. Giới hạn độ dài trong `auth.constants.js`. | Done |
 | **A-R02** `[BE]` | Test Auth | `auth.schema.test.js`: unit test validate đăng ký/đăng nhập. Test hồi quy qua API: `scripts/auth-regression.mjs` (C-07B). | Done |
 | **A-R03** `[FE]` | Trang + form đăng ký | `pages/auth/RegisterPage.jsx`, `features/auth/components/RegisterForm.jsx`, `config/auth.js`. Validate khớp BE, thanh độ mạnh mật khẩu, nhập lại mật khẩu, trạng thái đang gửi. Thành công thì tự đăng nhập và sang `/profile` kèm banner chào mừng. | Done |
-| **A-R04** `[BE+FE]` | Xác minh email | Cột `isVerified` đã có (mặc định `false`) nhưng chưa có luồng xác minh. `POST /api/v1/auth/verify-email`, gửi email bằng Nodemailer. | To Do |
+| **A-R04** `[BE+FE]` | Xác minh email | Cột `isVerified` đã có (mặc định `false`) nhưng chưa có luồng xác minh. `POST /api/v1/auth/verify-email`, gửi email bằng Nodemailer.  **Kết quả:** `POST /auth/verify-email`, `POST /auth/verify-email/resend` (cần đăng nhập); đăng ký tự gửi email xác thực, link hạn 24 giờ. Trang `pages/auth/VerifyEmailPage.jsx` + `features/auth/components/VerifyEmailStatus.jsx`, mỗi token chỉ gửi một lần kể cả khi StrictMode chạy effect hai lần. Còn nút gửi lại trên giao diện (vd. cạnh *Not verified* ở `/profile/edit`). | Done |
 
 ## Feature: Handle Error page
 
