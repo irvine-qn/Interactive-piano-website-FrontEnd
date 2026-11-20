@@ -29,7 +29,7 @@ const PrivacyOptions = ({ value, onChange }) => {
               />
               <span
                 aria-hidden="true"
-                className="mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center border-2 border-solid border-[var(--color-ink)] bg-[var(--color-surface-card)]"
+                className="mt-0.5 flex h-[1.125rem] w-[1.125rem] shrink-0 items-center justify-center border-2 border-solid border-[var(--color-ink)] bg-[var(--color-surface-card)]"
               >
                 {checked && <span className="h-2 w-2 bg-[var(--color-brand)]" />}
               </span>

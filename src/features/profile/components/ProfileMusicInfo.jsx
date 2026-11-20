@@ -35,7 +35,7 @@ const ProfileMusicInfo = ({ user }) => {
         <h2 className="m-0 text-base font-bold text-[var(--color-ink)]">Music profile</h2>
         <Link
           to={ROUTES.PROFILE_EDIT}
-          className="text-sm font-bold text-[var(--color-brand-strong)] no-underline hover:text-[var(--color-brand-deep)]"
+          className="text-sm font-bold text-[var(--color-brand-deep)] no-underline hover:text-[var(--color-brand-deep)]"
         >
           Edit
         </Link>
@@ -44,7 +44,7 @@ const ProfileMusicInfo = ({ user }) => {
         {level && (
           <div>
             <h3 className={LABEL_CLASS}>Level</h3>
-            <p className={`${TAG_CLASS} m-0 inline-block border-[var(--color-ink)] bg-[var(--color-brand)] text-[var(--color-neutral-white)]`}>
+            <p className={`${TAG_CLASS} m-0 inline-block border-[var(--color-ink)] bg-[var(--color-brand)] text-[var(--color-ink)]`}>
               {level.label}
             </p>
           </div>

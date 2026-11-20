@@ -129,7 +129,7 @@ const EditSheetDialog = ({ sheet, onSave, onClose }) => {
           <button
             type="submit"
             disabled={isSaving}
-            className={`${BUTTON_CLASS} bg-[var(--color-brand)] text-[var(--color-neutral-white)] hover:bg-[var(--color-brand-strong)]`}
+            className={`${BUTTON_CLASS} bg-[var(--color-brand)] text-[var(--color-ink)] hover:bg-[var(--color-brand-strong)]`}
           >
             {isSaving ? "Saving..." : "Save changes"}
           </button>

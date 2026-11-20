@@ -14,7 +14,7 @@ const ProfileStats = ({ stats = {} }) => (
         key={key}
         className="flex items-center gap-4 border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] p-4"
       >
-        <span className="flex size-12 shrink-0 items-center justify-center border-2 border-[var(--color-ink)] bg-[var(--color-brand-tint)] text-[var(--color-brand-strong)]">
+        <span className="flex size-12 shrink-0 items-center justify-center border-2 border-[var(--color-ink)] bg-[var(--color-brand-tint)] text-[var(--color-brand-deep)]">
           <Icon size={24} aria-hidden="true" />
         </span>
         <div>

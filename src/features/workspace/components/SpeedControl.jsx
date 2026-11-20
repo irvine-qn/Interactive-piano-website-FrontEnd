@@ -30,7 +30,7 @@ const SpeedControl = () => {
     <div
       role="group"
       aria-label="Playback speed"
-      className="flex h-11 shrink-0 items-center gap-2 border-2 border-solid border-[var(--color-ink)] bg-[var(--color-surface-soft)] px-2"
+      className="flex h-11 shrink-0 items-center gap-2 max-sm:flex-1 max-sm:justify-between border-2 border-solid border-[var(--color-ink)] bg-[var(--color-surface-soft)] px-2"
     >
       <button
         type="button"
@@ -42,9 +42,9 @@ const SpeedControl = () => {
       >
         <Minus aria-hidden="true" className="h-4 w-4" />
       </button>
-      <output aria-live="polite" className="flex w-14 flex-col items-center leading-none">
-        <span className="text-[20px] font-bold tabular-nums text-[var(--color-brand)]">{bpm ?? '--'}</span>
-        <span className="mt-0.5 text-[9px] font-semibold text-[var(--color-neutral-400)]">BPM · {playbackRate}x</span>
+      <output aria-live="polite" className="flex w-20 flex-col items-center whitespace-nowrap leading-none">
+        <span className="text-[20px] font-bold tabular-nums text-[var(--color-brand-deep)]">{bpm ?? '--'}</span>
+        <span className="mt-0.5 text-xs font-semibold text-[var(--color-neutral-400)]">BPM · {playbackRate}x</span>
       </output>
       <button
         type="button"

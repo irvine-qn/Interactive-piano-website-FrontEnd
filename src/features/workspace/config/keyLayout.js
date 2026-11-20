@@ -2,6 +2,8 @@ const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 
 const FIRST_MIDI = 21;
 const LAST_MIDI = 108;
 export const BLACK_KEY_RATIO = 0.62;
+export const IS_TOUCH_SCREEN = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
+export const DEFAULT_KEY_LABELS = IS_TOUCH_SCREEN ? 'names' : 'shortcuts';
 
 const KEYS = Array.from({ length: LAST_MIDI - FIRST_MIDI + 1 }, (_, i) => {
   const midi = FIRST_MIDI + i;

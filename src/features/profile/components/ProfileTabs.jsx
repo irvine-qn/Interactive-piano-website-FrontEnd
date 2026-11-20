@@ -76,7 +76,7 @@ const SheetSearchControls = ({ search, onSearchChange, difficulty, onDifficultyC
                 onClick={() => onDifficultyChange?.(value)}
                 className={`h-8 cursor-pointer border-2 border-[var(--color-ink)] px-3 font-[inherit] text-[13px] font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-brand)] ${
                   isSelected
-                    ? "bg-[var(--color-brand)] text-[var(--color-neutral-white)]"
+                    ? "bg-[var(--color-brand)] text-[var(--color-ink)]"
                     : "bg-[var(--color-surface-card)] text-[var(--color-ink)] hover:bg-[var(--color-surface-soft)]"
                 }`}
               >
@@ -101,9 +101,9 @@ const ProfileTabs = ({
 }) => (
   <section
     aria-label="Profile content"
-    className="flex flex-col gap-3 border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] p-4"
+    className="flex flex-col gap-3 border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] p-4 max-sm:border-0 max-sm:bg-transparent max-sm:p-0"
   >
-    <nav aria-label="Profile tabs" className="flex flex-wrap gap-2">
+    <nav aria-label="Profile tabs" className="flex flex-wrap gap-2 max-sm:-mx-4 max-sm:flex-nowrap max-sm:overflow-x-auto max-sm:px-4 max-sm:pb-1 max-sm:[scrollbar-width:none]">
       {TAB_ITEMS.map(({ key, label, Icon }) => {
         const isActive = key === activeTab;
 
@@ -113,10 +113,10 @@ const ProfileTabs = ({
             type="button"
             aria-current={isActive ? "page" : undefined}
             onClick={() => onTabChange?.(key)}
-            className={`flex h-10 cursor-pointer items-center gap-2 border-2 px-3 font-[inherit] text-sm font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-ink)] ${
+            className={`flex h-10 shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap border-2 px-3 font-[inherit] text-sm font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-ink)] ${
               isActive
-                ? "border-[var(--color-ink)] bg-[var(--color-brand)] text-[var(--color-neutral-white)]"
-                : "border-transparent bg-transparent text-[var(--color-ink)] hover:bg-[var(--color-surface-soft)]"
+                ? "border-[var(--color-ink)] bg-[var(--color-brand)] text-[var(--color-ink)]"
+                : "border-transparent bg-transparent text-[var(--color-ink)] hover:bg-[var(--color-surface-soft)] max-sm:border-[var(--color-ink)] max-sm:bg-[var(--color-surface-card)]"
             }`}
           >
             <Icon size={16} aria-hidden="true" />

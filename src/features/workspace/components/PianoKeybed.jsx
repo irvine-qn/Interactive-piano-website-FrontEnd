@@ -5,14 +5,14 @@ const PianoKeybed = ({ keyByNote, showHints, isPressed, playbackKeys = {}, onPre
   <div className="relative border-2 border-[var(--color-ink)] bg-[var(--color-piano-wood)] p-[14px]">
     <span
       aria-hidden="true"
-      className="absolute inset-x-[6px] top-[3px] h-[2px] bg-[repeating-linear-gradient(90deg,var(--color-piano-wood-grain)_0_8px,transparent_8px_16px)]"
+      className="absolute inset-x-[6px] top-[3px] h-[0.125rem] bg-[repeating-linear-gradient(90deg,var(--color-piano-wood-grain)_0_8px,transparent_8px_16px)]"
     />
-    <div className="h-[10px] border-2 border-[var(--color-ink)] bg-[var(--color-piano-felt)]" />
+    <div className="h-[0.625rem] border-2 border-[var(--color-ink)] bg-[var(--color-piano-felt)]" />
     <div
       data-keybed
       role="group"
       aria-label="Piano keyboard"
-      className="relative h-[200px] select-none border-l-[1.5px] border-[var(--color-ink)] bg-[var(--color-key-white)]"
+      className="relative h-[12.5rem] touch-none select-none [-webkit-touch-callout:none] border-l-[1.5px] border-[var(--color-ink)] bg-[var(--color-key-white)]"
     >
       {KEY_LAYOUT.map((key) => (
         <Key
@@ -26,8 +26,8 @@ const PianoKeybed = ({ keyByNote, showHints, isPressed, playbackKeys = {}, onPre
           interactive
           isPressed={isPressed(key.note)}
           playbackHand={playbackKeys[key.note]?.hand ?? null}
-          onMouseDown={onPress}
-          onMouseUp={onRelease}
+          onPress={onPress}
+          onRelease={onRelease}
         />
       ))}
     </div>

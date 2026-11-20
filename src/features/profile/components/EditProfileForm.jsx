@@ -1,7 +1,7 @@
 import { CheckSquare, Plus, Upload, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import defaultAvatar from "../../../assets/virtual-piano-assets/default-avatar.jpeg";
+import defaultAvatar from "../../../assets/virtual-piano-assets/default-avatar.webp";
 import { toImageUrl } from "../../../config/api";
 import { DISPLAY_NAME_MAX_LENGTH } from "../../../config/auth";
 import {
@@ -35,7 +35,7 @@ const DISABLED_INPUT_CLASS = `${inputClass} disabled:bg-[var(--color-surface-mut
 const SECONDARY_BUTTON_CLASS =
   "flex h-10 cursor-pointer items-center justify-center gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] px-4 font-[inherit] text-sm font-bold text-[var(--color-ink)] no-underline transition-colors hover:bg-[var(--color-surface-soft)] disabled:cursor-not-allowed disabled:opacity-60";
 const PRIMARY_BUTTON_CLASS =
-  "flex h-10 cursor-pointer items-center justify-center gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-brand)] px-4 font-[inherit] text-sm font-bold text-[var(--color-neutral-white)] transition-colors hover:bg-[var(--color-brand-strong)] disabled:cursor-not-allowed disabled:bg-[var(--color-surface-disabled)] disabled:text-[var(--color-neutral-500)] disabled:opacity-60";
+  "flex h-10 cursor-pointer items-center justify-center gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-brand)] px-4 font-[inherit] text-sm font-bold text-[var(--color-ink)] transition-colors hover:bg-[var(--color-brand-strong)] disabled:cursor-not-allowed disabled:bg-[var(--color-surface-disabled)] disabled:text-[var(--color-neutral-500)] disabled:opacity-60";
 
 const toFormValues = (user) => ({
   displayName: user.displayName ?? "",
@@ -400,7 +400,7 @@ const EditProfileFields = ({ user, onSaved, onPhotoChange }) => {
                     onClick={() => setField("level", isSelected ? "" : value)}
                     className={`h-9 cursor-pointer border-2 px-4 font-[inherit] text-sm font-bold transition-colors ${
                       isSelected
-                        ? "border-[var(--color-ink)] bg-[var(--color-brand)] text-[var(--color-neutral-white)]"
+                        ? "border-[var(--color-ink)] bg-[var(--color-brand)] text-[var(--color-ink)]"
                         : "border-transparent bg-transparent text-[var(--color-ink)] hover:bg-[var(--color-surface-soft)]"
                     }`}
                   >
@@ -443,7 +443,7 @@ const EditProfileFields = ({ user, onSaved, onPhotoChange }) => {
 
       <FormError message={error} />
 
-      <div className="flex flex-wrap items-center justify-between gap-3 border-2 border-[var(--color-ink)] bg-[var(--color-surface-soft)] px-5 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-2 border-[var(--color-ink)] bg-[var(--color-surface-soft)] px-5 py-3 max-sm:fixed max-sm:inset-x-0 max-sm:bottom-0 max-sm:z-20 max-sm:gap-2 max-sm:border-x-0 max-sm:border-b-0 max-sm:bg-[var(--color-surface-card)] max-sm:px-4">
         <p className="m-0 flex items-center gap-2 text-sm font-semibold text-[var(--color-neutral-600)]">
           {isDirty && (
             <>
@@ -452,7 +452,7 @@ const EditProfileFields = ({ user, onSaved, onPhotoChange }) => {
             </>
           )}
         </p>
-        <div className="flex gap-2">
+        <div className="flex gap-2 max-sm:w-full max-sm:[&>*]:flex-1 max-sm:[&>*]:justify-center">
           <Link to={ROUTES.PROFILE} className={SECONDARY_BUTTON_CLASS}>
             Cancel
           </Link>

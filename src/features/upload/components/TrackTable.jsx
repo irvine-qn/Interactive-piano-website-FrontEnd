@@ -6,7 +6,7 @@ const plural = (count, word) => `${count.toLocaleString('en')} ${word}${count ==
 
 const Badge = ({ tone, children }) => (
   <span
-    className={`inline-block border-[1.5px] border-solid px-1.5 py-px text-[11px] font-bold leading-4 ${
+    className={`inline-block border-[1.5px] border-solid px-1.5 py-px text-xs font-bold leading-4 ${
       tone === 'brand'
         ? 'border-[var(--color-brand-strong)] bg-[var(--color-brand-tint)] text-[var(--color-brand-deep)]'
         : 'border-[var(--color-neutral-400)] bg-[var(--color-surface-muted)] text-[var(--color-neutral-600)]'
@@ -16,7 +16,7 @@ const Badge = ({ tone, children }) => (
   </span>
 );
 
-const HEADER_CELL = 'border-0 border-b-2 border-solid border-[var(--color-ink)] px-3 py-2 text-left text-[11px] font-bold uppercase tracking-wide text-[var(--color-neutral-600)]';
+const HEADER_CELL = 'border-0 border-b-2 border-solid border-[var(--color-ink)] px-3 py-2 text-left text-xs font-bold uppercase tracking-wide text-[var(--color-neutral-600)]';
 const CELL = 'border-0 border-b border-solid border-[var(--color-line-soft)] px-3 py-2.5 text-sm text-[var(--color-ink)]';
 
 // Thẻ ② Tracks: chọn track của file MIDI (BE gợi ý sẵn, tự chọn chỉ đúng 8/9 bài mẫu nên người dùng xác nhận).
@@ -37,13 +37,13 @@ const TrackTable = ({ analysis, selectedTracks, isUpdating, error, onChange }) =
       </p>
 
       <div className="overflow-x-auto border-2 border-solid border-[var(--color-ink)]">
-        <table className="w-full min-w-[560px] border-collapse">
+        <table className="w-full min-w-[35rem] border-collapse max-sm:min-w-0">
           <thead className="bg-[var(--color-surface-soft)]">
             <tr>
               <th scope="col" className={HEADER_CELL}>Track</th>
               <th scope="col" className={HEADER_CELL}>Instrument</th>
               <th scope="col" className={`${HEADER_CELL} text-right`}>Notes</th>
-              <th scope="col" className={HEADER_CELL}>Range</th>
+              <th scope="col" className={`${HEADER_CELL} max-sm:hidden`}>Range</th>
             </tr>
           </thead>
           <tbody>
@@ -76,7 +76,7 @@ const TrackTable = ({ analysis, selectedTracks, isUpdating, error, onChange }) =
                     </span>
                   </td>
                   <td className={`${CELL} text-right tabular-nums`}>{track.noteCount.toLocaleString('en')}</td>
-                  <td className={`${CELL} whitespace-nowrap tabular-nums`}>
+                  <td className={`${CELL} whitespace-nowrap tabular-nums max-sm:hidden`}>
                     {track.minNote} – {track.maxNote}
                   </td>
                 </tr>

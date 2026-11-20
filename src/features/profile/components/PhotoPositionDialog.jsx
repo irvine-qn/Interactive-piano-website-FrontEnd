@@ -130,7 +130,7 @@ const PhotoPositionDialog = ({ kind, url, onConfirm, onCancel, onError }) => {
             type="button"
             disabled={!view}
             onClick={handleSave}
-            className={`${BUTTON_CLASS} bg-[var(--color-brand)] text-[var(--color-neutral-white)] hover:bg-[var(--color-brand-strong)] disabled:cursor-not-allowed disabled:opacity-60`}
+            className={`${BUTTON_CLASS} bg-[var(--color-brand)] text-[var(--color-ink)] hover:bg-[var(--color-brand-strong)] disabled:cursor-not-allowed disabled:opacity-60`}
           >
             Save
           </button>

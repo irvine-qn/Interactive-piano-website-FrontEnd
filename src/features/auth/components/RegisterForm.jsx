@@ -108,7 +108,7 @@ const RegisterForm = () => {
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
       <div>
-        <h2 className="m-0 text-[30px] font-extrabold text-[var(--color-ink)]">
+        <h2 className="m-0 text-[24px] font-extrabold sm:text-[30px] text-[var(--color-ink)]">
           Create account
         </h2>
         <p className="mt-2 text-sm font-medium text-[var(--color-neutral-600)]">
@@ -186,7 +186,7 @@ const RegisterForm = () => {
               {STRENGTH_BAR_COLORS.map((color, i) => (
                 <span
                   key={color}
-                  className={`h-[6px] border border-[var(--color-ink)] ${
+                  className={`h-[0.375rem] border border-[var(--color-ink)] ${
                     i < passwordScore ? color : "bg-[var(--color-line-handle)]"
                   }`}
                 />
@@ -220,7 +220,7 @@ const RegisterForm = () => {
       <button
         type="submit"
         disabled={loading}
-        className="flex h-12 cursor-pointer items-center justify-center gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-brand)] font-[inherit] text-sm font-bold text-[var(--color-neutral-white)] disabled:cursor-not-allowed disabled:bg-[var(--color-brand-light)]"
+        className="flex h-12 cursor-pointer items-center justify-center gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-brand)] font-[inherit] text-sm font-bold text-[var(--color-ink)] disabled:cursor-not-allowed disabled:bg-[var(--color-brand-light)]"
       >
         <UserPlus aria-hidden="true" className="h-4 w-4" />
         {loading ? "Creating account..." : "Create account"}
@@ -231,7 +231,7 @@ const RegisterForm = () => {
         <Link
           to={ROUTES.LOGIN}
           state={location.state}
-          className="ml-2 font-bold text-[var(--color-brand-strong)] no-underline"
+          className="ml-2 font-bold text-[var(--color-brand-deep)] no-underline"
         >
           Log in
         </Link>

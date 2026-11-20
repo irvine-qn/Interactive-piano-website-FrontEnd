@@ -1,7 +1,7 @@
 import { CircleAlert, RotateCcw, SearchX } from 'lucide-react';
 import SheetCard from './SheetCard';
 
-const GRID_CLASS = 'grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
+const GRID_CLASS = 'grid grid-cols-1 gap-4 sm:gap-7 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
 
 const SkeletonCard = () => (
   <div aria-hidden="true" className="flex flex-col border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] shadow-[var(--shadow-hard)]">
@@ -39,7 +39,7 @@ const SheetGrid = ({ sheets, status, error, onRetry, skeletonCount }) => {
         <button
           type="button"
           onClick={onRetry}
-          className="mt-2 flex h-10 cursor-pointer items-center gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-brand)] px-5 font-[inherit] text-sm font-bold text-[var(--color-neutral-white)] shadow-[var(--shadow-hard-sm)] hover:bg-[var(--color-brand-strong)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+          className="mt-2 flex h-10 cursor-pointer items-center gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-brand)] px-5 font-[inherit] text-sm font-bold text-[var(--color-ink)] shadow-[var(--shadow-hard-sm)] hover:bg-[var(--color-brand-strong)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
         >
           <RotateCcw aria-hidden="true" className="h-4 w-4" />
           Try again

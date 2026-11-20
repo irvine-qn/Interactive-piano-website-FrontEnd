@@ -59,7 +59,7 @@ const FileDropzone = ({ onFile, disabled = false }) => {
             : 'border-[var(--color-brand)] bg-[var(--color-surface-soft)]'
         }`}
       >
-        <Upload aria-hidden="true" className="h-10 w-10 text-[var(--color-brand)]" />
+        <Upload aria-hidden="true" className="h-10 w-10 text-[var(--color-brand-deep)]" />
         <p className="m-0 text-base font-bold text-[var(--color-ink)]">
           {isDragging ? 'Drop the file to analyze it' : 'Drag and drop a MIDI file here'}
         </p>

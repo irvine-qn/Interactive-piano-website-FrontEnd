@@ -5,6 +5,25 @@ Mục **Cần làm sau khi pull** là các lệnh phải chạy trên máy của
 
 ---
 
+## 2026-11-20 – Giao diện mobile, xác thực email, đặt lại mật khẩu, dọn code
+
+- **Giao diện mobile** (theo thiết kế `UI/mobile`): sửa Home, Workspace, Library, Profile, Login, Register, Forgot Password, Upload, Edit Profile. Desktop giữ nguyên. Chi tiết ở `TASK_DECOMPOSITION.md` › *Giao diện mobile (MB-xx)*.
+- **Thiết bị cảm ứng** (`pointer: coarse`): ẩn dải Shortcuts, nút Show/Hide shortcuts, Zone 1/2, nút How to play và ký tự phím tắt trên phím. *Key labels* mặc định *Note names*. Desktop vẫn hiện đủ shortcuts.
+- **Bấm phím bằng cảm ứng:** phím đàn dùng Pointer Events, giữ ngón tay thì nốt ngân, bấm được nhiều ngón cùng lúc, không bật menu chạm giữ.
+- **Workspace:**
+  - Desktop: khối Waterfall (dải Shortcuts, canvas, bàn phím) cao bằng màn hình, không phải cuộn khi chơi.
+  - Mobile: khi đang phát, khung nhìn tự dời theo nốt sắp rơi (`hooks/useFollowNotes.js`).
+  - Chế độ Play: phím cần bấm có **màu xanh lá** riêng, chỉ sáng đúng nốt của hợp âm đang chờ.
+  - Sửa lỗi: bấm phím khi bài đang dừng ở Auto Play làm bài tự chạy ngầm và phím tự sáng.
+  - Waterfall bỏ chữ tên nốt trên thanh rơi. Ô BPM không còn tràn khi đổi tốc độ. Nút *How to play* cuộn theo trang, không che Zone 2.
+- **Trang mới:** `/reset-password` và `/verify-email` (mở từ link trong email). Thêm câu thông báo cho các mã lỗi mới của Backend.
+- **API mặc định:** không đặt `VITE_API_URL` thì gọi Backend ở cùng tên máy đang mở trang, cổng 5000. Mở bằng IP mạng LAN trên điện thoại vẫn tới đúng Backend.
+- **Lint:** sửa cấu hình ESLint, hết 266 lỗi `no-unused-vars` báo sai do JSX. `npm run lint` giờ sạch.
+- **Dọn code:** xoá `playNote` (`toneEngine.js`), `getBaseBpm` (`songClock.js`), `console.log` khi tải tiếng piano; xoá ảnh không dùng `default-avatar.jpeg`, `fiano-logo.png`, `fox-mascot.png`.
+- **Bundle:** VexFlow chỉ nạp font Bravura (`vexflow/bravura`), chunk bản nhạc 984 kB còn 562 kB. Bản nhạc hiển thị không đổi.
+
+**Cần làm sau khi pull:** cập nhật Backend theo CHANGELOG của Backend (`npm install`, `npm run db:deploy`, thêm biến mới vào `.env`). Phía FE không cần chạy lệnh gì thêm. Thử trên điện thoại thì chạy `npm run dev -- --host`.
+
 ## 2026-11-07 – Profile: bài đã upload, ảnh hồ sơ, lịch sử chơi
 
 - **Tab *Uploaded sheets*:** dữ liệu thật, có tìm kiếm, lọc độ khó, *Load more*; xem, sửa, đổi Public/Private, xoá bài. Thẻ *Sheets uploaded* hiện số thật. Bỏ nút Download và phần Draft vì chưa có tính năng.

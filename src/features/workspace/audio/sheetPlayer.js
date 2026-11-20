@@ -43,10 +43,14 @@ const finishChord = (chord) => {
   applyChordOctaves(chords[chord.index + 1]);
 };
 
+const showSuggestedKeys = (chord) =>
+  useWorkspaceStore.setState({
+    playbackKeys: Object.fromEntries(requiredNotes(chord).map(({ name }) => [name, { hand: "suggest", count: 1 }])),
+  });
+
 const clearWaitingChord = () => {
   if (!waitingChord) return;
-  const store = useWorkspaceStore.getState();
-  requiredNotes(waitingChord).forEach(({ name }) => store.clearPlaybackKey(name));
+  useWorkspaceStore.setState({ playbackKeys: {} });
   const chord = waitingChord;
   waitingChord = null;
   finishChord(chord);
@@ -64,8 +68,7 @@ const handleChordReached = (time, chord) => {
   waitingChord = chord;
   waitPauseTime = time;
   Tone.Transport.pause(time);
-  const store = useWorkspaceStore.getState();
-  requiredNotes(chord).forEach(({ name, hand }) => store.setPlaybackKey(name, hand));
+  showSuggestedKeys(chord);
 };
 
 const startFromFirstChord = async () => {
@@ -75,6 +78,7 @@ const startFromFirstChord = async () => {
 };
 
 export const handleUserNote = (note) => {
+  if (useWorkspaceStore.getState().currentMode !== "PRACTICE") return;
   recentPresses.set(note, performance.now());
   const notStarted = Tone.Transport.state !== "started" && getSongTime() < START_POSITION_TOLERANCE_SECONDS;
   if (waitingChord) waitingPresses.add(note);
