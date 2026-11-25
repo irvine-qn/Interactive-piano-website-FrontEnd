@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { playNoteImmediately, stopNote, resetPlayback } from '../../piano/audio/toneEngine';
 import { setPlaybackRate as applyPlaybackRate } from '../audio/songClock';
 import { alignOctavesToTime, handleUserNote, resetWaitState } from '../audio/sheetPlayer';
+import { recordNotePress } from '../hooks/usePracticeSession';
+import { DEFAULT_KEY_LABELS } from '../config/keyLayout';
 
 export const useWorkspaceStore = create((set, get) => ({
   currentMode: 'AUTO_PLAY',
@@ -12,7 +14,7 @@ export const useWorkspaceStore = create((set, get) => ({
   isPlaying: false,
   volume: 100,
   playbackRate: 1,
-  keyLabels: 'shortcuts',
+  keyLabels: DEFAULT_KEY_LABELS,
   viewMode: 'waterfall',
   showShortcuts: true,
   duration: 250,
@@ -52,6 +54,7 @@ export const useWorkspaceStore = create((set, get) => ({
     const next = { ...pressedSources, [source]: note };
     set({ pressedSources: next, pressedKeys: [...new Set(Object.values(next))] });
     handleUserNote(note);
+    recordNotePress();
   },
 
   releaseKey: (source = 'mouse') => {

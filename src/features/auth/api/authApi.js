@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "../../../config/api";
+import apiClient from "../../../lib/axios";
 
 const BASE_URL = `${API_BASE_URL}/api/v1/auth`;
 
@@ -8,6 +9,10 @@ const ERROR_MESSAGES = {
   EMAIL_TAKEN: "This email is already in use.",
   VALIDATION_FAILED: "Some information is invalid. Please check and try again.",
   NOT_FOUND: "This feature is not available yet.",
+  EMAIL_NOT_VERIFIED: "This account's email has not been verified yet.",
+  TOO_MANY_REQUESTS: "Too many attempts. Please wait a few minutes and try again.",
+  INVALID_TOKEN: "This link is invalid or has expired.",
+  ALREADY_VERIFIED: "Your email is already verified.",
   NETWORK_ERROR: "Unable to connect to the server.",
 };
 
@@ -41,3 +46,13 @@ export const registerUser = ({ displayName, username, email, password }) =>
 
 export const forgotPassword = ({ email }) =>
   postJson("/forgot-password", { email });
+
+export const resetPassword = ({ token, password }) =>
+  postJson("/reset-password", { token, password });
+
+export const verifyEmail = ({ token }) => postJson("/verify-email", { token });
+
+export const resendVerification = () =>
+  apiClient.post("/auth/verify-email/resend").then((res) => res.data).catch((error) => {
+    throw { code: error.code, message: ERROR_MESSAGES[error.code] || error.message || DEFAULT_ERROR_MESSAGE };
+  });

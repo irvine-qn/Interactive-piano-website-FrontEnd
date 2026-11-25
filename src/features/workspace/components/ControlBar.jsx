@@ -38,7 +38,7 @@ const silenceNow = (resetKeys) => {
 };
 
 const SLIDER_CLASS =
-  'h-2 cursor-pointer appearance-none border-[1.5px] border-solid border-[var(--color-ink)] bg-[linear-gradient(to_right,var(--color-brand)_var(--fill,0%),var(--color-surface-card)_var(--fill,0%))] disabled:cursor-not-allowed disabled:opacity-50 [&::-moz-range-thumb]:h-[18px] [&::-moz-range-thumb]:w-[10px] [&::-moz-range-thumb]:rounded-none [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-[var(--color-ink)] [&::-moz-range-thumb]:bg-[var(--color-surface-card)] [&::-webkit-slider-thumb]:h-[18px] [&::-webkit-slider-thumb]:w-[10px] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-solid [&::-webkit-slider-thumb]:border-[var(--color-ink)] [&::-webkit-slider-thumb]:bg-[var(--color-surface-card)]';
+  'h-2 cursor-pointer appearance-none border-[1.5px] border-solid border-[var(--color-ink)] bg-[linear-gradient(to_right,var(--color-brand)_var(--fill,0%),var(--color-surface-card)_var(--fill,0%))] disabled:cursor-not-allowed disabled:opacity-50 [&::-moz-range-thumb]:h-[1.125rem] [&::-moz-range-thumb]:w-[0.625rem] [&::-moz-range-thumb]:rounded-none [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-[var(--color-ink)] [&::-moz-range-thumb]:bg-[var(--color-surface-card)] [&::-webkit-slider-thumb]:h-[1.125rem] [&::-webkit-slider-thumb]:w-[0.625rem] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-solid [&::-webkit-slider-thumb]:border-[var(--color-ink)] [&::-webkit-slider-thumb]:bg-[var(--color-surface-card)]';
 
 const ControlBar = () => {
   const { currentMode, setMode, isPlaying, setIsPlaying, duration, resetKeys, volume, setVolume } = useWorkspaceStore(
@@ -127,11 +127,11 @@ const ControlBar = () => {
   const VolumeIcon = volume === 0 ? VolumeX : volume < 50 ? Volume1 : Volume2;
 
   return (
-    <div className="flex w-full flex-wrap items-center gap-x-6 gap-y-3 px-5 py-4">
+    <div className="flex w-full flex-wrap items-center gap-x-6 gap-y-3 px-5 py-4 max-sm:gap-y-3 max-sm:px-3 max-sm:py-3">
       <div
         role="group"
         aria-label="Playback mode"
-        className="flex shrink-0 gap-1 border-2 border-solid border-[var(--color-ink)] bg-[var(--color-surface-soft)] p-1"
+        className="flex shrink-0 gap-1 max-sm:w-full max-sm:[&>button]:flex-1 max-sm:[&>button]:justify-center border-2 border-solid border-[var(--color-ink)] bg-[var(--color-surface-soft)] p-1"
       >
         {MODES.map(({ id, label, Icon }) => {
           const isActive = currentMode === id;
@@ -143,7 +143,7 @@ const ControlBar = () => {
               onClick={() => setMode(id)}
               className={`flex h-9 cursor-pointer items-center gap-2 border-2 border-solid px-4 font-[inherit] text-sm font-bold ${
                 isActive
-                  ? 'border-[var(--color-ink)] bg-[var(--color-brand)] text-[var(--color-neutral-white)] shadow-[var(--shadow-hard-sm)]'
+                  ? 'border-[var(--color-ink)] bg-[var(--color-brand)] text-[var(--color-ink)] shadow-[var(--shadow-hard-sm)]'
                   : 'border-transparent bg-transparent text-[var(--color-ink)] hover:bg-[var(--color-brand-tint)]'
               }`}
             >
@@ -154,7 +154,7 @@ const ControlBar = () => {
         })}
       </div>
 
-      <div className="flex min-w-[240px] flex-1 items-center gap-3">
+      <div className="flex min-w-[min(15rem,100%)] flex-1 items-center gap-3">
         <span
           ref={currentTimeRef}
           className="w-10 shrink-0 text-right text-xs font-bold tabular-nums text-[var(--color-neutral-600)]"
@@ -179,7 +179,7 @@ const ControlBar = () => {
         </span>
       </div>
 
-      <div className="flex shrink-0 flex-wrap items-center gap-4">
+      <div className="flex min-w-0 max-w-full flex-wrap items-center gap-4 max-sm:w-full max-sm:gap-2">
         <SpeedControl />
         <button
           type="button"
@@ -194,13 +194,13 @@ const ControlBar = () => {
           type="button"
           onClick={isPlaying ? handlePause : handlePlay}
           aria-label={isPlaying ? 'Pause' : 'Play'}
-          className="flex h-11 w-11 cursor-pointer items-center justify-center border-2 border-solid border-[var(--color-ink)] bg-[var(--color-brand)] p-0 text-[var(--color-neutral-white)] shadow-[var(--shadow-hard-sm)] hover:bg-[var(--color-brand-strong)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+          className="flex h-11 w-11 cursor-pointer items-center justify-center border-2 border-solid border-[var(--color-ink)] bg-[var(--color-brand)] p-0 text-[var(--color-ink)] shadow-[var(--shadow-hard-sm)] hover:bg-[var(--color-brand-strong)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
         >
           <PlayIcon aria-hidden="true" className="h-5 w-5 fill-current" />
         </button>
 
-        <div className="flex h-11 items-center gap-2 border-2 border-solid border-[var(--color-ink)] bg-[var(--color-surface-soft)] px-3">
-          <VolumeIcon aria-hidden="true" className="h-5 w-5 shrink-0 text-[var(--color-brand-strong)]" />
+        <div className="flex h-11 items-center gap-2 border-2 border-solid border-[var(--color-ink)] bg-[var(--color-surface-soft)] px-3 max-sm:basis-full">
+          <VolumeIcon aria-hidden="true" className="h-5 w-5 shrink-0 text-[var(--color-brand-deep)]" />
           <input
             type="range"
             aria-label="Volume"
@@ -211,7 +211,7 @@ const ControlBar = () => {
             value={volume}
             onChange={(e) => setVolume(Number(e.target.value))}
             style={{ '--fill': `${volume}%` }}
-            className={`${SLIDER_CLASS} w-24`}
+            className={`${SLIDER_CLASS} w-24 max-sm:w-auto max-sm:min-w-0 max-sm:flex-1`}
           />
         </div>
       </div>

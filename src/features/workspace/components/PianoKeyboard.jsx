@@ -25,13 +25,13 @@ const PianoKeyboard = () => {
   useKeyboardInput({ noteByCode, handByCode, chordKeys, pressKey, releaseKey, moveZone });
   useMidiInput({ pressKey, releaseKey });
 
-  const pressWithMouse = useCallback((note) => pressKey(note, 'mouse'), [pressKey]);
-  const releaseMouse = useCallback(() => releaseKey('mouse'), [releaseKey]);
+  const pressWithMouse = useCallback((note, source = 'mouse') => pressKey(note, source), [pressKey]);
+  const releaseMouse = useCallback((source = 'mouse') => releaseKey(source), [releaseKey]);
 
   return (
     <>
       {mappingStatus === 'error' && (
-        <p role="alert" className="m-0 mb-2 flex items-center gap-3 text-sm font-semibold text-[var(--color-danger)]">
+        <p role="alert" className="m-0 mb-2 flex items-center pointer-coarse:hidden! gap-3 text-sm font-semibold text-[var(--color-danger)]">
           Keyboard shortcuts are unavailable (could not load the key map). You can still play with the mouse.
           <button
             type="button"

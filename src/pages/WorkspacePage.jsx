@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { ROUTES } from "../config/routes";
 import { useShallow } from "zustand/react/shallow";
 import { useWorkspaceStore } from "../features/workspace/store/useWorkspaceStore";
 import PianoKeyboard from "../features/workspace/components/PianoKeyboard";
@@ -12,8 +13,12 @@ import ShortcutToggle from "../features/workspace/components/ShortcutToggle";
 import ViewModeToggle from "../features/workspace/components/ViewModeToggle";
 import WaterfallCanvas from "../features/workspace/canvas/practiceWaterfall";
 import { useSheetLoader } from "../features/workspace/hooks/useSheetLoader";
+import { usePracticeSession } from "../features/workspace/hooks/usePracticeSession";
+import { useFollowNotes } from "../features/workspace/hooks/useFollowNotes";
 import Footer from "../components/common/footer";
 import HowToPlay from "../features/home/components/HowToPlay";
+import OctaveNavigator from "../features/home/components/OctaveNavigator";
+import { MIN_VIEW_OCTAVE, useOctaveView } from "../hooks/useOctaveView";
 
 const SheetMusicScore = lazy(() => import("../features/workspace/canvas/sheetMusicScore"));
 
@@ -21,7 +26,7 @@ const CARD_CLASS =
   "border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] shadow-[var(--shadow-hard)]";
 
 const WorkspacePage = () => {
-  const { sheet, sheetStatus, sheetError, viewMode, keyLabels, setKeyLabels, handOctaves, moveHandOctave, showShortcuts, currentMode } = useWorkspaceStore(
+  const { sheet, sheetStatus, sheetError, viewMode, keyLabels, setKeyLabels, handOctaves, moveHandOctave, showShortcuts, currentMode, isPlaying } = useWorkspaceStore(
     useShallow((state) => ({
       sheet: state.sheet,
       sheetStatus: state.sheetStatus,
@@ -29,6 +34,7 @@ const WorkspacePage = () => {
       viewMode: state.viewMode,
       showShortcuts: state.showShortcuts,
       currentMode: state.currentMode,
+      isPlaying: state.isPlaying,
       keyLabels: state.keyLabels,
       setKeyLabels: state.setKeyLabels,
       handOctaves: state.handOctaves,
@@ -38,33 +44,46 @@ const WorkspacePage = () => {
   const isSheetView = viewMode === "sheet";
   const { sheetId } = useParams();
   const reloadSheet = useSheetLoader(sheetId);
+  usePracticeSession(sheetId);
+  const { view, viewOctave, maxViewOctave, moveView, setViewOctave, renderInView } = useOctaveView({ portrait: 3, landscape: 2 });
+  useFollowNotes({ notes: sheet?.notes, isPlaying, view, viewOctave, setViewOctave });
 
   return (
     <div className="flex flex-1 flex-col">
-      <main className="mx-auto flex w-full max-w-[1600px] flex-1 flex-col gap-6 px-4 pb-14 pt-10">
+      <main className="mx-auto flex w-full max-w-[100rem] flex-1 flex-col gap-4 px-4 pb-14 pt-6 sm:gap-6 sm:pt-10 lg:gap-3 lg:pt-3">
         <section aria-label="Sheet information" className={`${CARD_CLASS} px-5 py-4`}>
-          <SheetInfoPanel sheet={sheet} status={sheetStatus} />
+          <SheetInfoPanel sheet={sheet} status={sheetStatus} notFound={sheetError?.code === "SHEET_NOT_FOUND"} />
         </section>
 
         <section aria-label="Playback controls" className={CARD_CLASS}>
           <ControlBar />
         </section>
 
-        <section aria-label="Waterfall and piano" className={CARD_CLASS}>
+        <section aria-label="Waterfall and piano" className={`${CARD_CLASS} lg:flex lg:h-[calc(100dvh-5.5rem)] lg:min-h-[34rem] lg:scroll-mt-[4.75rem] lg:flex-col`}>
           <header className="flex flex-wrap items-center gap-3 border-0 border-b-2 border-solid border-[var(--color-ink)] bg-[var(--color-surface-soft)] px-5 py-2">
             <span aria-hidden="true" className="h-3 w-3 border-2 border-[var(--color-ink)] bg-[var(--color-brand)]" />
             <h2 className="m-0 text-sm font-bold uppercase tracking-wide text-[var(--color-ink)]">{isSheetView ? "Sheet music" : "Waterfall"}</h2>
-            <div className="ml-auto flex flex-wrap items-center gap-x-6 gap-y-2">
+            <div className="ml-auto flex min-w-0 max-w-full flex-wrap items-center gap-x-6 gap-y-2 max-md:ml-0 max-md:w-full max-md:gap-x-2 max-md:portrait:[&>button]:w-full max-md:portrait:[&>button]:justify-center max-md:portrait:[&_label]:w-full max-md:portrait:[&_label>span:last-child]:flex-1 max-md:portrait:[&_select]:w-full">
               <ViewModeToggle />
-              <ShortcutToggle />
-              <KeyLabelSelect value={keyLabels} onChange={setKeyLabels} />
-              <OctaveShiftControl handOctaves={handOctaves} onMove={moveHandOctave} automatic={currentMode === "PRACTICE"} />
+              <div className="contents pointer-coarse:hidden!">
+                <ShortcutToggle />
+              </div>
+              <div className="contents pointer-coarse:hidden!">
+                <KeyLabelSelect value={keyLabels} onChange={setKeyLabels} />
+              </div>
+              <div className="contents pointer-coarse:hidden!">
+                <OctaveShiftControl handOctaves={handOctaves} onMove={moveHandOctave} automatic={currentMode === "PRACTICE"} />
+              </div>
             </div>
           </header>
 
-          <div className="flex flex-col p-[14px]">
-            {showShortcuts && <ShortcutStrip />}
-            <div className="relative h-[clamp(260px,calc(100dvh-360px),440px)] w-full overflow-hidden border-2 border-[var(--color-ink)] bg-[var(--color-surface-paper)]">
+          <div className="flex flex-col p-[14px] max-md:portrait:p-2 lg:min-h-0 lg:flex-1">
+            {showShortcuts && (
+              <div className="pointer-coarse:hidden!">
+                <ShortcutStrip />
+              </div>
+            )}
+            <div className="relative h-[clamp(16.25rem,calc(100dvh-22.5rem),27.5rem)] w-full max-md:portrait:h-[clamp(14rem,38dvh,20rem)] lg:h-auto lg:min-h-[6rem] lg:flex-1 overflow-hidden border-2 border-[var(--color-ink)] bg-[var(--color-surface-paper)]">
               {isSheetView ? (
                 <Suspense fallback={null}>
                   <SheetMusicScore />
@@ -77,13 +96,28 @@ const WorkspacePage = () => {
                   Loading sheet...
                 </div>
               )}
-              {sheetStatus === "error" && (
+              {sheetStatus === "error" && sheetError?.code === "SHEET_NOT_FOUND" && (
+                // E-02: bài không tồn tại hoặc là bài PRIVATE của người khác (BE trả 404 giống nhau). Thử lại cũng vô ích.
+                <div role="alert" className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-4 text-center">
+                  <p className="m-0 text-base font-bold text-[var(--color-ink)]">We couldn&apos;t find this sheet.</p>
+                  <p className="m-0 max-w-md text-sm font-medium text-[var(--color-neutral-600)]">
+                    The link may be wrong, the sheet may have been deleted, or it is a private sheet that only its uploader can see.
+                  </p>
+                  <Link
+                    to={ROUTES.LIBRARY}
+                    className="flex h-10 items-center border-2 border-[var(--color-ink)] bg-[var(--color-brand)] px-5 text-sm font-bold text-[var(--color-ink)] no-underline shadow-[var(--shadow-hard-sm)] hover:bg-[var(--color-brand-strong)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+                  >
+                    Back to Sheet Library
+                  </Link>
+                </div>
+              )}
+              {sheetStatus === "error" && sheetError?.code !== "SHEET_NOT_FOUND" && (
                 <div role="alert" className="absolute inset-0 flex flex-col items-center justify-center gap-3 px-4 text-center">
                   <p className="m-0 text-sm font-bold text-[var(--color-danger)]">{sheetError?.message}</p>
                   <button
                     type="button"
                     onClick={reloadSheet}
-                    className="flex h-10 cursor-pointer items-center border-2 border-[var(--color-ink)] bg-[var(--color-brand)] px-5 font-[inherit] text-sm font-bold text-[var(--color-neutral-white)] shadow-[var(--shadow-hard-sm)] hover:bg-[var(--color-brand-strong)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+                    className="flex h-10 cursor-pointer items-center border-2 border-[var(--color-ink)] bg-[var(--color-brand)] px-5 font-[inherit] text-sm font-bold text-[var(--color-ink)] shadow-[var(--shadow-hard-sm)] hover:bg-[var(--color-brand-strong)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
                   >
                     Try again
                   </button>
@@ -91,8 +125,19 @@ const WorkspacePage = () => {
               )}
             </div>
 
-            <div className="w-full shrink-0">
-              <PianoKeyboard />
+            {view && !isSheetView && (
+              <div className="my-3">
+                <OctaveNavigator
+                  startOctave={viewOctave}
+                  octaves={view.octaves}
+                  minOctave={MIN_VIEW_OCTAVE}
+                  maxOctave={maxViewOctave}
+                  onMove={moveView}
+                />
+              </div>
+            )}
+            <div className="w-full shrink-0 lg:[&_[data-keybed]]:h-[clamp(6.5rem,16dvh,11rem)]">
+              {renderInView(<PianoKeyboard />, { framed: true })}
             </div>
           </div>
         </section>

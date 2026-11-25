@@ -18,7 +18,7 @@ const Column = memo(({ chord, moves }) => (
     data-chord={chord.index}
     className="flex w-6 shrink-0 flex-col items-center border-0 border-r border-solid border-[var(--color-line-disabled)] py-0.5 text-xs font-bold text-[var(--color-ink)] data-[active]:bg-[var(--color-brand-tint)]"
   >
-    <span aria-label="Move zones" className="h-4 whitespace-nowrap text-[10px] leading-4 tracking-tighter text-[var(--color-brand-strong)]">
+    <span aria-label="Move zones" className="h-4 whitespace-nowrap text-xs leading-4 tracking-tighter text-[var(--color-brand-deep)]">
       {moveArrows(moves, 'left')}
       {moveArrows(moves, 'right')}
     </span>

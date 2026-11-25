@@ -39,7 +39,7 @@ const Pagination = ({ page, totalPages, onChange }) => (
               onClick={() => item !== page && onChange(item)}
               className={`${BUTTON_CLASS} ${
                 item === page
-                  ? 'bg-[var(--color-brand)] text-[var(--color-neutral-white)] shadow-[var(--shadow-hard-sm)]'
+                  ? 'bg-[var(--color-brand)] text-[var(--color-ink)] shadow-[var(--shadow-hard-sm)]'
                   : IDLE_CLASS
               }`}
             >

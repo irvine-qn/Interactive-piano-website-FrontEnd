@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Mail } from "lucide-react";
+import { ArrowLeft, Mail } from "lucide-react";
 import { forgotPassword } from "../api/authApi";
 import { ROUTES } from "../../../config/routes";
 import { EMAIL_REGEX } from "../../../config/auth";
 import { FieldLabel, FormError, inputClass } from "./AuthFormFields";
 
-const linkClass = "font-bold text-[var(--color-brand-strong)] no-underline";
+const linkClass = "font-bold text-[var(--color-brand-deep)] no-underline";
 
 const ForgotPasswordForm = () => {
   const [email, setEmail] = useState("");
@@ -37,14 +37,15 @@ const ForgotPasswordForm = () => {
   if (success) {
     return (
       <div className="flex flex-col gap-5">
-        <h2 className="m-0 text-[30px] font-extrabold text-[var(--color-ink)]">Check your inbox</h2>
+        <h2 className="m-0 text-[24px] font-extrabold sm:text-[30px] text-[var(--color-ink)]">Check your inbox</h2>
         <p
           role="status"
           className="m-0 border-2 border-[var(--color-success-border)] bg-[var(--color-success-banner)] px-4 py-3 text-sm font-semibold text-[var(--color-success-deep)]"
         >
           We've sent you a password reset email. Please check your inbox.
         </p>
-        <Link to={ROUTES.LOGIN} className={`text-center text-sm ${linkClass}`}>
+        <Link to={ROUTES.LOGIN} className={`inline-flex items-center justify-center gap-1.5 text-center text-sm ${linkClass}`}>
+          <ArrowLeft size={16} aria-hidden="true" />
           Back to log in
         </Link>
       </div>
@@ -54,7 +55,7 @@ const ForgotPasswordForm = () => {
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
       <div>
-        <h2 className="m-0 text-[30px] font-extrabold text-[var(--color-ink)]">Forgot password</h2>
+        <h2 className="m-0 text-[24px] font-extrabold sm:text-[30px] text-[var(--color-ink)]">Forgot password</h2>
         <p className="mt-2 text-sm font-medium text-[var(--color-neutral-600)]">
           Enter your account email to receive a password reset link.
         </p>
@@ -79,14 +80,15 @@ const ForgotPasswordForm = () => {
       <button
         type="submit"
         disabled={loading}
-        className="flex h-12 cursor-pointer items-center justify-center gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-brand)] font-[inherit] text-sm font-bold text-[var(--color-neutral-white)] disabled:cursor-not-allowed disabled:bg-[var(--color-brand-light)]"
+        className="flex h-12 cursor-pointer items-center justify-center gap-2 border-2 border-[var(--color-ink)] bg-[var(--color-brand)] font-[inherit] text-sm font-bold text-[var(--color-ink)] disabled:cursor-not-allowed disabled:bg-[var(--color-brand-light)]"
       >
         <Mail aria-hidden="true" className="h-4 w-4" />
         {loading ? "Sending..." : "Send reset link"}
       </button>
 
       <p className="m-0 text-center text-sm">
-        <Link to={ROUTES.LOGIN} className={linkClass}>
+        <Link to={ROUTES.LOGIN} className={`inline-flex items-center gap-1.5 ${linkClass}`}>
+          <ArrowLeft size={16} aria-hidden="true" />
           Back to log in
         </Link>
       </p>

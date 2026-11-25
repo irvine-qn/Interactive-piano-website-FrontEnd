@@ -9,7 +9,7 @@ const MARKDOWN_COMPONENTS = {
     <h1 className="m-0 pr-10 text-[26px] font-extrabold text-[var(--color-ink)]">{children}</h1>
   ),
   h2: ({ children }) => (
-    <h2 className="mb-2 mt-6 text-xl font-bold text-[var(--color-brand-strong)]">{children}</h2>
+    <h2 className="mb-2 mt-6 text-xl font-bold text-[var(--color-brand-deep)]">{children}</h2>
   ),
   h3: ({ children }) => (
     <h3 className="mb-2 mt-4 text-base font-bold text-[var(--color-ink)]">{children}</h3>
@@ -30,7 +30,7 @@ const HowToPlay = () => {
       <button
         type="button"
         onClick={() => dialogRef.current.showModal()}
-        className="fixed right-4 top-[100px] z-30 flex h-8 cursor-pointer items-center gap-2 border-2 border-solid border-[var(--color-ink)] bg-[var(--color-surface-card)] px-3 font-[inherit] text-sm font-bold text-[var(--color-brand-strong)] shadow-[var(--shadow-hard-sm)] hover:bg-[var(--color-brand-tint)]"
+        className="pointer-coarse:hidden! absolute right-4 top-[calc(4rem+0.75rem)] z-10 max-md:portrait:bottom-4 max-md:portrait:top-auto max-lg:landscape:right-6 max-lg:landscape:top-[4.75rem] max-lg:landscape:h-7 max-lg:landscape:text-xs flex h-8 cursor-pointer items-center gap-2 border-2 border-solid border-[var(--color-ink)] bg-[var(--color-brand-deep)] px-3 font-[inherit] text-sm font-bold text-[var(--color-neutral-white)] shadow-[var(--shadow-hard-sm)] hover:bg-[var(--color-brand-strong)]"
       >
         <CircleHelp aria-hidden="true" className="h-4 w-4" />
         How to play

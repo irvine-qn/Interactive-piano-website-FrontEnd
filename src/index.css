@@ -1,4 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss/theme.css";
 @import "tailwindcss/utilities.css";
 
@@ -41,9 +40,9 @@
   --color-neutral-700: #4b5563;       /* Noi dung phu dam */
   --color-neutral-600: #5b6476;       /* Chu phu chinh */
   --color-neutral-500: #6b7280;       /* Bieu tuong va nghe si */
-  --color-neutral-450: #7a8299;       /* Ten tac gia */
-  --color-neutral-400: #8a94a6;       /* Goi y va thong tin phu */
-  --color-neutral-350: #9aa3b2;       /* Chu cho tim kiem */
+  --color-neutral-450: #5d6680;       /* Ten tac gia */
+  --color-neutral-400: #5f6b7e;       /* Goi y va thong tin phu */
+  --color-neutral-350: #687285;       /* Chu cho tim kiem */
   --color-neutral-300: #a9b0be;       /* Chu cho nhap lieu */
   --color-neutral-250: #b8bfcc;       /* Dau ngan cach */
   --color-neutral-200: #b9b0a0;       /* Bieu tuong trang trong */
@@ -174,6 +173,13 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  font-size: 16px;
+}
+
+@media (min-width: 1280px) {
+  html {
+    font-size: min(calc(100vw / 90), 24px);
+  }
 }
 
 body {

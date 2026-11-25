@@ -1,12 +1,8 @@
 import sheetCoverDots from '../../../assets/virtual-piano-assets/sheet-cover-dots.svg';
 import { DIFFICULTY_META } from '../config/difficulty';
+import { COVER_BG } from '../config/cover';
+import PrivateBadge from './PrivateBadge';
 
-const COVER_BG = {
-  yellow: 'bg-[var(--color-pastel-yellow)]',
-  pink: 'bg-[var(--color-pastel-pink)]',
-  mint: 'bg-[var(--color-pastel-mint)]',
-  lavender: 'bg-[var(--color-pastel-lavender)]',
-};
 
 const createRandom = (seedText) => {
   let seed = [...seedText].reduce((hash, char) => (hash * 31 + char.charCodeAt(0)) | 0, 7);
@@ -118,18 +114,18 @@ const DifficultyBadge = ({ difficulty }) => {
   const meta = DIFFICULTY_META[difficulty];
   if (!meta) return null;
   return (
-    <span className={`flex items-center gap-1.5 border-[1.5px] border-[var(--color-ink)] px-2 py-0.5 text-[11px] font-bold ${meta.badgeClass}`}>
+    <span className={`flex items-center gap-1.5 border-[1.5px] border-[var(--color-ink)] px-2 py-0.5 text-xs font-bold ${meta.badgeClass}`}>
       <span aria-hidden="true" className={`h-1.5 w-1.5 ${meta.dotClass}`} />
       {meta.label}
     </span>
   );
 };
 
-const SheetCover = ({ sheet }) => {
+const SheetCover = ({ sheet, className = '' }) => {
   const { tilt, staves } = buildCoverArt(sheet.id);
 
   return (
-    <div className={`relative aspect-[8/5] w-full overflow-hidden ${COVER_BG[sheet.coverColor] ?? COVER_BG.yellow}`}>
+    <div className={`relative aspect-[8/5] w-full overflow-hidden ${className} ${COVER_BG[sheet.coverColor] ?? COVER_BG.yellow}`}>
       <div
         aria-hidden="true"
         className="absolute inset-0"
@@ -137,7 +133,7 @@ const SheetCover = ({ sheet }) => {
       />
 
       <div
-        className="absolute left-1/2 top-[52%] w-[70%] border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] shadow-[var(--shadow-hard)]"
+        className="absolute left-1/2 top-[52%] w-[70%] max-sm:w-[88%] border-2 border-[var(--color-ink)] bg-[var(--color-surface-card)] shadow-[var(--shadow-hard)]"
         style={{ transform: `translate(-50%, -50%) rotate(${tilt}deg)` }}
       >
         <svg aria-hidden="true" viewBox="0 0 320 220" className="block w-full" stroke="var(--color-ink)" fill="var(--color-ink)">
@@ -152,9 +148,13 @@ const SheetCover = ({ sheet }) => {
       <div className="absolute left-2.5 top-2.5">
         <DifficultyBadge difficulty={sheet.difficulty} />
       </div>
-      <span className="absolute right-2.5 top-2.5 border-[1.5px] border-[var(--color-ink)] bg-[var(--color-surface-card)] px-2 py-0.5 text-[11px] font-bold text-[var(--color-brand-strong)]">
-        MIDI
-      </span>
+      <div className="absolute right-2.5 top-2.5 flex gap-1.5 max-sm:hidden">
+        {/* Bài upload chỉ mình thấy (U-FE-10) */}
+        {sheet.visibility === 'PRIVATE' && <PrivateBadge />}
+        <span className="border-[1.5px] border-[var(--color-ink)] bg-[var(--color-surface-card)] px-2 py-0.5 text-xs font-bold text-[var(--color-brand-deep)]">
+          MIDI
+        </span>
+      </div>
     </div>
   );
 };

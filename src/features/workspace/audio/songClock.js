@@ -31,4 +31,3 @@ export const setPlaybackRate = (rate) => {
   playbackRate = rate;
   Tone.Transport.bpm.value = baseBpm * rate;
 };
-export const getBaseBpm = () => baseBpm;
