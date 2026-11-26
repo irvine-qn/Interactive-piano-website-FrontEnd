@@ -1,0 +1,12 @@
+// Cấu hình deploy Frontend lên Cloudflare Workers (Static Assets).
+// Workers Builds chạy `npm run build` rồi `npx wrangler deploy`; file trong dist/ được phục vụ miễn phí.
+// VITE_API_URL đặt ở mục Build variables trên Cloudflare (Vite gắn vào code lúc build), không đặt ở đây.
+{
+  "name": "fiano",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    // Đường dẫn không khớp file nào (vd /library, /workspace/fur-elise) trả về index.html cho React Router
+    "not_found_handling": "single-page-application"
+  }
+}

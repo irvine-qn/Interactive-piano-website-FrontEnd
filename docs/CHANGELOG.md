@@ -5,6 +5,14 @@ Mục **Cần làm sau khi pull** là các lệnh phải chạy trên máy của
 
 ---
 
+## 2026-11-26 – Chuẩn bị deploy lên Cloudflare Workers
+
+- Thêm `wrangler.jsonc`: deploy thư mục `dist/` lên Cloudflare Workers (Static Assets), mọi đường dẫn của React Router trả `index.html`.
+- `.gitignore` bỏ qua thư mục `.wrangler/`.
+- Backend thêm biến `CORS_ORIGIN`, `TRUST_PROXY`, `RESEND_API_KEY` (xem CHANGELOG của Backend).
+
+**Cần làm sau khi pull:** không có. `npm run dev` và `npm run build` không đổi.
+
 ## 2026-11-20 – Giao diện mobile, xác thực email, đặt lại mật khẩu, dọn code
 
 - **Giao diện mobile** (theo thiết kế `UI/mobile`): sửa Home, Workspace, Library, Profile, Login, Register, Forgot Password, Upload, Edit Profile. Desktop giữ nguyên. Chi tiết ở `TASK_DECOMPOSITION.md` › *Giao diện mobile (MB-xx)*.
