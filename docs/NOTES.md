@@ -111,7 +111,14 @@ Hướng dẫn cài đặt, cấu trúc thư mục, routes và quy ước Tailwi
 - **Kết quả đánh giá code (2026-11-07):** AU-01 → AU-17 trong `TASK_DECOMPOSITION.md`. **Chưa nên deploy công khai** khi chưa xong nhóm 1. AU-01 (quên mật khẩu) và AU-07 (xác thực email) đã xong ngày 2026-11-20.
 - **Giao diện mobile:** đã sửa đủ 11 trang theo thiết kế (MB-xx). Còn các tính năng chỉ có trong thiết kế (Playlist, Export, Chia sẻ, Lưu nháp, thanh độ mạnh mật khẩu...) và footer theo thiết kế: chờ quyết định.
 - **Chưa có nút gửi lại email xác thực trên giao diện** (API `POST /auth/verify-email/resend` đã có). Tài khoản cũ chưa xác thực thì chưa dùng được Quên mật khẩu.
-- Security: còn AU-04 → AU-06.
+- Security: còn AU-04, AU-06; AU-05 mới có giới hạn CORS.
+
+## 5b. Production (Cloudflare Workers)
+
+- **Merge vào `main` là deploy.** Cloudflare Workers Builds chạy `npm run build` rồi `npx wrangler deploy` theo `wrangler.jsonc`.
+- **`VITE_API_URL` đặt ở mục *Build variables*** trên Cloudflare, không phải biến runtime: Vite gắn giá trị vào code lúc build. Đổi URL Backend thì phải build lại.
+- `wrangler.jsonc` bật `not_found_handling: "single-page-application"`: mọi đường dẫn không phải file đều trả `index.html` cho React Router. Đừng thêm `public/404.html`.
+- Domain Frontend mới (vd thêm `www`) thì thêm vào `CORS_ORIGIN` của Backend, nếu không trình duyệt chặn request.
 - Test component FE: chưa viết.
 
 ## 6. Kiểm tra trước khi tạo PR
